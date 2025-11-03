@@ -67,9 +67,9 @@ def get_program_arguments() -> ProgramArguments:
 
 def _generate_argparse_parser() -> argparse.ArgumentParser:
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
-        prog="BioSimulators Tool, Abstraction, Node, & Dependency Resolver (BStandr)",
-        description="""BioSimulators project designed to help users resolve any abstract or missing components,
-                and/or creating a containerized environment to repeatedly run the provided experiment""",
+        prog="BioSimulators Experiment Description Implementation Compiler (BSedic)",
+        description="""BSedic is a BioSimulators project designed to allow users to transform their
+biological experiments written in Sed into Process-Bigraph simulations.""",
     )
     parser.add_argument("input_file_path", type=str)  # positional argument
     parser.add_argument(

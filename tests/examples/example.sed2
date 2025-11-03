@@ -17,7 +17,7 @@ example = {
         'my-special-simulation': {
             'type': 'step',
             'address': 'UniformTimeCourse'}}}
-            
+
 
 
 # take these two values and combine them

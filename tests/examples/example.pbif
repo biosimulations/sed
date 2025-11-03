@@ -48,6 +48,6 @@ SBML_NSODE_UTC_simulation_schema = {
                 '_type': 'array',
                 '_shape': [4, 21],
                 '_data': 'float64'}}}}
-            
-            
+
+
 SBML_NSODE_UTC_simulation_state = {}
