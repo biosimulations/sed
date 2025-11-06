@@ -1,0 +1,56 @@
+example = {
+    'data': {
+        'file_path': 'string',
+        'model_representation': 'concentrations',
+        'utc_arguments': 'utc_arguments',
+        'metadata': 'metadata',
+        'numerical_data': {
+            '_type': 'array',
+            '_shape': [4, 21],
+            '_data': 'float64'}},
+
+    'algorithms': {
+        'sbml_load': {
+            'type': 'step',
+            'address': 'LoadData'},
+
+        'my-special-simulation': {
+            'type': 'step',
+            'address': 'UniformTimeCourse'}}}
+            
+
+
+# take these two values and combine them
+# to create a pbif (!)
+
+substitutions = {
+    'ODE_UniformTimeCourse': 'copasi:0.3.5'}
+
+
+sed_example = {
+    "mod1": {
+	type: model
+	location: "path/to/my/model.xml"
+	language: "urn:sedml:language:sbml"},
+    "sim1" {
+	type: ODE_UniformTimeCourse,
+	initial_time: 0,
+	start_time: 0,
+	end_time: 50,
+	nsteps: 100,
+	outputs: ["time", "S1", "S2", "comp1"]},
+    "task1": {
+	type: task
+	model: "mod1"
+	simulation: "sim1"},
+    "S1_conc": {
+	type: dataGenerator
+	input: ["task1": "S1"]
+	operation: input / ["task1": "comp1"]},
+"report1": {
+	type: report
+	outputs: ["task1": "time", "S1_conc", "task1": "S2"]
+	filename: "my_sim.csv"
+	file_format: CSV
+}
+}

@@ -1,0 +1,53 @@
+
+
+
+# ===============================
+# type declarations
+
+concentrations = {
+    'concentrations': 'map[float]'}
+
+utc_arguments = {
+    'initial_time': 'float',
+    'start_time': 'float',
+    'end_time': 'float',
+    'step_count': 'integer',
+    'output_ids': 'list[string]'}
+
+metadata = {
+    'name': 'string',
+    'time': 'datetime',
+    'version': 'string',
+    'data': 'any'}
+
+# =====================================
+
+SBML_NSODE_UTC_simulation_schema = {
+    'file_path': 'string',
+    'model_representation': 'concentrations',
+    'utc_arguments': 'utc_arguments',
+    'metadata': 'metadata',
+    'numerical_data': {
+        '_type': 'array',
+        '_shape': [4, 21],
+        '_data': 'float64'},
+    'sbml_load': {
+        '_type': 'step',
+        '_inputs': {
+            'file_path': 'string'},
+        '_outputs': {
+            'model_representation': 'concentrations'}},
+    'ns-ode-utc-sim': {
+        '_type': 'step',
+        '_inputs': {
+            'model_representation': 'concentrations',
+            'utc_arguments': 'utc_arguments'},
+        '_outputs': {
+            'metadata': 'metadata',
+            'numerical_data': {
+                '_type': 'array',
+                '_shape': [4, 21],
+                '_data': 'float64'}}}}
+            
+            
+SBML_NSODE_UTC_simulation_state = {}
