@@ -1,0 +1,134 @@
+{
+    'ontology': 'http://www.biomodels.net/kisao',
+
+    # High level overview, and execute tasks in order based on dependencies
+    'tasks': {
+        'Sim1Mod1': {
+            _type: "simulate",
+            model: "model1",
+            simulation: "plant-cell",
+            report: "csvReport"
+        },
+        'Sim2Mod1': {
+            _type: "simulate",
+            model: "model1",
+            simulation: "sim2",
+            report: "zarrReport"
+        },
+        'CompareSim1Sim2': {
+            _type: 'algorithm',
+            algorithm: "comparison",
+            report: "comparisonReport"
+        }
+    },
+
+    # Description of environment
+    'models': {
+        'plant-cell': {
+            _type: "KISAO#KISAO_0000015"
+            location: "path/to/my/model.xml"
+            language: "urn:sedml:language:sbml"
+        },
+        'plant-root': {
+            _type: "KISAO#KISAO_0000015"
+            location: "path/to/my/model.xml"
+            language: "urn:sedml:language:sbml"
+        }
+    },
+
+    # Configuration of environment, ready to be executed
+    'simulations': {
+        '': {
+            _type: "KISAO#KISAO_0000019",
+            arguments: {
+                initial_time: 0,
+                start_time: 0,
+                end_time: 50,
+                nsteps: 100,
+            },
+            pre-processor: [],
+            post-processor: []
+        },
+        'sim2': {
+            _type: "KISAO#KISAO_0000019",
+            arguments: {
+                initial_time: 0,
+                start_time: 0,
+                end_time: 50,
+                nsteps: 100,
+            },
+        }
+    },
+
+    # Various steps which can be computed
+    "algorithms": {
+        "sim1sim2Compare": {
+            _type: "comparison",
+            arguments: {
+                compareFunction: "difference"
+            }
+        }
+    }
+
+    # File output at the end, each report gives a standard set of metadata embedded in it's file format
+    'reports': {
+        "csvReport": {
+            _type: "tabular"
+            outputs: ["task1": "time", "S1_conc", "task1": "S2"]
+            filename: "my_sim.csv"
+            file_format: CSV
+        },
+        "zarrReport": {
+            _type: "binary",
+            outputs: ["task1": "time", "S1_conc", "task1": "S2"],
+            filename: "sim.zar",
+            file_format: "ZARR"
+        },
+        "comparisonReport": {
+            _type: "tabular",
+            outputs: ["task1": "time", "S1_conc", "task1": "S1"],
+            filename: "comparison.csv",
+            file_format: "CSV"
+        },
+        "visualization": {
+            _type: "image",
+            filename: "results.png",
+            outputs: ["S1_conc"]
+            file_format: "PNG"
+        }
+    }
+
+
+    'co-simulate': {
+        'plant-tissue': {
+            _type: "co",
+            shared_dependencies: {
+                "co2",
+                "h20"
+            }
+            simulations: [
+                {
+                    "name": "thyloid",
+                    "_type": "KISAO#KISAO_0000019",
+                    "arguments": {},
+                    "shared_input": {}
+                },
+                {
+                    "name": "cell_wall",
+                    "_type": "KISAO#KISAO_0000019",
+                    "arguments": {},
+                    "shared_input": {},
+                    "pre-processor": {},
+                    "post-processor": {}
+                },
+                {
+                    "name": "stoma",
+                    "_type": "KISAO#KISAO_0000019",
+                    "arguments": {},
+                    "pre-processor": {},
+                    "post-processor": {}
+                }
+            ]
+        }
+    }
+}
