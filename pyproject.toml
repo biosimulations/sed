@@ -18,6 +18,7 @@ classifiers = [
 dependencies = [
     "jinja2>=3.1.6",
     "pandas>=2.3.3",
+    "polars>=1.35.2",
     "process-bigraph>=0.0.46",
     "pydantic>=2.12.3",
     "python-libsbml>=5.20.5",
@@ -42,6 +43,8 @@ dev = [
     "mkdocs>=1.4.2",
     "mkdocs-material>=8.5.10",
     "mkdocstrings[python]>=0.26.1",
+    "tellurium>=2.2.11.1",
+    "biocompose",
 ]
 
 [build-system]
@@ -121,3 +124,6 @@ skip_empty = true
 [tool.coverage.run]
 branch = true
 source = ["bsedic"]
+
+[tool.uv.sources]
+biocompose = { git = "https://github.com/vivarium-collective/biocompose", rev = "numerical-types" }

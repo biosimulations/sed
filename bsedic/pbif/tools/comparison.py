@@ -1,4 +1,7 @@
+from typing import Any
+
 import numpy as np
+import polars
 from process_bigraph import Step
 
 from bsedic.pbif.tools.stats import mean_squared_error_dict
@@ -7,6 +10,7 @@ from bsedic.pbif.tools.stats import mean_squared_error_dict
 class ComparisonTool(Step):
     config_schema = {
         'ignore_nans': "boolean",
+        'columns_of_interest': "list[string]",
     }
     def inputs(self):
         return {
@@ -27,8 +31,8 @@ class ComparisonTool(Step):
 
 
 class MSEComparison(ComparisonTool):
-    def update(self, inputs):
-        results_map = inputs.get("results", {})
+    def update(self, state: dict[str, Any], interval=None) -> dict[str, Any]:
+        results_map = state.get("results", {})
         if not isinstance(results_map, dict) or len(results_map) < 2:
             raise ValueError(
                 "CompareResults.update expects inputs['results'] "
@@ -41,7 +45,7 @@ class MSEComparison(ComparisonTool):
         for eid in engine_ids:
             column_to_row = {}
             engines_results = results_map[eid]
-            np_array = np.array(engines_results.get("values"))
+            np_array = np.asarray(engines_results.get("values"))
             for c, i in enumerate(engines_results.get("columns")):
                 column_to_row[c] = np_array[:, i]
             engine_to_species[eid] = column_to_row
