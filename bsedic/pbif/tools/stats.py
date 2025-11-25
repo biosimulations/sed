@@ -1,5 +1,9 @@
+import typing
+
 import numpy as np
 from process_bigraph import Step
+
+# ruff: noqa: TRY003
 
 
 def mean_squared_error_dict(a: dict[str, list[float]], b: dict[str, list[float]]) -> float:
@@ -39,7 +43,7 @@ def independent_mean_squared_error(a: list[float], b: list[float]) -> float:
 
 
 class StatsTool(Step):
-    config_schema = {
+    config_schema: typing.ClassVar[dict[str, str]] = {
         "ignore_nans": "boolean",
     }
 

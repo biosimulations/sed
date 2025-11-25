@@ -1,3 +1,4 @@
+import typing
 from typing import Any
 
 import numpy as np
@@ -5,9 +6,11 @@ from process_bigraph import Step
 
 from bsedic.pbif.tools.stats import mean_squared_error_dict
 
+# ruff: noqa: TRY003
+
 
 class ComparisonTool(Step):
-    config_schema = {
+    config_schema: typing.ClassVar[dict[str, str]] = {
         "ignore_nans": "boolean",
         "columns_of_interest": "list[string]",
     }
