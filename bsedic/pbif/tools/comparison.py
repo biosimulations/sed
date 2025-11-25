@@ -46,7 +46,7 @@ class MSEComparison(ComparisonTool):
             column_to_row = {}
             engines_results = results_map[eid]
             np_array = np.asarray(engines_results.get("values"))
-            for c, i in enumerate(engines_results.get("columns")):
+            for i, c in enumerate(engines_results.get("columns")):
                 column_to_row[c] = np_array[:, i]
             engine_to_species[eid] = column_to_row
 

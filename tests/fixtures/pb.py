@@ -1,10 +1,11 @@
 import pytest
 from process_bigraph import ProcessTypes, discover_packages, Composite
 from biocompose.processes import TelluriumUTCStep, CopasiUTCStep
-from biocompose import standard_types
+# from biocompose import standard_types
 
-# from bsedic.pbif.tools import standard_types
+from bsedic.pbif.tools import standard_types
 from bsedic.pbif.tools.comparison import MSEComparison
+import os
 
 
 @pytest.fixture(scope="function", autouse=True)
@@ -18,7 +19,8 @@ def comparison_composite() -> Composite:
     for k, i in standard_types.items():
         core.register(k, i)
 
-    model_path = '/Users/evalencia/Documents/BioSimulators/bsedic/tests/resources/BIOMD0000000012_url.xml'
+
+    model_path = f'{os.getcwd()}/tests/resources/BIOMD0000000012_url.xml'
 
     state = {
         # provide initial values to overwrite those in the configured model
@@ -77,8 +79,9 @@ def comparison_composite() -> Composite:
     document = {
         'state': state,
         'bridge': bridge}
-    return Composite(
+    comp = Composite(
         document,
         core=core)
+    return comp
 
 
