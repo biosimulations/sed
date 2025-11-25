@@ -152,7 +152,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/56/56/95694fc762aa8e5f7
 [[package]]
 name = "biocompose"
 version = "0.0.2"
-source = { git = "https://github.com/vivarium-collective/biocompose?rev=numerical-types#68bceffeffba81592ad7573f96152b64638566b7" }
+source = { editable = "../biocompose" }
 dependencies = [
     { name = "bigraph-schema" },
     { name = "bigraph-viz" },
@@ -163,6 +163,21 @@ dependencies = [
     { name = "rest-process" },
     { name = "tellurium" },
 ]
+
+[package.metadata]
+requires-dist = [
+    { name = "bigraph-schema" },
+    { name = "bigraph-viz" },
+    { name = "build", marker = "extra == 'dev'" },
+    { name = "copasi-basico" },
+    { name = "matplotlib" },
+    { name = "process-bigraph" },
+    { name = "pytest" },
+    { name = "pytest", marker = "extra == 'dev'" },
+    { name = "rest-process" },
+    { name = "tellurium" },
+]
+provides-extras = ["dev"]
 
 [[package]]
 name = "bsedic"
@@ -200,7 +215,7 @@ requires-dist = [
     { name = "jinja2", specifier = ">=3.1.6" },
     { name = "pandas", specifier = ">=2.3.3" },
     { name = "polars", specifier = ">=1.35.2" },
-    { name = "process-bigraph", specifier = ">=0.0.46" },
+    { name = "process-bigraph", specifier = ">=0.0.51" },
     { name = "pydantic", specifier = ">=2.12.3" },
     { name = "python-libsbml", specifier = ">=5.20.5" },
     { name = "spython", specifier = ">=0.3.14" },
@@ -209,7 +224,7 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "biocompose", git = "https://github.com/vivarium-collective/biocompose?rev=numerical-types" },
+    { name = "biocompose", editable = "../biocompose" },
     { name = "deptry", specifier = ">=0.23.0" },
     { name = "mkdocs", specifier = ">=1.4.2" },
     { name = "mkdocs-material", specifier = ">=8.5.10" },
@@ -2298,7 +2313,7 @@ wheels = [
 
 [[package]]
 name = "process-bigraph"
-version = "0.0.46"
+version = "0.0.51"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "bigraph-schema" },
@@ -2308,9 +2323,9 @@ dependencies = [
     { name = "pint" },
     { name = "pytest" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/41/7b/af6ea14c38b56aeb3fc9465a8afa92f86c6107998ce43e1c0c4a8e9f7205/process_bigraph-0.0.46.tar.gz", hash = "sha256:7c022974d3af6dc0b481d833b9448f2cd04e70a722b54bbc45a57180f6725346", size = 240291, upload-time = "2025-10-09T18:26:47.454Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/75/9c/66c7efd5fcda94f559cb600b0ed80c84253244796429c5018a8260d5dfc3/process_bigraph-0.0.51.tar.gz", hash = "sha256:2044dc418d58624030b4bb3b81d4a7b4a22178b09d61f00ca79f8b3333b7af76", size = 46495, upload-time = "2025-11-18T09:12:21.532Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/6d/e4/b33c6aa0cae73bdaa6463d86ebe8cd507f8a2b9834a97189d53872387d95/process_bigraph-0.0.46-py3-none-any.whl", hash = "sha256:5c1d4018d49422d80cb0da598863b49217178dc724d41a0533f12636778e8603", size = 52407, upload-time = "2025-10-09T18:26:45.574Z" },
+    { url = "https://files.pythonhosted.org/packages/28/f8/0dee183e0a0ee0d61b274ce2ed53cd700a69be6c47d65621384440c3c6c8/process_bigraph-0.0.51-py3-none-any.whl", hash = "sha256:a2e36cb5a7c4e4f3cec22ede28ed8c7bdb89a5a2c49542d676c014a05c887098", size = 52726, upload-time = "2025-11-18T09:12:20.405Z" },
 ]
 
 [[package]]

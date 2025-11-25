@@ -19,7 +19,7 @@ dependencies = [
     "jinja2>=3.1.6",
     "pandas>=2.3.3",
     "polars>=1.35.2",
-    "process-bigraph>=0.0.46",
+    "process-bigraph>=0.0.51",
     "pydantic>=2.12.3",
     "python-libsbml>=5.20.5",
     "spython>=0.3.14",
@@ -126,4 +126,4 @@ branch = true
 source = ["bsedic"]
 
 [tool.uv.sources]
-biocompose = { git = "https://github.com/vivarium-collective/biocompose", rev = "numerical-types" }
+biocompose =  { path = "../biocompose", editable = true }
