@@ -28,7 +28,6 @@ class ExperimentNodeImplementation(ExperimentNode):
     address: _SOURCE_TYPE
 
 
-
 class ExperimentWiring(pydantic.BaseModel):
     id: _ID_TYPE
     output: _ID_TYPE

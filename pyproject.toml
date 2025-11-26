@@ -5,7 +5,7 @@ description = "BSedic is a BioSimulators project designed to allow users to tran
 authors = [{ name = "Center for Reproducable Biological Modeling", email = "drescher@uchc.edu" }]
 readme = "README.md"
 keywords = ['python']
-requires-python = ">=3.11,<4.0"
+requires-python = ">=3.11,<3.13"
 classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python",
@@ -16,13 +16,15 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "jinja2>=3.1.6",
-    "pandas>=2.3.3",
-    "process-bigraph>=0.0.46",
+    # "jinja2>=3.1.6",
+    "numpy>=2.3.4",
+    # "pandas>=2.3.3",
+    # "polars>=1.35.2",
+    "process-bigraph>=0.0.51",
     "pydantic>=2.12.3",
-    "python-libsbml>=5.20.5",
+    # "python-libsbml>=5.20.5",
     "spython>=0.3.14",
-    "vivarium-interface>=0.0.5",
+    # "vivarium-interface>=0.0.5",
 ]
 
 [project.urls]
@@ -42,6 +44,8 @@ dev = [
     "mkdocs>=1.4.2",
     "mkdocs-material>=8.5.10",
     "mkdocstrings[python]>=0.26.1",
+    "tellurium>=2.2.11.1",
+    "biocompose",
 ]
 
 [build-system]
@@ -54,12 +58,16 @@ packages = ["bsedic"]
 [tool.mypy]
 files = ["bsedic"]
 disallow_untyped_defs = true
-disallow_any_unimported = true
+disallow_any_unimported = false
 no_implicit_optional = true
 check_untyped_defs = true
 warn_return_any = true
 warn_unused_ignores = true
 show_error_codes = true
+
+[[tool.mypy.overrides]]
+module = ["process_bigraph.*"]
+ignore_missing_imports = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -121,3 +129,7 @@ skip_empty = true
 [tool.coverage.run]
 branch = true
 source = ["bsedic"]
+
+[tool.uv.sources]
+biocompose = { git = "https://github.com/vivarium-collective/biocompose", rev = "numerical-types" }
+# biocompose =  { path = "../biocompose", editable = true }

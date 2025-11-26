@@ -3,7 +3,7 @@
 [![codecov](https://codecov.io/gh/biosimulators/biosim-registry/branch/main/graph/badge.svg)](https://codecov.io/gh/biosimulators/biosim-registry)
 [![License](https://img.shields.io/github/license/biosimulators/biosim-registry)](https://img.shields.io/github/license/biosimulators/biosim-registry)
 
-# BioSimulations Registry 
+# BioSimulations Registry
 A repository filled with high quality processes, steps, and composites for process bi-graph.
 All used as a standard library for process bi-graph.
 
