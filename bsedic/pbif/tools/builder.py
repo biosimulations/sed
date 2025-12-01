@@ -1,10 +1,9 @@
 import copy
-import json
-from enum import EnumType, Enum
+from enum import Enum
 from typing import Any
 
 from process_bigraph import Step, Process, ProcessTypes, Composite
-from bsedic.pbif.tools import standard_types
+
 
 class StepBuilder(Step):
     pass
@@ -54,17 +53,10 @@ class CompositeBuilder:
         self.step_number: int = 0
         self.state: dict[Any, Any] = {}
 
-    def allocate_step_key(self, step_name: str) -> str:
+    def _allocate_step_key(self, step_name: str) -> str:
         step_key = f'{step_name}_{self.step_number}'
         self.step_number += 1
         return step_key
-
-    # Recursively discover which set of items are being iterated upon
-        # The result should take the shape of navigation helper class
-    # With said set, recursively iterate through all configs
-        # That is start with first entry in set, and recursively go until there are no more
-        # Then iterate the values actually within the set, once all layers of recursion are reached. Iterating at each layer
-        # At each layer, a piece of the dict should be constructed, with the final recursion layer placing the last piece in
 
     def _deconstruct_dictionary(self, base_path: list[str], dict_values: dict[str, Any],
                                 composite_type: CompositeType) -> list[_PathNavigation]:
@@ -86,7 +78,7 @@ class CompositeBuilder:
                            config_values: dict[str, Any],
                            state_values: dict[str, Any],
                            input_mappings: dict[str, list[str]]) -> None:
-        inputs: list[CompositeBuilder._PathNavigation] = \
+        parameter_values: list[CompositeBuilder._PathNavigation] = \
             (self._deconstruct_dictionary([], state_values, CompositeBuilder.CompositeType.STATE)
              + self._deconstruct_dictionary([], config_values, CompositeBuilder.CompositeType.CONFIG))
 
@@ -94,32 +86,27 @@ class CompositeBuilder:
             path_of_focus = all_paths[-1]
             for cur_value in path_of_focus.values:
                 # put appropriate values
+                sub_struct = None
                 match path_of_focus.composite_type:
                     case CompositeBuilder.CompositeType.CONFIG:
                         sub_struct = current_step[step_name]['config']
-                        i = 0
-                        while i < len(path_of_focus.path):
-                            if i == len(path_of_focus.path) - 1:
-                                sub_struct[path_of_focus.path[i]] = cur_value
-                            sub_struct = sub_struct[path_of_focus.path[i]]
-                            i += 1
-
                     case CompositeBuilder.CompositeType.STATE:
                         sub_struct = current_step
-                        i = 0
-                        while i < len(path_of_focus.path):
-                            if i == len(path_of_focus.path) - 1:
-                                sub_struct[path_of_focus.path[i]] = cur_value
-                            elif path_of_focus.path[i] not in sub_struct:
-                                sub_struct[path_of_focus.path[i]] = {}
-                            sub_struct = sub_struct[path_of_focus.path[i]]
-                            i += 1
+
+                i = 0
+                while i < len(path_of_focus.path):
+                    if i == len(path_of_focus.path) - 1:
+                        sub_struct[path_of_focus.path[i]] = cur_value
+                    elif path_of_focus.path[i] not in sub_struct:
+                        sub_struct[path_of_focus.path[i]] = {}
+                    sub_struct = sub_struct[path_of_focus.path[i]]
+                    i += 1
 
                 # pass down as needed
                 if len(all_paths) > 1:
                     combinatorics(current_step, all_paths[:-1])
                 else:
-                    step_key = self.allocate_step_key(f'param_scan_{step_name}')
+                    step_key = self._allocate_step_key(f'param_scan_{step_name}')
                     self.state[step_key] = copy.deepcopy(current_step)
 
         combinatorics({
@@ -131,26 +118,12 @@ class CompositeBuilder:
                 'inputs': input_mappings,
                 'outputs': {'result': ['results']}
             }
-        }, inputs)
+        }, parameter_values)
 
 
     def build(self) -> Composite:
         comp = Composite(self.state, core=self.core)
         return comp
-    # def build(self) -> str:
-    #     final = {
-    #         "composition": self.composite,
-    #         "state": self.state
-    #     }
-    #     return json.dumps(final)
-    #
-    #
-    #
-    # def add_to_composite(self, key: str, element: str | int | float | dict) -> None:
-    #     self.composite[key] = element
-    #
-    # def add_to_state(self, key: str, element: str | int | float | dict) -> None:
-    #     self.state[key] = element
 
 
 
