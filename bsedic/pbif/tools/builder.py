@@ -1,5 +1,6 @@
 import copy
 from enum import Enum
+from multiprocessing.util import sub_debug
 from typing import Any, Optional
 
 from process_bigraph import Composite, Process, ProcessTypes, Step
@@ -87,6 +88,11 @@ class CompositeBuilder:
     ) -> None:
         config_values = config_values or {}
         state_values = state_values or {}
+        param_step_key = self._allocate_step_key("parameter_scan")
+        self.state[param_step_key] = {}
+        self.state[param_step_key]["results"] = {}
+        self.state[param_step_key]["inputs"] = {}
+
         parameter_values: list[CompositeBuilder._PathNavigation] = self._deconstruct_dictionary(
             [], state_values, CompositeBuilder.CompositeType.STATE
         ) + self._deconstruct_dictionary([], config_values, CompositeBuilder.CompositeType.CONFIG)
@@ -98,9 +104,9 @@ class CompositeBuilder:
                 sub_struct = None
                 match path_of_focus.composite_type:
                     case CompositeBuilder.CompositeType.CONFIG:
-                        sub_struct = current_step[step_name]["config"]
+                        sub_struct = current_step['step']["config"]
                     case CompositeBuilder.CompositeType.STATE:
-                        sub_struct = current_step
+                        sub_struct = current_step['state']
 
                 i = 0
                 while i < len(path_of_focus.path):
@@ -115,19 +121,25 @@ class CompositeBuilder:
                 if len(all_paths) > 1:
                     combinatorics(current_step, all_paths[:-1])
                 else:
-                    step_key = self._allocate_step_key(f"param_scan_{step_name}")
-                    self.state[step_key] = copy.deepcopy(current_step)
+                    step_key = self._allocate_step_key(step_name)
+                    current_step['step']['outputs']['result'] = ['results', step_key]
+                    for k in current_step['step']['inputs'].keys():
+                        current_step['step']['inputs'][k] = ['inputs', step_key] + current_step['step']['inputs'][k]
+                    self.state[param_step_key]['inputs'][step_key] = copy.deepcopy(current_step['state'])
+                    self.state[param_step_key][step_key] = copy.deepcopy(current_step['step'])
+
+
 
         combinatorics(
             {
-                "results": {},
-                step_name: {
+                'state': {},
+                'step':{
                     "_type": "step",
                     "address": f"local:{step_name}",
                     "config": step_config,
                     "inputs": input_mappings,
-                    "outputs": {"result": ["results"]},
-                },
+                    "outputs": {"result": {}},
+                }
             },
             parameter_values,
         )
