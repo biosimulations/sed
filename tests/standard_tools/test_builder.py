@@ -29,15 +29,18 @@ def test_parameter_scan_composite_generation():
     )
     unique_input = set()
     combination_len = 3 * 3 * 3 * 3
-    assert len(builder.state.keys()) == combination_len
+    keys_of_interest = [k for k in builder.state["parameter_scan_0"] if "TelluriumUTCStep" in k]
+    assert len(keys_of_interest) == combination_len
 
     # Take generated composite, and ensure every combination is unique
-    for k in builder.state:
+    for k in keys_of_interest:
+        param_inputs = builder.state["parameter_scan_0"]["inputs"]
+        param_config = builder.state["parameter_scan_0"][k]["config"]
         values_in_step = (
-            f"PX{builder.state[k]['species_concentrations']['PX']}:"
-            f"PY{builder.state[k]['species_concentrations']['PY']}:"
-            f"PZ{builder.state[k]['species_concentrations']['PZ']}:"
-            f"Time{builder.state[k][step_name]['config']['time']}"
+            f"PX{param_inputs[k]['species_concentrations']['PX']}:"
+            f"PY{param_inputs[k]['species_concentrations']['PY']}:"
+            f"PZ{param_inputs[k]['species_concentrations']['PZ']}:"
+            f"Time{param_config['time']}"
         )
         assert values_in_step not in unique_input
         unique_input.add(values_in_step)
@@ -76,8 +79,13 @@ def test_parameter_scan():
         input_mappings={"concentrations": ["species_concentrations"], "counts": ["species_counts"]},
     )
     param_composite = builder.build()
+    param_state = param_composite.state["parameter_scan_0"]
     step_name = "biocompose.processes.tellurium_process.TelluriumUTCStep"
-    result_set = [param_composite.state[k] for k in param_composite.state if "TelluriumUTCStep" in k]
+    result_set = [
+        {"results": param_state["results"][k], "step": param_state[k], "inputs": param_state["inputs"][k]}
+        for k in param_state
+        if "TelluriumUTCStep" in k
+    ]
     for px_i in px:
         for py_i in py:
             for pz_i in pz:
@@ -107,10 +115,10 @@ def test_parameter_scan():
 
                     for param in result_set:
                         check = (
-                            param["species_concentrations"]["PX"] == px_i
-                            and param["species_concentrations"]["PY"] == py_i
-                            and param["species_concentrations"]["PZ"] == pz_i
-                            and param[step_name]["config"]["time"] == time_i
+                            param["inputs"]["species_concentrations"]["PX"] == px_i
+                            and param["inputs"]["species_concentrations"]["PY"] == py_i
+                            and param["inputs"]["species_concentrations"]["PZ"] == pz_i
+                            and param["step"]["config"]["time"] == time_i
                         )
                         if check:
                             assert res == param["results"]
