@@ -2,11 +2,18 @@ import os
 
 import pytest
 from biocompose.processes import CopasiUTCStep, TelluriumUTCStep
-from process_bigraph import Composite, ProcessTypes
+from process_bigraph import Composite, ProcessTypes, generate_core
 
 # from biocompose import standard_types
 from bsedic.pbif.tools import standard_types
+from bsedic.pbif.tools.builder import CompositeBuilder
 from bsedic.pbif.tools.comparison import MSEComparison
+
+
+@pytest.fixture(scope="function")
+def fully_registered_builder() -> CompositeBuilder:
+    core = generate_core()
+    return CompositeBuilder(core=core)
 
 
 @pytest.fixture(scope="function", autouse=True)
