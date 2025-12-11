@@ -12,6 +12,7 @@ class StepBuilder(Step):
 class ComparisonProcess(Process):
     pass
 
+
 class CompositeOverrides:
     pass
 
@@ -41,19 +42,17 @@ class CompositeBuilder:
         self.step_number += 1
         return step_key
 
-    def add_step(self, address: str,
-                 config: dict[str, str | int],
-                 inputs: dict[str, Any],
-                 outputs: dict[str, Any]) -> None:
+    def add_step(
+        self, address: str, config: dict[str, str | int], inputs: dict[str, Any], outputs: dict[str, Any]
+    ) -> None:
         new_step_key = self._allocate_step_key(address)
         self.state[new_step_key] = {
             "_type": "step",
             "address": address,
             "config": config,
             "inputs": inputs,
-            "outputs": outputs
+            "outputs": outputs,
         }
-
 
     def add_comparison_step(self, comparison_name: str, store_with_values: list[str]) -> None:
         comparison_step_key = self._allocate_step_key("comparison_step")
@@ -66,7 +65,7 @@ class CompositeBuilder:
             },
             "outputs": {
                 "comparison": ["comparison_result", comparison_name],
-            }
+            },
         }
 
     def _deconstruct_dictionary(
@@ -133,7 +132,7 @@ class CompositeBuilder:
                     step_key = self._allocate_step_key(step_name)
                     current_step["step"]["outputs"]["result"] = ["results", step_key]
                     for k in current_step["step"]["inputs"]:
-                        current_step["step"]["inputs"][k] = ["inputs", step_key] + current_step["step"]["inputs"][k]
+                        current_step["step"]["inputs"][k] = ["inputs", step_key]
                     self.state[param_step_key]["inputs"][step_key] = copy.deepcopy(current_step["state"])
                     self.state[param_step_key][step_key] = copy.deepcopy(current_step["step"])
 
