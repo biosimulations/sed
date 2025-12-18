@@ -23,7 +23,7 @@
   "tasks": {
     "sim1": {
       "_type": "uniformTimeCourse",
-      "model": "model1",
+      "model": "#inputs:models:model1",
       "initialTime": 0,
       "outputStartTime": 0,
       "outputEndTime": 20,
@@ -32,7 +32,7 @@
     },
     "sim2": {
       "_type": "uniformTimeCourse",
-      "model": "model1",
+      "model": "#inputs:models:model1",
       "initialTime": 0,
       "outputStartTime": 0,
       "outputEndTime": 20,
@@ -41,11 +41,11 @@
     },
     "sim1_sim2_compare": {
       "_type": "calculation",
-      "math": "(tasks:sim1 - tasks:sim2)^2"
+      "math": "(#tasks:sim1 - #tasks:sim2)^2"
     },
     "sim1_exp_compare": {
       "_type": "calculation",
-      "math": "(tasks:sim1 - data:experiment1)^2"
+      "math": "(#tasks:sim1 - #data:experiment1)^2"
     },
     "sim2_exp_compare": {
       "_type": "calculation",
