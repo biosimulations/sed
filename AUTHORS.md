@@ -1,5 +1,5 @@
-# Authors of BSedic:
+# Authors of Sed:
 
-The maintainers of the BSedic project are:
+The maintainers of the Sed project are:
 * Logan C.W. Drescher (@CodeByDrescher)
-* Ezekiel Valencia (@Ezequiel-Valencia)
+* Ezequiel Valencia (@Ezequiel-Valencia)

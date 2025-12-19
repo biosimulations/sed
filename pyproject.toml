@@ -1,7 +1,7 @@
 [project]
-name = "bsedic"
+name = "Sed"
 version = "0.0.1"
-description = "BioSim Registry is a project focused on delivering high quality processes and tooling in relation to process bi-graph."
+description = ""
 authors = [{ name = "Center for Reproducable Biological Modeling", email = "evalencia@uchc.edu" }]
 readme = "README.md"
 keywords = ['python']
