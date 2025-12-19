@@ -134,7 +134,7 @@ def load_sed(path):
 
 
 def test_one():
-    document = load_sed("tests/examples/one/")
+    document = load_sed("examples/one/")
 
     # ipdb.set_trace()
 
