@@ -1,5 +1,5 @@
 [project]
-name = "biosim-registry"
+name = "bsedic"
 version = "0.0.1"
 description = "BioSim Registry is a project focused on delivering high quality processes and tooling in relation to process bi-graph."
 authors = [{ name = "Center for Reproducable Biological Modeling", email = "evalencia@uchc.edu" }]
