@@ -1,8 +1,8 @@
 [project]
-name = "bsedic"
+name = "biosim-registry"
 version = "0.0.1"
-description = "BSedic is a BioSimulators project designed to allow users to transform their biological experiments written in Sed into Process-Bigraph simulations."
-authors = [{ name = "Center for Reproducable Biological Modeling", email = "drescher@uchc.edu" }]
+description = "BioSim Registry is a project focused on delivering high quality processes and tooling in relation to process bi-graph."
+authors = [{ name = "Center for Reproducable Biological Modeling", email = "evalencia@uchc.edu" }]
 readme = "README.md"
 keywords = ['python']
 requires-python = ">=3.11,<3.13"
@@ -21,7 +21,7 @@ dependencies = [
     # "pandas>=2.3.3",
     # "polars>=1.35.2",
     "process-bigraph>=0.0.51",
-    "bigraph-schema>=0.0.77",
+    # "bigraph-schema>=0.0.77",
     "pydantic>=2.12.3",
     # "python-libsbml>=5.20.5",
     "spython>=0.3.14",

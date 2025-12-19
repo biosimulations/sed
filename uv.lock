@@ -163,11 +163,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "bsedic"
+name = "biosim-registry"
 version = "0.0.1"
 source = { editable = "." }
 dependencies = [
-    { name = "bigraph-schema" },
     { name = "numpy" },
     { name = "process-bigraph" },
     { name = "pydantic" },
@@ -192,7 +191,6 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "bigraph-schema", specifier = ">=0.0.77" },
     { name = "numpy", specifier = ">=2.3.4" },
     { name = "process-bigraph", specifier = ">=0.0.51" },
     { name = "pydantic", specifier = ">=2.12.3" },
