@@ -28,9 +28,11 @@
       "_type": "uniformTimeCourse",
       "model": "#inputs:models:model1",
       "initialTime": 0,
-      "outputStartTime": 0,
-      "outputEndTime": 20,
-      "numberOfSteps": 50,
+      "timeRange": {
+        "start": 0,
+        "end": 20,
+        "numberOfSteps": 50
+      },
       "outputVariables": [
         "time",
         "S1",
@@ -41,9 +43,11 @@
       "_type": "uniformTimeCourse",
       "model": "#inputs:models:model1",
       "initialTime": 0,
-      "outputStartTime": 0,
-      "outputEndTime": 20,
-      "numberOfSteps": 50,
+      "timeRange": {
+        "start": 0,
+        "end": 20,
+        "numberOfSteps": 50
+      },
       "outputVariables": [
         "time",
         "S1",
