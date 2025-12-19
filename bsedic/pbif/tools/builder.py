@@ -13,23 +13,6 @@ class ComparisonProcess(Process):
     pass
 
 
-# def add_comparison_step(viv: Vivarium, edge_id_1: str, edge_id_2: str) -> Vivarium:
-#     name = f'compare_{edge_id_1}_to_{edge_id_2}'
-#     comparison_process = {
-#         'name': name,
-#         'process_id': 'Comparison',
-#         'config': {'ignore_nans': 'false'},
-#         'inputs': {'left': ['array'],
-#                    'right': ['array']},
-#         'outputs': {'comparison_result': ['array']}
-#     }
-#     viv.add_process(**comparison_process)
-#     viv.connect_process(name=name,
-#                         inputs={"left": {edge_id_1: "result"}, "right": {edge_id_2: "result"}},
-#                         outputs={"comparison_result": ['array']})
-#     return viv
-
-
 class CompositeOverrides:
     pass
 
@@ -52,12 +35,38 @@ class CompositeBuilder:
     def __init__(self, core: ProcessTypes):
         self.core: ProcessTypes = core
         self.step_number: int = 0
-        self.state: dict[Any, Any] = {}
+        self.state: dict[str, Any] = {}
 
     def _allocate_step_key(self, step_name: str) -> str:
         step_key = f"{step_name}_{self.step_number}"
         self.step_number += 1
         return step_key
+
+    def add_step(
+        self, address: str, config: dict[str, str | int], inputs: dict[str, Any], outputs: dict[str, Any]
+    ) -> None:
+        new_step_key = self._allocate_step_key(address)
+        self.state[new_step_key] = {
+            "_type": "step",
+            "address": address,
+            "config": config,
+            "inputs": inputs,
+            "outputs": outputs,
+        }
+
+    def add_comparison_step(self, comparison_name: str, store_with_values: list[str]) -> None:
+        comparison_step_key = self._allocate_step_key("comparison_step")
+        self.state[comparison_step_key] = {
+            "_type": "step",
+            "address": "local:bsedic.pbif.tools.comparison.MSEComparison",
+            "config": {},
+            "inputs": {
+                "results": store_with_values,
+            },
+            "outputs": {
+                "comparison_result": ["comparison_results", comparison_name],
+            },
+        }
 
     def _deconstruct_dictionary(
         self, base_path: list[str], dict_values: dict[str, Any], composite_type: CompositeType
@@ -79,7 +88,7 @@ class CompositeBuilder:
 
     def add_parameter_scan(
         self,
-        step_name: str,
+        step_address: str,
         step_config: dict[Any, Any],
         input_mappings: dict[str, list[str]],
         config_values: Optional[dict[str, Any]] = None,
@@ -120,10 +129,10 @@ class CompositeBuilder:
                 if len(all_paths) > 1:
                     combinatorics(current_step, all_paths[:-1])
                 else:
-                    step_key = self._allocate_step_key(step_name)
+                    step_key = self._allocate_step_key(step_address.split(":")[1])
                     current_step["step"]["outputs"]["result"] = ["results", step_key]
                     for k in current_step["step"]["inputs"]:
-                        current_step["step"]["inputs"][k] = ["inputs", step_key] + current_step["step"]["inputs"][k]
+                        current_step["step"]["inputs"][k] = ["inputs", step_key]
                     self.state[param_step_key]["inputs"][step_key] = copy.deepcopy(current_step["state"])
                     self.state[param_step_key][step_key] = copy.deepcopy(current_step["step"])
 
@@ -132,7 +141,7 @@ class CompositeBuilder:
                 "state": {},
                 "step": {
                     "_type": "step",
-                    "address": f"local:{step_name}",
+                    "address": step_address,
                     "config": step_config,
                     "inputs": input_mappings,
                     "outputs": {"result": {}},

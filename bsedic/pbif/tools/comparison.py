@@ -69,4 +69,4 @@ class MSEComparison(ComparisonTool):
                 species_mse[i_name][j_name] = mse
                 species_mse[j_name][i_name] = mse
 
-        return {"comparison": {"species_mse": species_mse}}
+        return {"comparison_result": {"species_mse": species_mse}}

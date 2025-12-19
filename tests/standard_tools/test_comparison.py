@@ -1,7 +1,10 @@
-from process_bigraph import Composite
+from typing import Any
+
+from process_bigraph import Composite, ProcessTypes
 
 
-def test_mse_comparison(comparison_composite: Composite):
+def test_mse_comparison(comparison_document: dict[Any, Any], fully_registered_core: ProcessTypes) -> None:
+    comparison_composite = Composite(config=comparison_document, core=fully_registered_core)
     comparison_result = comparison_composite.bridge_updates[-1]["result"]["species_mse"]
     for key in comparison_result:
         for compared_to in comparison_result[key]:

@@ -117,7 +117,7 @@ wheels = [
 
 [[package]]
 name = "bigraph-schema"
-version = "0.0.74"
+version = "0.0.77"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "fire" },
@@ -131,9 +131,9 @@ dependencies = [
     { name = "setuptools" },
     { name = "twine" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/51/07/9533a1d780dbbd1e7946d456fef507f4e36a4cb1bf503ded5ed5871f5a41/bigraph_schema-0.0.74.tar.gz", hash = "sha256:5d1a72debffa3f284eec5d869004a73bec581ccffcf629ead8339ee637c40d8e", size = 285964, upload-time = "2025-09-22T23:13:21.346Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9c/fa/1aaad9d4ccec44f92670b880f13a4dc35e04d0951626f9688d2ce2e2147d/bigraph_schema-0.0.77.tar.gz", hash = "sha256:4dc42288f0a5fe140a5e1b6e9fb2a2137e6c30eed6ce7bcda2e47e5858f20687", size = 54309, upload-time = "2025-11-18T09:11:55.816Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e1/fa/7a5672984545b48b75b96d2590309f6bace33f21e3057f1bfbaa83bca7bd/bigraph_schema-0.0.74-py3-none-any.whl", hash = "sha256:76b370dc24257a5cd7fcb8b3345573e3630f0e76c705c54f3ede63130141d415", size = 57674, upload-time = "2025-09-22T23:13:19.876Z" },
+    { url = "https://files.pythonhosted.org/packages/4d/28/ff47fc469d8324f92a9928f7d87d262782f9b6308a340147ba2a98f5dcf3/bigraph_schema-0.0.77-py3-none-any.whl", hash = "sha256:7cf511addbbe1022b19db287b7e973480b263922c3533c560d66ac55e2939f26", size = 57655, upload-time = "2025-11-18T09:11:54.511Z" },
 ]
 
 [[package]]
@@ -150,7 +150,7 @@ sdist = { url = "https://files.pythonhosted.org/packages/56/56/95694fc762aa8e5f7
 [[package]]
 name = "biocompose"
 version = "0.0.2"
-source = { git = "https://github.com/vivarium-collective/biocompose?rev=numerical-types#88b4c4f65e8c9981c5d5a8a0b7532426d9145d6e" }
+source = { git = "https://github.com/vivarium-collective/biocompose?rev=numerical-types#892f72a4e8e74156ea61766ee61ab24d00210c02" }
 dependencies = [
     { name = "bigraph-schema" },
     { name = "bigraph-viz" },

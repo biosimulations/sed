@@ -9,13 +9,13 @@ from bsedic.pbif.tools.builder import CompositeBuilder
 def test_parameter_scan_composite_generation():
     core = generate_core()
     builder = CompositeBuilder(core=core)
-    step_name = "biocompose.processes.tellurium_process.TelluriumUTCStep"
+    step_name = "local:biocompose.processes.tellurium_process.TelluriumUTCStep"
     times = [1, 10, 100]
     px = [0, 1, 2]
     py = [3, 4, 5]
     pz = [6, 7, 8]
     builder.add_parameter_scan(
-        step_name=step_name,
+        step_address=step_name,
         step_config={
             "model_source": "any_path",
             "time": 10,
@@ -66,7 +66,7 @@ def test_parameter_scan():
     pz = [7, 9, 10]
     times = [1, 10]
     builder.add_parameter_scan(
-        step_name="biocompose.processes.tellurium_process.TelluriumUTCStep",
+        step_address="local:biocompose.processes.tellurium_process.TelluriumUTCStep",
         step_config={
             "model_source": model_path,
             "time": 10,
