@@ -11,18 +11,39 @@
       }
     }
   },
-
   "processes": {
     "cosimulator": {
       "_type": "cosimulation",
-      "simulations": ["ode", "fba"],
-      "updates": ["update_from_fba", "update_from_ode"],
+      "simulations": [
+        "ode",
+        "fba"
+      ],
+      "updates": [
+        "update_from_fba",
+        "update_from_ode"
+      ],
       "loop_variable": "time",
       "initialValue": 0.0,
       "interval": 1.0,
       "numberOfSteps": 50,
-      "outputLabels": ["time", "S1", "S2", "S3", "J0", "J1", "J2" ],
-      "outputSources": ["time", "ode:model['S1']", "ode:model['S2']", "ode:model['S3']", "fba:model['J0']", "fba:model['J1']", "fba:model['J2']"],
+      "outputLabels": [
+        "time",
+        "S1",
+        "S2",
+        "S3",
+        "J0",
+        "J1",
+        "J2"
+      ],
+      "outputSources": [
+        "time",
+        "ode:model['S1']",
+        "ode:model['S2']",
+        "ode:model['S3']",
+        "fba:model['J0']",
+        "fba:model['J1']",
+        "fba:model['J2']"
+      ],
       "notes": "Can't use outputVariables in ode/fba, and reference them with ode['S1'], because nothing outputs t0.  Instead, we have to directly check model variables with ode:model['var']."
     },
     "ode": {
@@ -82,7 +103,6 @@
       }
     }
   },
-
   "outputs": {
     "reports": {
       "cosim_out": {

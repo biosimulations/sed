@@ -14,12 +14,15 @@
           "organization": "column-based",
           "ncols": 3,
           "nrows": 52,
-          "units": ["seconds", "mMol", "mMol"]
+          "units": [
+            "seconds",
+            "mMol",
+            "mMol"
+          ]
         }
       }
     }
   },
-
   "tasks": {
     "sim1": {
       "_type": "uniformTimeCourse",
@@ -28,7 +31,11 @@
       "outputStartTime": 0,
       "outputEndTime": 20,
       "numberOfSteps": 50,
-      "outputVariables": ["time", "S1", "S2"]
+      "outputVariables": [
+        "time",
+        "S1",
+        "S2"
+      ]
     },
     "sim2": {
       "_type": "uniformTimeCourse",
@@ -37,7 +44,11 @@
       "outputStartTime": 0,
       "outputEndTime": 20,
       "numberOfSteps": 50,
-      "outputVariables": ["time", "S1", "S2"]
+      "outputVariables": [
+        "time",
+        "S1",
+        "S2"
+      ]
     },
     "sim1_sim2_compare": {
       "_type": "calculation",
@@ -57,12 +68,13 @@
     },
     "simcompare_v2": {
       "_type": "sumOfSquares",
-      "inputs": ["#tasks:sim1",
-                 "#tasks:sim2",
-                 "#data:experiment1"]
+      "inputs": [
+        "#tasks:sim1",
+        "#tasks:sim2",
+        "#data:experiment1"
+      ]
     }
   },
-
   "outputs": {
     "reports": {
       "sim1Report": {
