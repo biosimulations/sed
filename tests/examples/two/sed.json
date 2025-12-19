@@ -8,7 +8,7 @@
     }
   },
 
-  "processes": {
+  "tasks": {
     "paramScan_k1": {
       "_type": "parameterScan",
       "model": "model1",
@@ -21,30 +21,30 @@
     },
     "paramScan_k2": {
       "_type": "parameterScan",
-      "model": "processes:paramScan_k1:models",
+      "model": "tasks:paramScan_k1:models",
       "scannedVariable": "k2",
       "range": [0.1, 0.2, 0.5, 1.0, 2.0, 5.0, 10.0],
       "outputRange": "true"
     },
     "steadyStates": {
       "_type": "steadyState",
-      "model": "processes:paramScan_k2:models",
+      "model": "tasks:paramScan_k2:models",
       "outputVariables": ["S1", "S2"],
       "outputModel": "true"
     },
     "jacobians": {
       "_type": "calculation",
-      "math": "jacobian(processes:steadyStates:model)"
+      "math": "jacobian(tasks:steadyStates:model)"
     }
   },
 
   "outputs": {
     "reports": {
       "steadyStateReport": {
-        "outputs": "processes:steadyStates"
+        "outputs": "tasks:steadyStates"
       },
       "jacobianReport": {
-        "outputs": "processes:jacobians"
+        "outputs": "tasks:jacobians"
       }
     },
     "plots": {
@@ -65,14 +65,14 @@
         },
         "curves": {
           "S1": {
-            "x": "processes:paramScan_k1:range",
-            "y": "processes:paramScan_k2:range",
-            "z": "processes:steadyStates['S1']"
+            "x": "tasks:paramScan_k1:range",
+            "y": "tasks:paramScan_k2:range",
+            "z": "tasks:steadyStates['S1']"
           },
           "S2": {
-            "x": "processes:paramScan_k1:range",
-            "y": "processes:paramScan_k2:range",
-            "z": "processes:steadyStates['S2']"
+            "x": "tasks:paramScan_k1:range",
+            "y": "tasks:paramScan_k2:range",
+            "z": "tasks:steadyStates['S2']"
           }
         }
       }

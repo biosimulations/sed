@@ -4,11 +4,11 @@ import shutil
 from spython.main.parse.parsers import DockerParser  # type: ignore[import-untyped]
 from spython.main.parse.writers import SingularityWriter  # type: ignore[import-untyped]
 
-from bsedic.pbif.containerization.container_constructor import (
+from bsedic.pbg.containerization.container_constructor import (
     formulate_dockerfile_for_necessary_env,
 )
-from bsedic.pbif.local_registry import load_local_modules
-from bsedic.utils.experiment_archive import extract_archive_returning_pbif_path
+from bsedic.pbg.local_registry import load_local_modules
+from bsedic.utils.experiment_archive import extract_archive_returning_pbg_path
 from bsedic.utils.input_types import (
     ContainerizationEngine,
     ContainerizationFileRepr,
@@ -27,7 +27,7 @@ def execute_bsedic(
     ) or original_program_arguments.input_file_path.endswith(".omex")
     required_program_arguments: ProgramArguments
     if input_is_archive:
-        new_input_file_path = extract_archive_returning_pbif_path(
+        new_input_file_path = extract_archive_returning_pbg_path(
             original_program_arguments.input_file_path, str(original_program_arguments.output_dir)
         )
     else:
