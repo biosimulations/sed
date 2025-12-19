@@ -53,11 +53,11 @@
     },
     "compare_summary": {
       "_type": "calculation",
-      "math": "[sum(#tasks:sim1_sim2_compare), sum(tasks:sim1_exp_compare), sum(#tasks:sim2_exp_compare)]"
+      "math": "[sum(#tasks:sim1_sim2_compare), sum(#tasks:sim1_exp_compare), sum(#tasks:sim2_exp_compare)]"
     },
     "simcompare_v2": {
       "_type": "sumOfSquares",
-      "inputs": ["#proceses:sim1",
+      "inputs": ["#tasks:sim1",
                  "#tasks:sim2",
                  "#data:experiment1"]
     }
