@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from bsedic.sed.data_structure import ExperimentNode, ExperimentNodeImplementation
+from bsedic.data_structure import ExperimentNode, ExperimentNodeImplementation
 
 # Need to create a datasource of implementations with proper tags that tie back to their abstract concepts.
 # With all of the groups gathered covering all abstract concept, in each group pick one implementation based on
