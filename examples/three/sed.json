@@ -23,9 +23,11 @@
         "update_from_ode"
       ],
       "loop_variable": "time",
-      "initialValue": 0.0,
-      "interval": 1.0,
-      "numberOfSteps": 50,
+      "range": {
+        "start": 0.0,
+        "interval": 1.0,
+        "numberOfSteps": 50
+      },
       "outputLabels": [
         "time",
         "S1",
@@ -50,7 +52,7 @@
       "_type": "oneStep",
       "initialModel": "model1",
       "initialTime": "processes:cosimulator:loop_value",
-      "step": "processes:cosimulator:interval",
+      "step": "processes:cosimulator:range:interval",
       "outputVariables": [],
       "outputModel": "true"
     },
