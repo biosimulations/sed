@@ -11,16 +11,16 @@
       }
     }
   },
-  "processes": {
+  "tasks": {
     "cosimulator": {
       "_type": "cosimulation",
       "simulations": [
-        "ode",
-        "fba"
+        "#tasks:ode",
+        "#tasks:fba"
       ],
       "updates": [
-        "update_from_fba",
-        "update_from_ode"
+        "#tasks:update_from_fba",
+        "#tasks:update_from_ode"
       ],
       "loop_variable": "time",
       "range": {
@@ -39,68 +39,68 @@
       ],
       "outputSources": [
         "time",
-        "ode:model['S1']",
-        "ode:model['S2']",
-        "ode:model['S3']",
-        "fba:model['J0']",
-        "fba:model['J1']",
-        "fba:model['J2']"
+        "#tasks:ode:model['S1']",
+        "#tasks:ode:model['S2']",
+        "#tasks:ode:model['S3']",
+        "#tasks:fba:model['J0']",
+        "#tasks:fba:model['J1']",
+        "#tasks:fba:model['J2']"
       ],
-      "notes": "Can't use outputVariables in ode/fba, and reference them with ode['S1'], because nothing outputs t0.  Instead, we have to directly check model variables with ode:model['var']."
+      "notes": "Can't use outputVariables in ode/fba, and reference them with ode['S1'], because nothing outputs t0.  Instead, we have to directly check model variables with #tasks:ode:model['var']."
     },
     "ode": {
       "_type": "oneStep",
       "initialModel": "model1",
-      "initialTime": "processes:cosimulator:loop_value",
-      "step": "processes:cosimulator:range:interval",
+      "initialTime": "#tasks:cosimulator:loop_value",
+      "step": "#tasks:cosimulator:range:interval",
       "outputVariables": [],
       "outputModel": "true"
     },
     "fba": {
       "_type": "fluxBalanceAnalysis",
-      "model": "processes:paramScan_k2:models",
+      "model": "#tasks:paramScan_k2:models",
       "outputVariables": [],
       "outputModel": "true"
     },
     "update_from_ode": {
       "_type": "modelUpdate",
-      "model": "processes:fba:model",
+      "model": "#tasks:fba:model",
       "changes": {
         "S1": {
           "_type": "change_value",
           "identifier": "S1",
-          "value": "processes:ode:model['S1']"
+          "value": "#tasks:ode:model['S1']"
         },
         "S2": {
           "_type": "change_value",
           "identifier": "S2",
-          "value": "processes:ode:model['S2']"
+          "value": "#tasks:ode:model['S2']"
         },
         "S3": {
           "_type": "change_value",
           "identifier": "S3",
-          "value": "processes:ode:model['S3']"
+          "value": "#tasks:ode:model['S3']"
         }
       }
     },
     "update_from_fba": {
       "_type": "modelUpdate",
-      "model": "processes:ode:model",
+      "model": "#tasks:ode:model",
       "changes": {
         "J0": {
           "_type": "change_value",
           "identifier": "J0",
-          "value": "processes:fba:model['J0']"
+          "value": "#tasks:fba:model['J0']"
         },
         "J1": {
           "_type": "change_value",
           "identifier": "J1",
-          "value": "processes:fba:model['J1']"
+          "value": "#tasks:fba:model['J1']"
         },
         "J2": {
           "_type": "change_value",
           "identifier": "J2",
-          "value": "processes:fba:model['J2']"
+          "value": "#tasks:fba:model['J2']"
         }
       }
     }
@@ -108,7 +108,7 @@
   "outputs": {
     "reports": {
       "cosim_out": {
-        "outputs": "processes:cosimulator",
+        "outputs": "#tasks:cosimulator",
         "filename": "cosimulation.csv",
         "file_format": "http://purl.org/NET/mediatypes/text/csv"
       }
@@ -125,28 +125,28 @@
         },
         "curves": {
           "S1": {
-            "x": "processes:cosimulator['time']",
-            "y": "processes:cosimulator['S1']"
+            "x": "#tasks:cosimulator['time']",
+            "y": "#tasks:cosimulator['S1']"
           },
           "S2": {
-            "x": "processes:cosimulator['time']",
-            "y": "processes:cosimulator:['S2']"
+            "x": "#tasks:cosimulator['time']",
+            "y": "#tasks:cosimulator:['S2']"
           },
           "S3": {
-            "x": "processes:cosimulator['time']",
-            "y": "processes:cosimulator:['S3']"
+            "x": "#tasks:cosimulator['time']",
+            "y": "#tasks:cosimulator:['S3']"
           },
           "J0": {
-            "x": "processes:cosimulator['time']",
-            "y": "processes:cosimulator:['J0']"
+            "x": "#tasks:cosimulator['time']",
+            "y": "#tasks:cosimulator:['J0']"
           },
           "J1": {
-            "x": "processes:cosimulator['time']",
-            "y": "processes:cosimulator:['J1']"
+            "x": "#tasks:cosimulator['time']",
+            "y": "#tasks:cosimulator:['J1']"
           },
           "J2": {
-            "x": "processes:cosimulator['time']",
-            "y": "processes:cosimulator:['J2']"
+            "x": "#tasks:cosimulator['time']",
+            "y": "#tasks:cosimulator:['J2']"
           }
         }
       }
