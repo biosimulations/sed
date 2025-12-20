@@ -1,5 +1,5 @@
 {
-  "Non-task elements": {
+  "types": {
     "range": {
       "_type": "union",
       "_options": [
@@ -10,6 +10,7 @@
         },
         {
           "_type": "optional_minimum[3]",
+          "_description": "3 of the 4 options must be chosen, with scale defaulting to 'linear'",
           "_options": {
             "start": {
               "_type": "float",
@@ -32,7 +33,7 @@
       ]
     }
   },
-  "Task types": {
+  "tasks": {
     "uniformTimeCourse": {
       "requiredInputs": {
         "model": "The input model or models to the simulator.  Must be an internal reference to an #input:models object, or to the output of another #task that can produce a model (or models).",
