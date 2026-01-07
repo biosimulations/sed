@@ -82,12 +82,12 @@
   "outputs": {
     "reports": {
       "sim1Report": {
-        "outputs": "tasks:sim1",
+        "dataSets": "tasks:sim1",
         "filename": "sim1.csv",
         "file_format": "http://purl.org/NET/mediatypes/text/csv"
       },
       "sim2Report": {
-        "outputs": "tasks:sim2",
+        "dataSets": "tasks:sim2",
         "filename": "sim2.csv",
         "file_format": "http://purl.org/NET/mediatypes/text/csv"
       },

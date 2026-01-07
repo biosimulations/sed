@@ -53,10 +53,10 @@
   "outputs": {
     "reports": {
       "steadyStateReport": {
-        "outputs": "tasks:steadyStates"
+        "dataSets": "tasks:steadyStates"
       },
       "jacobianReport": {
-        "outputs": "tasks:jacobians"
+        "dataSets": "tasks:jacobians"
       }
     },
     "plots": {

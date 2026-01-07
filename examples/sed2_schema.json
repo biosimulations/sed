@@ -6,7 +6,7 @@
         {
           "values": {
             "_type": "ordered_list[float]",
-            "_description": "A list of increasing-or-duplicate values.  I.e. [1, 2, 5, 10, 20] or [0, 1, 1, 2.3, 2.5].  If used, may not use any other optional input, as this completely defines the "}
+            "_description": "A list of increasing-or-duplicate values.  I.e. [1, 2, 5, 10, 20] or [0, 1, 1, 2.3, 2.5].  If used, may not use any other optional input, as this completely defines the range"}
         },
         {
           "_type": "optional_minimum[3]",
@@ -27,7 +27,7 @@
           },
           "scale": {
             "_type": "enum[linear,log10]",
-            "_description": "Only used if 'interval' is not defined."
+            "_description": "Only used if 'interval' or 'values' are not defined."
           }
         }
       ]
