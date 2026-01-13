@@ -1,4 +1,13 @@
 {
+    "inputs": {
+        "models": "A list of model objects, by ID",
+        "data": "A list of data objects, by ID"
+    },
+    "tasks": "A list of task objects, by ID",
+    "outputs": {
+        "reports": "A list of report objects, by ID",
+        "plots": "A list of plot objects, by ID"
+    },
     "Non-task elements": {
         "range": {
             "optionalInputs": {
@@ -12,6 +21,25 @@
             "Other validation rules": "If 'values' is not defined, exactly three of the optional inputs 'start', 'end', 'numberOfSteps', and 'interval' must be defined, which together define a series of values.",
             "notes": "Not a task itself, but used in tasks that need a range of values.  Not sure if 'scale' should be optional or required."
         }
+    },
+    "task": {
+        "requiredValues": {
+            "_type": "The type of the task.  This the only base required element; the type value determines everything else about what's required or optional.  Every type ",
+            "kisao": "The KISAO value corresponding to the _type.  A single _type may have multiple legal corresponding KISAO values, but every KISAO value will only have a single corresponding _type."
+        },
+        "optionalValues": {
+            "parameters": "One or more unnamed (?) parameter object children."
+        }
+    },
+    "parameter": {
+        "requiredValues": {
+            "kisao": "The KISAO ID of the parameter.",
+            "value": "The value to use for the parameter.  Could be anything formally, but must correspond to the kisao ID, i.e. if the KISAO ID is for a tolerance, the value must be a number."
+        },
+        "optionalValues": {
+            "name": "The name of the parameter.  Should correspond to the KISAO ID."
+        },
+        "alternatively...": "Maybe the optional 'name' can be the 'id' of the parameter object?  Or maybe the KiSAO ID should be the 'id' of the parameter object?"
     },
     "Task types": {
         "uniformTimeCourse": {
