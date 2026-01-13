@@ -1,0 +1,302 @@
+{
+  "experiment1": {
+    "time": [
+      0.0,
+      0.4,
+      0.8,
+      1.2,
+      1.6,
+      2.0,
+      2.4,
+      2.8,
+      3.2,
+      3.6,
+      4.0,
+      4.4,
+      4.8,
+      5.2,
+      5.6,
+      6.0,
+      6.4,
+      6.8,
+      7.2,
+      7.6,
+      8.0,
+      8.4,
+      8.8,
+      9.2,
+      9.6,
+      10.0,
+      10.4,
+      10.8,
+      11.2,
+      11.6,
+      12.0,
+      12.4,
+      12.8,
+      13.2,
+      13.6,
+      14.0,
+      14.4,
+      14.8,
+      15.2,
+      15.6,
+      16.0,
+      16.4,
+      16.8,
+      17.2,
+      17.6,
+      18.0,
+      18.4,
+      18.8,
+      19.2,
+      19.6,
+      20.0
+    ],
+    "S1": [
+      0.0,
+      -0.096462,
+      0.77536,
+      0.398377,
+      1.95634,
+      0.43424,
+      2.31661,
+      1.63781,
+      1.47421,
+      1.5134,
+      2.16433,
+      1.59439,
+      1.28056,
+      2.83845,
+      2.12138,
+      2.53842,
+      1.37347,
+      1.78225,
+      2.87535,
+      2.89526,
+      2.36637,
+      2.06501,
+      1.08944,
+      1.00189,
+      1.96954,
+      2.11752,
+      1.93697,
+      1.21197,
+      1.2256,
+      2.39194,
+      2.48004,
+      2.26794,
+      1.65868,
+      1.84528,
+      1.95177,
+      2.21217,
+      2.33751,
+      1.81878,
+      1.476,
+      1.93818,
+      1.86633,
+      1.02945,
+      2.61655,
+      1.30463,
+      1.0087,
+      1.72675,
+      1.0998,
+      1.81183,
+      2.49586,
+      2.88889,
+      1.19091
+    ],
+    "S2": [
+      0.0,
+      -0.3805337,
+      -0.183798,
+      0.422139,
+      1.32352,
+      0.045263,
+      -0.073549,
+      1.96991,
+      0.30589,
+      2.16673,
+      1.00971,
+      2.08582,
+      2.06762,
+      2.42712,
+      2.9307,
+      1.74501,
+      1.9049,
+      3.65041,
+      3.57768,
+      2.25997,
+      3.91058,
+      3.38387,
+      3.47122,
+      3.37403,
+      4.32371,
+      3.53667,
+      4.28731,
+      3.74101,
+      4.65717,
+      3.49415,
+      5.17828,
+      5.11091,
+      4.00633,
+      5.08686,
+      3.50676,
+      4.39329,
+      5.0467,
+      3.75221,
+      5.10704,
+      4.51739,
+      5.56643,
+      4.21435,
+      4.66529,
+      3.90941,
+      4.23384,
+      5.09871,
+      5.75114,
+      4.53224,
+      4.88811,
+      4.66484,
+      5.31852
+    ]
+  },
+  "sim1": {
+    "_type": "step",
+    "address": "local:uniformTimeCourse",
+    "config": {},
+    "inputs": {
+      "model": [
+        "inputs",
+        "models",
+        "model1"
+      ],
+      "initialTime": [
+        "initialTime"
+      ],
+      "timeRange": [
+        "timeRange"
+      ]
+    },
+    "_outputs": {
+      "time": "array[float]",
+      "S1": "array[float]",
+      "S2": "array[float]"
+    },
+    "outputs": {
+      "time": [
+        "sim1",
+        "time"
+      ],
+      "S1": [
+        "sim1",
+        "S1"
+      ],
+      "S2": [
+        "sim1",
+        "S2"
+      ]
+    }
+  },
+  "sim2": {
+    "_type": "step",
+    "address": "local:uniformTimeCourse",
+    "config": {},
+    "inputs": {
+      "model": [
+        "inputs",
+        "models",
+        "model1"
+      ],
+      "initialTime": [
+        "initialTime"
+      ],
+      "timeRange": [
+        "timeRange"
+      ]
+    },
+    "_outputs": {
+      "time": "array[float]",
+      "S1": "array[float]",
+      "S2": "array[float]"
+    },
+    "outputs": {
+      "time": [
+        "sim2",
+        "time"
+      ],
+      "S1": [
+        "sim2",
+        "S1"
+      ],
+      "S2": [
+        "sim2",
+        "S2"
+      ]
+    }
+  },
+  "sim1_sim2_compare": {
+    "_type": "step",
+    "address": "local:calculation",
+    "config": {},
+    "inputs": {},
+    "_outputs": null,
+    "outputs": {
+      "sim1_sim2_compare_result": [
+        "sim1_sim2_compare",
+        "sim1_sim2_compare_result"
+      ]
+    }
+  },
+  "sim1_exp_compare": {
+    "_type": "step",
+    "address": "local:calculation",
+    "config": {},
+    "inputs": {},
+    "_outputs": null,
+    "outputs": {
+      "sim1_exp_compare_result": [
+        "sim1_exp_compare",
+        "sim1_exp_compare_result"
+      ]
+    }
+  },
+  "sim2_exp_compare": {
+    "_type": "step",
+    "address": "local:calculation",
+    "config": {},
+    "inputs": {},
+    "_outputs": null,
+    "outputs": {
+      "sim2_exp_compare_result": [
+        "sim2_exp_compare",
+        "sim2_exp_compare_result"
+      ]
+    }
+  },
+  "compare_summary": {
+    "_type": "step",
+    "address": "local:calculation",
+    "config": {},
+    "inputs": {},
+    "_outputs": null,
+    "outputs": {
+      "compare_summary_result": [
+        "compare_summary",
+        "compare_summary_result"
+      ]
+    }
+  },
+  "simcompare_v2": {
+    "_type": "step",
+    "address": "local:sumOfSquares",
+    "config": {},
+    "inputs": {},
+    "_outputs": null,
+    "outputs": {
+      "simcompare_v2_result": [
+        "simcompare_v2",
+        "simcompare_v2_result"
+      ]
+    }
+  }
+}
