@@ -10,6 +10,8 @@ from inputs_manager import load_inputs_section
 from outputs_manager import load_outputs_section
 from tasks_manager import load_tasks_section
 
+from pbest import CompositeBuilder
+
 
 # TODO: need to import the database
 #   containing information about the
@@ -60,6 +62,7 @@ def transpile(sed: dict[Any, Any], root_dir=None) -> dict[str, Any]:
     output_section = load_outputs_section(outputs)
     document.update(output_section)
 
+    export_to_process_bg(document) 
 
     # ipdb.set_trace()
 
@@ -82,7 +85,7 @@ def load_sed(path, filename):
 if __name__ == "__main__":
     document = load_sed("../../examples/one/", "sed.json")
     print(document)
-    print("\n\n\n")
+    print("")
 
     document = load_sed("../../examples/two/", "sed.json")
     print(document)

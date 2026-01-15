@@ -115,6 +115,10 @@ class SteadyState(object):
             print("Unsaved data when creating SteadyState:", leftovers)
             return True
         return False
+    
+    def exportToProcessBigraph():
+        """foo"""
+        pass
 
    
 
