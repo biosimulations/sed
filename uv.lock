@@ -1502,6 +1502,27 @@ wheels = [
 ]
 
 [[package]]
+name = "pbest"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "copasi-basico" },
+    { name = "jinja2" },
+    { name = "libroadrunner" },
+    { name = "numpy" },
+    { name = "pandas" },
+    { name = "process-bigraph" },
+    { name = "pydantic" },
+    { name = "python-copasi" },
+    { name = "spython" },
+    { name = "tellurium" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/12/7a/e6c4198fece292a04de72540223142679423dfebcdbe20a29ba8ad7d485b/pbest-0.1.0.tar.gz", hash = "sha256:83c869014cbe4b04b9d511bfce7cf429356007ad32cb7ebfa4e2ff812d7a0da1", size = 152704, upload-time = "2026-01-09T13:53:18.173Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/50/ce/b9db77f44be6c9cd51961479080a7fdd20258c5ecea420e7240437fe540c/pbest-0.1.0-py3-none-any.whl", hash = "sha256:dd965bbcad4bcc48df96eeff50ff4864a8deaa90f327cfd3749382098dd130d5", size = 27553, upload-time = "2026-01-09T13:53:19.547Z" },
+]
+
+[[package]]
 name = "pexpect"
 version = "4.9.0"
 source = { registry = "https://pypi.org/simple" }
@@ -2286,6 +2307,7 @@ version = "0.0.1"
 source = { editable = "." }
 dependencies = [
     { name = "numpy" },
+    { name = "pbest" },
     { name = "process-bigraph" },
     { name = "pydantic" },
     { name = "spython" },
@@ -2310,6 +2332,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "numpy", specifier = ">=2.3.4" },
+    { name = "pbest", specifier = ">=0.1.0" },
     { name = "process-bigraph", specifier = ">=0.0.51" },
     { name = "pydantic", specifier = ">=2.12.3" },
     { name = "spython", specifier = ">=0.3.14" },

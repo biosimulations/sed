@@ -142,16 +142,6 @@ def load_tasks_section(tasks_section_config):
             case _:
                 raise ValueError("Unknown task type " + step_type + ".")
             
-        # step_config = {
-        #     "_type": "step",
-        #     "address": f"local:{step_type}",
-        #     "config": {},
-        #     "inputs": make_inputs(step_type, config),
-        #     "_outputs": make_outputs(step_type, outputs),
-        #     "outputs": {output_key: [key, output_key] for output_key in outputs},
-        # }
-
-
     return tasks
 
 
