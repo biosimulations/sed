@@ -4,7 +4,8 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
-from basico import load_model_from_string
+# from basico import load_model_from_string
+
 
 
 def load_csv(location: str, parameters: dict):
@@ -26,24 +27,34 @@ def load_data(data_config, root):
 
     return data
 
+
+
 # No processing, pass the file location to appropiate step/process
 # For each reference to model in question, replace with file location
 # (In reference to specific task in question, and its config)
 # (ex. UTCCopais config: model_path=[said model])
-def load_model():
-    pass
+def load_model(data_config, root):
+    #TODO: error handling
+    location = data_config["location"]
+    path = root / location
+    language = data_config["language"]
+    model = {"filepath": path,
+             "language": language}
+    return model
 
 
 def load_inputs_section(input_section: dict[Any, Any], root: Path):
-    data = {}
-    for key, config in input_section["data"].items():
+    inputs = {}
+    inputs["data"] = {}
+    inputs["models"] = {}
+    for key, config in input_section.pop("data", {}).items():
         loaded = load_data(config, root)
-        data[key] = loaded
+        inputs["data"][key] = loaded
 
-    for key, config in input_section["models"].items():
-        loaded = load_model()
-        data[key] = loaded
+    for key, config in input_section.pop("models", {}).items():
+        loaded = load_model(config, root)
+        inputs["models"][key] = loaded
 
-    return data
+    return inputs
 
 

@@ -6,9 +6,9 @@ from typing import Any
 import numpy as np
 import pandas as pd
 
-from sed.transpiler.inputs_manager import load_inputs_section
-from sed.transpiler.outputs_manager import load_outputs_section
-from sed.transpiler.tasks_manager import load_tasks_section
+from inputs_manager import load_inputs_section
+from outputs_manager import load_outputs_section
+from tasks_manager import load_tasks_section
 
 
 # TODO: need to import the database
@@ -46,27 +46,18 @@ def transpile(sed: dict[Any, Any], root_dir=None) -> dict[str, Any]:
     root_dir = Path(root_dir or ".")
 
     inputs = sed.get("inputs", {})
-    data = inputs.get("data", {})
-    models = inputs.get("models", {})
-
     tasks = sed.get("tasks", {})
-
     outputs = sed.get("outputs", {})
-    reports = outputs.get("reports", {})
-    plots = outputs.get("plots", {})
-
-    styles = plots.get("styles", {})
-    figures = plots.get("figures", {})
 
     document = {}
 
     data_section = load_inputs_section(inputs, root_dir)
     document.update(data_section)
 
-    tasks_section = load_tasks_section(tasks, root_dir)
+    tasks_section = load_tasks_section(tasks)
     document.update(tasks_section)
 
-    output_section = load_outputs_section(outputs, root_dir)
+    output_section = load_outputs_section(outputs)
     document.update(output_section)
 
 
@@ -75,12 +66,9 @@ def transpile(sed: dict[Any, Any], root_dir=None) -> dict[str, Any]:
     return document
 
 
-CANONICAL_SED_NAME = "sed.json"
-
-
-def load_sed(path):
+def load_sed(path, filename):
     path = Path(path)
-    sed_path = path / CANONICAL_SED_NAME
+    sed_path = path / filename
 
     with open(sed_path) as sed_file:
         sed = json.load(sed_file)
@@ -90,11 +78,11 @@ def load_sed(path):
     return document
 
 
-def test_one():
-    document = load_sed("examples/one/")
-    print(document)
-    # ipdb.set_trace()
-
 
 if __name__ == "__main__":
-    test_one()
+    document = load_sed("../../examples/one/", "sed.json")
+    print(document)
+    print("\n\n\n")
+
+    document = load_sed("../../examples/two/", "sed.json")
+    print(document)

@@ -105,12 +105,12 @@
         "file_format": "http://purl.org/NET/mediatypes/text/csv"
       },
       "comparisonSummary": {
-        "outputs": "tasks:compare_summary"
+        "dataSets": "tasks:compare_summary"
       }
     },
     "plots": {
       "Fig1": {
-        "_type": "Plot2D",
+        "_type": "plot2D",
         "label": "Figure 1",
         "xAxis": {
           "label": "Time"

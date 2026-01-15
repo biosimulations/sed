@@ -61,7 +61,7 @@
     },
     "plots": {
       "Fig1": {
-        "_type": "Plot3D",
+        "_type": "plot3D",
         "label": "Figure 1",
         "xAxis": {
           "label": "k1",
@@ -75,7 +75,7 @@
           "label": "Concentrations",
           "scale": "linear"
         },
-        "curves": {
+        "surfaces": {
           "S1": {
             "x": "tasks:paramScan_k1:range",
             "y": "tasks:paramScan_k2:range",
