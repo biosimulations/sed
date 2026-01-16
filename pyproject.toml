@@ -27,6 +27,7 @@ dependencies = [
     # "python-libsbml>=5.20.5",
     "spython>=0.3.14",
     # "vivarium-interface>=0.0.5",
+    "sympy>=1.14.0",
 ]
 
 [project.urls]

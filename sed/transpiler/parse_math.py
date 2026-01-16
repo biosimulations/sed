@@ -1,22 +1,22 @@
-from parsimonious.grammar import Grammar
+from sympy import symbols
 
-grammar = Grammar(
+from parsimonious.grammar import Grammar
+from parsimonious.nodes import NodeVisitor
+
+
+math_grammar = Grammar(
     '''
-    expression = group / operation
-    group = left_paren expression right_paren
-    operation = add / subtract / multiply / divide / exponent / variable / constant
-    add = expression plus expression
-    subtract = expression minus expression
-    multiply = expression times expression
-    divide = expression under expression
-    exponent = expression caret expression
-    variable = hash constant
-    constant = ~r"[a-zA-Z0-9_.:]+"
+    expression = term ((plus / minus) term)*
+    term = factor ((times / slash) factor)*
+    factor = (variable / number / left_paren expression right_paren) (caret expression)?
+    variable = hash symbol
+    symbol = ~r"[a-zA-Z0-9_.:]+"
+    number = ~r"[0-9]+"
     hash = "#"
     plus = "+"
     minus = "-"
     times = "*"
-    under = "/"
+    slash = "/"
     caret = "^"
     left_paren = "("
     right_paren = ")"
@@ -24,25 +24,108 @@ grammar = Grammar(
 )
 
 
-grammar = Grammar(
-    '''
-    atom = group / variable / constant
-    group = left_paren expression right_paren
-    expression = add_sub
-    add_sub = mul_div ((plus / minus) mul_div)*
-    mul_div = exponent ((times / under) exponent)*
-    exponent = atom (caret exponent)?
-    variable = hash constant
-    constant = ~r"[a-zA-Z0-9_.:]+"
-    hash = "#"
-    plus = "+"
-    minus = "-"
-    times = "*"
-    under = "/"
-    caret = "^"
-    left_paren = "("
-    right_paren = ")"
-    ''')
+class MathVisitor(NodeVisitor):
+    def __init__(self, variables):
+        self.variables = variables
+        self.allocate_index = 0
+        self.symbols = dict(zip(
+            self.variables,
+            symbols(' '.join(self.variables))))
+        self.path_symbols = {}
+        self.symbol_paths = {}
+
+    def visit_expression(self, node, visit):
+        base = visit[0][0]
+        sequence = visit[1]
+
+        result = base
+        if sequence:
+            for step in sequence:
+                import ipdb; ipdb.set_trace()
+                operation = step[0][0]
+                target = step[1][0]
+                import ipdb; ipdb.set_trace()
+                result = operation(result, target)
+
+        return result
+
+    def visit_term(self, node, visit):
+        base = visit[0]
+        sequence = [
+            term[0]
+            for term in visit[1:]
+            if term]
+            
+        return base, sequence
+
+    def visit_factor(self, node, visit):
+        base = visit[0][0]
+        if isinstance(base, list):
+            base = base[1]
+
+        exponent = visit[1]
+
+        result = base
+        if exponent:
+            operation = exponent[0][0]
+            power = exponent[0][1]
+            result = operation(base, power)
+
+        return result
+
+    def visit_variable(self, node, visit):
+        return self.symbols[visit[1]]
+
+    def visit_symbol(self, node, visit):
+        path = tuple(node.text.split(':'))
+
+        if path not in self.path_symbols:
+            if self.allocate_index >= len(self.variables):
+                raise Exception(f'all variables already allocated! no more for {path}')
+
+            new_variable = self.variables[self.allocate_index]
+            new_symbol = self.symbols[new_variable]
+            self.allocate_index += 1
+
+            self.path_symbols[path] = (new_variable, new_symbol)
+            self.symbol_paths[new_variable] = path
+
+        return self.path_symbols[path][0]
+
+    def visit_number(self, node, visit):
+        return float(node.text)
+
+    def visit_plus(self, node, visit):
+        return lambda x, y: x + y
+
+    def visit_minus(self, node, visit):
+        return lambda x, y: x - y
+
+    def visit_times(self, node, visit):
+        return lambda x, y: x * y
+
+    def visit_slash(self, node, visit):
+        return lambda x, y: x / y
+
+    def visit_caret(self, node, visit):
+        return lambda x, y: x ** y
+
+    def visit_number(self, node, visit):
+        return float(node.text)
+
+    def generic_visit(self, node, visit):
+        return visit
+
+
+def visit_expression(expression, visitor):
+    parsed = math_grammar.parse(expression)
+    return visitor.visit(parsed)
+
+
+def parse_expression(expression):
+    variables = ['a', 'b', 'c', 'd', 'e', 'x', 'y', 'z', 'w', 'i', 'j', 'k', 'm', 'n']
+    visitor = MathVisitor(variables)
+    return visit_expression(expression, visitor)
 
 
 tests = {
@@ -51,8 +134,10 @@ tests = {
 
 def test_math_parser():
     for test_key, test_string in tests.items():
-        print(grammar.parse(test_string))
-
+        parsed = math_grammar.parse(test_string)
+        result = parse_expression(test_string)
+        print(f"{test_string} --> {result}")
+    
 
 if __name__ == '__main__':
     test_math_parser()
