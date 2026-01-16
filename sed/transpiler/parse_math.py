@@ -35,26 +35,30 @@ class MathVisitor(NodeVisitor):
         self.symbol_paths = {}
 
     def visit_expression(self, node, visit):
-        base = visit[0][0]
+        base = visit[0]
         sequence = visit[1]
 
         result = base
         if sequence:
             for step in sequence:
                 operation = step[0][0]
-                target = step[1][0]
+                target = step[1]
                 result = operation(result, target)
 
         return result
 
     def visit_term(self, node, visit):
         base = visit[0]
-        sequence = [
-            term[0]
-            for term in visit[1:]
-            if term]
+        sequence = visit[1:]
             
-        return base, sequence
+        result = base
+        if sequence:
+            for step in sequence[0]:
+                operation = step[0][0]
+                target = step[1]
+                result = operation(result, target)
+
+        return result
 
     def visit_factor(self, node, visit):
         base = visit[0][0]
@@ -120,20 +124,29 @@ def visit_expression(expression, visitor):
     return visitor.visit(parsed)
 
 
+def default_math_visitor():
+    variables = ['a', 'b', 'c', 'd', 'e', 'x', 'y', 'z', 'w', 'i', 'j', 'k', 'm', 'n']
+    visitor = MathVisitor(variables)
+    return visitor
+
+
 def parse_expression(expression):
     variables = ['a', 'b', 'c', 'd', 'e', 'x', 'y', 'z', 'w', 'i', 'j', 'k', 'm', 'n']
     visitor = MathVisitor(variables)
     return visit_expression(expression, visitor)
 
 
-tests = {
-    'example': '(#tasks:sim1-#data:experiment1)^2'}
+tests = [
+    '(#tasks:sim1-#data:experiment1)^2',
+    '((#x:y:z*#e:f:g:h)-(#y:z/#m:n:o*#k:l:m))^(#x:y+#a:b-#x:y:z)',
+]
 
 
 def test_math_parser():
-    for test_key, test_string in tests.items():
-        parsed = math_grammar.parse(test_string)
-        result = parse_expression(test_string)
+    for test_string in tests:
+        visitor = default_math_visitor()
+        result = visit_expression(test_string, visitor)
+
         print(f"{test_string} --> {result}")
     
 
