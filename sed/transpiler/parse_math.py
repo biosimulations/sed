@@ -41,10 +41,8 @@ class MathVisitor(NodeVisitor):
         result = base
         if sequence:
             for step in sequence:
-                import ipdb; ipdb.set_trace()
                 operation = step[0][0]
                 target = step[1][0]
-                import ipdb; ipdb.set_trace()
                 result = operation(result, target)
 
         return result
