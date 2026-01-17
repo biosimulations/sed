@@ -1,9 +1,16 @@
 import re
 
 class Range(object):
-    """A 'range' object, used whenever  actor to execute simulations."""
+    """A 'range' object, used to define a range in one of several ways:
+        * start, end, numberOfSteps (and optional 'scale')
+        * start, end, interval
+        * start, numberOfSteps, interval
+        * end, numberOfSteps, interval
+        * values
+    """
 
     def __init__(self, range_config: dict):
+        self.type_key = "Range"
         self.start = range_config.pop("start", None)
         self.end = range_config.pop("end", None)
         self.numberOfSteps = range_config.pop("numberOfSteps", None)
@@ -24,6 +31,7 @@ class UniformTimeCourse(object):
     
     def __init__(self, utc_config: dict):
         #TODO: error checking
+        self.type_key = "UniformTimeCourse"
         self.model = utc_config.pop("model", None)
         self.timeRange = Range(utc_config.pop("timeRange", {}))
         self.outputVariables = utc_config.pop("outputVariables", None)
@@ -43,6 +51,7 @@ class Calculation(object):
     
     def __init__(self, calc_config: dict):
         #TODO: error checking
+        self.type_key = "Calculation"
         self.infix = calc_config.pop("math", None)
         self.units = calc_config.pop("units", None)
         self.validate(calc_config)
@@ -73,6 +82,7 @@ class SumOfSquares(object):
     """The definition of a 'sumOfSquares' task, which calculates the differences between inputs."""
     
     def __init__(self, sos_config: dict):
+        self.type_key = "SumOfSquares"
         self.inputs = sos_config.pop("inputs", None)
         self.validate(sos_config)
     
@@ -88,6 +98,7 @@ class ParameterScan(object):
     """The definition of a 'parameter scan' task, which takes a model as input and outputs an array of models."""
     
     def __init__(self, paramscan_config: dict):
+        self.type_key = "ParameterScan"
         self.model = paramscan_config.pop("model", None)
         self.scannedVariable = paramscan_config.pop("scannedVariable", None)
         self.range = Range(paramscan_config.pop("range", {}))
@@ -106,6 +117,7 @@ class SteadyState(object):
     """The definition of a 'parameter scan' task, which takes a model as input and outputs an array of models."""
     
     def __init__(self, ss_config: dict):
+        self.type_key = "SteadyState"
         self.model = ss_config.pop("model", None)
         self.outputVariables = ss_config.pop("outputVariables", None)
         self.outputModel = ss_config.pop("outputModel", None)

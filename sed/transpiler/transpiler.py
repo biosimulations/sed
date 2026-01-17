@@ -55,16 +55,11 @@ def parse_hash(var_hash):
     return var_hash[1:].split(":")[1:]
 
 
-def task_to_step(task_data):
-    if isinstance(task_data, UniformTimeCourse):
-        return "UniformTimeCourse"
-
-
 def export_to_pbg(sed, context):
     pbg = sed['inputs']
 
     for task_key, task_data in sed['tasks'].items():
-        step_task = task_to_step(task_data)
+        type_key = task_data.type_key
         step_name = 'Tellurium'
         if 'tasks' in context and task_key in context['tasks']:
             step_name = context['tasks'][task_key]
@@ -73,10 +68,10 @@ def export_to_pbg(sed, context):
             "_type": "step",
             "address": f"local:{step_name}",
             "config": {},
-            "_inputs": make_inputs_schema(step_task, task_data),
-            "inputs": make_inputs(step_task, task_data),
-            "_outputs": make_outputs_schema(step_task, task_data),
-            "outputs": make_outputs(step_task, task_key, task_data)
+            "_inputs": make_inputs_schema(type_key, task_data),
+            "inputs": make_inputs(type_key, task_data),
+            "_outputs": make_outputs_schema(type_key, task_data),
+            "outputs": make_outputs(type_key, task_key, task_data)
         }
 
         pbg[task_key] = step_config
