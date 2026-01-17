@@ -121,10 +121,10 @@ if __name__ == "__main__":
     context = {
         'tasks': {
             'sim2': 'Copasi'}}
-    pbg1 = transpile("../../examples/one/", "sed.json", context)
+    pbg1 = transpile("examples/one/", "sed.json", context)
     print(pbg1)
     print("")
 
-    pbg2 = transpile("../../examples/two/", "sed.json")
+    pbg2 = transpile("examples/two/", "sed.json")
     print(pbg2)
     
