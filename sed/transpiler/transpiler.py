@@ -66,7 +66,7 @@ def export_to_pbg(sed, context):
     for task_key, task_data in sed['tasks'].items():
         step_task = task_to_step(task_data)
         step_name = 'Tellurium'
-        if task_key in context['tasks']:
+        if 'tasks' in context and task_key in context['tasks']:
             step_name = context['tasks'][task_key]
 
         step_config = {
@@ -84,52 +84,52 @@ def export_to_pbg(sed, context):
     return pbg
     
 
-def transpile(sed: dict[Any, Any], root_dir=None) -> dict[str, Any]:
+def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> dict[str, Any]:
     root_dir = Path(root_dir or ".")
 
     inputs = sed.get("inputs", {})
     tasks = sed.get("tasks", {})
     outputs = sed.get("outputs", {})
 
-    document = {}
+    seddoc = {}
 
-    inputs_section = load_inputs_section(inputs, root_dir)
-    document['inputs'] = inputs_section
+    seddoc['inputs']  = load_inputs_section(inputs, root_dir)
+    seddoc['tasks']   = load_tasks_section(tasks)
+    seddoc['outputs'] = load_outputs_section(outputs)
 
-    tasks_section = load_tasks_section(tasks)
-    document['tasks'] = tasks_section
+    print(seddoc)
+    print("")
 
-    outputs_section = load_outputs_section(outputs)
-    document['outputs'] = outputs_section
+    return seddoc
 
-    context = {
-        'tasks': {
-            'sim2': 'Copasi'}}
+def translate_to_pbg(seddoc, context):
 
-    pbg = export_to_pbg(document, context)
+    pbg = export_to_pbg(seddoc, context)
 
-    import ipdb; ipdb.set_trace()
+    #import ipdb; ipdb.set_trace()
 
-    return document
+    return pbg    
 
-
-def load_sed(path, filename):
+def transpile(path, filename, context={}):
     path = Path(path)
     sed_path = path / filename
 
     with open(sed_path) as sed_file:
         sed = json.load(sed_file)
 
-    document = transpile(sed, path)
-
-    return document
-
+    seddoc = load_sed(sed, path)
+    pbg = translate_to_pbg(seddoc, context)
+    return pbg
 
 
 if __name__ == "__main__":
-    document = load_sed("examples/one/", "sed.json")
-    print(document)
+    context = {
+        'tasks': {
+            'sim2': 'Copasi'}}
+    pbg1 = transpile("../../examples/one/", "sed.json", context)
+    print(pbg1)
     print("")
 
-    document = load_sed("examples/two/", "sed.json")
-    print(document)
+    pbg2 = transpile("../../examples/two/", "sed.json")
+    print(pbg2)
+    

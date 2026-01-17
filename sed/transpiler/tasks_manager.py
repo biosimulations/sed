@@ -1,3 +1,5 @@
+import re
+
 class Range(object):
     """A 'range' object, used whenever  actor to execute simulations."""
 
@@ -46,7 +48,7 @@ class Calculation(object):
         self.validate(calc_config)
     
     def __str__(self):
-        ret = "Infix: '" + self.infix + "'\n"
+        ret = "Calculation object.  Infix: '" + self.infix + "'\n"
         if self.units:
             ret += "Units: '" + self.units + "'\n"
         return ret.strip()
@@ -63,8 +65,8 @@ class Calculation(object):
 
     def getInputVariables(self):
         """Parse the infix to retrieve all SED variable inputs."""
-        print("Not actually doing anything yet.")
-        return []
+        strlist = re.findall(r'#[a-zA-Z0-9_:.]*', self.infix)
+        return set(strlist)
 
 
 class SumOfSquares(object):
