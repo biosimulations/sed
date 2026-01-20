@@ -1,7 +1,10 @@
+import json
 import sys
 from pathlib import Path
 
+import pbest.globals
 from pandas import DataFrame
+from process_bigraph import Composite
 from roadrunner import RoadRunner
 import tellurium as te
 import pandas as pd
@@ -30,7 +33,7 @@ def demo_transpiler(demo_number: int):
             copasi_df: DataFrame = run_time_course(
                 start_time=0,
                 duration=20,
-                intervals=0.4,
+                intervals=50,
                 update_model=True,
                 use_sbml_id=True,
                 model=load_model(str(example_one_dir / "example1.xml"))
@@ -38,6 +41,7 @@ def demo_transpiler(demo_number: int):
 
             csv_df: DataFrame = pd.read_csv(example_one_dir / "experimental_data.csv")
             print(copasi_df)
+            print(tellurium_result)
             print(csv_df)
 
 
@@ -51,4 +55,11 @@ def demo_transpiler(demo_number: int):
 
 
 if __name__ == "__main__":
-    demo_transpiler(1)
+    core = pbest.globals.get_loaded_core()
+    with open(PROJECT_ROOT_DIR / "examples" / "one" / "example.pbg") as f:
+        pbg = json.load(f)
+        composite = Composite(core=core, config={"state": pbg})
+        print(composite.state["comparison_result"])
+        composite.run(1)
+
+

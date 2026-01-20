@@ -1,0 +1,60 @@
+{
+  "tellurium_step": {
+      "_type": "step",
+      "address": "local:pbest.registry.simulators.tellurium_process.TelluriumUTCStep",
+      "config": {
+          "model_source": "/Users/evalencia/Documents/BioSimulators/sed/examples/one/example1.xml",
+          "time": 20,
+          "n_points": 50
+      },
+      "inputs": {"concentrations": ["species_concentrations"], "counts": ["species_counts"]},
+      "outputs": {
+          "result": ["results", "tellurium"]
+      }
+  },
+  "copasi_step": {
+      "_type": "step",
+      "address": "local:pbest.registry.simulators.copasi_process.CopasiUTCStep",
+      "config": {
+          "model_source": "/Users/evalencia/Documents/BioSimulators/sed/examples/one/example1.xml",
+          "time": 20,
+          "n_points": 50
+      },
+      "inputs": {"concentrations": ["species_concentrations"], "counts": ["species_counts"]},
+      "outputs": {
+          "result": ["results", "copasi"]
+      }
+  },
+  "comparison": {
+      "_type": "step",
+      "address": "local:pbest.registry.comparison.MSEComparison",
+      "config": {},
+      "inputs": {
+          "results": ["results"]
+      },
+      "outputs": {
+          "comparison_result": ["comparison_result"]
+      }
+  },
+
+  "results": {
+    "csv": {
+      "time": [0.0, 0.4, 0.8, 1.2, 1.6, 2.0, 2.4, 2.8, 3.2, 3.6, 4.0, 4.4, 4.8, 5.2, 5.6, 6.0, 6.4, 6.8, 7.2, 7.6, 8.0, 8.4, 8.8, 9.2, 9.6, 10.0, 10.4, 10.8, 11.2, 11.6, 12.0, 12.4, 12.8, 13.2, 13.6, 14.0, 14.4, 14.8, 15.2, 15.6, 16.0, 16.4, 16.8, 17.2, 17.6, 18.0, 18.4, 18.8, 19.2, 19.6, 20],
+      "columns": ["S1", "S2"],
+      "values": [[-0.096462,-0.3805337], [0.77536,-0.183798], [0.398377,0.422139],
+        [1.95634,1.32352], [0.43424,0.045263], [2.31661,-0.073549], [1.63781,1.96991],
+        [1.47421,0.30589], [1.5134,2.16673], [2.16433,1.00971], [1.59439,2.08582],
+        [1.28056,2.06762], [2.83845,2.42712], [2.12138,2.9307], [2.53842,1.74501],
+        [1.37347,1.9049], [1.78225,3.65041], [2.87535,3.57768], [2.89526,2.25997],
+        [2.36637,3.91058], [2.06501,3.38387], [1.08944,3.47122], [1.00189,3.37403],
+        [1.96954,4.32371], [2.11752,3.53667], [1.93697,4.28731], [1.21197,3.74101],
+        [1.2256,4.65717], [2.39194,3.49415], [2.48004,5.17828], [2.26794,5.11091],
+        [1.65868,4.00633], [1.84528,5.08686], [1.95177,3.50676], [2.21217,4.39329],
+        [2.33751,5.0467], [1.81878,3.75221], [1.476,5.10704], [1.93818,4.51739],
+        [1.86633,5.56643], [1.02945,4.21435], [2.61655,4.66529], [1.30463,3.90941],
+        [1.0087,4.23384], [1.72675,5.09871], [1.0998,5.75114], [1.81183,4.53224],
+        [2.49586,4.88811], [2.88889,4.66484], [1.19091,5.31852]
+      ]
+    }
+  }
+}
