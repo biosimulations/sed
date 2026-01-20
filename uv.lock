@@ -2320,8 +2320,10 @@ dependencies = [
     { name = "pbest" },
     { name = "process-bigraph" },
     { name = "pydantic" },
+    { name = "python-copasi" },
     { name = "spython" },
     { name = "sympy" },
+    { name = "tellurium" },
 ]
 
 [package.dev-dependencies]
@@ -2346,8 +2348,10 @@ requires-dist = [
     { name = "pbest", specifier = ">=0.2.1" },
     { name = "process-bigraph", specifier = ">=0.0.51" },
     { name = "pydantic", specifier = ">=2.12.3" },
+    { name = "python-copasi", specifier = ">=4.45.298" },
     { name = "spython", specifier = ">=0.3.14" },
     { name = "sympy", specifier = ">=1.14.0" },
+    { name = "tellurium", specifier = ">=2.2.11.1" },
 ]
 
 [package.metadata.requires-dev]

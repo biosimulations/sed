@@ -7,7 +7,6 @@ from sed.transpiler.inputs_manager import load_inputs_section
 from sed.transpiler.outputs_manager import load_outputs_section
 from sed.transpiler.tasks_manager import load_tasks_section
 
-
 logger = logging.getLogger(__name__)
 
 # from pbest import CompositeBuilder

@@ -25,9 +25,11 @@ dependencies = [
     # "bigraph-schema>=0.0.77",
     "pydantic>=2.12.3",
     # "python-libsbml>=5.20.5",
+    "python-copasi>=4.45.298",
     "spython>=0.3.14",
     # "vivarium-interface>=0.0.5",
     "sympy>=1.14.0",
+    "tellurium>=2.2.11.1",
 ]
 
 [project.urls]
