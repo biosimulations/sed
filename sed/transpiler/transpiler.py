@@ -32,7 +32,7 @@ def make_inputs_schema(type_key, task_data):
 def make_inputs(type_key, task_data):
     result = {}
     if type_key == "UniformTimeCourse":
-        return {'model': parse_hash(task_data.model)}
+        return {'model_source': parse_hash(task_data.model)}
 
 
 def make_outputs_schema(type_key, task_data):
@@ -60,14 +60,14 @@ def export_to_pbg(sed, context):
 
     for task_key, task_data in sed['tasks'].items():
         type_key = task_data.type_key
-        step_name = 'Tellurium'
+        step_name = 'pbest.registry.simulators.tellurium_process.TelluriumUTCStep'
         if 'tasks' in context and task_key in context['tasks']:
             step_name = context['tasks'][task_key]
 
         step_config = {
             "_type": "step",
             "address": f"local:{step_name}",
-            "config": {},
+            "config": {"model_source": str(pbg['models']['model1']['filepath']), "n_points": 10, "time": 1},
             "_inputs": make_inputs_schema(type_key, task_data),
             "inputs": make_inputs(type_key, task_data),
             "_outputs": make_outputs_schema(type_key, task_data),
