@@ -7,8 +7,8 @@
     </listOfCompartments>
     <listOfSpecies>
       <species id="Xo" compartment="C" initialConcentration="2" hasOnlySubstanceUnits="false" boundaryCondition="true" constant="false"/>
-      <species id="S1" compartment="C" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
-      <species id="S2" compartment="C" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="S1" compartment="C" initialConcentration="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
+      <species id="S2" compartment="C" initialConcentration="0" hasOnlySubstanceUnits="false" boundaryCondition="false" constant="false"/>
     </listOfSpecies>
     <listOfParameters>
       <parameter id="k1" value="0.5" constant="true"/>
