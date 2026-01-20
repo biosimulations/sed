@@ -1512,9 +1512,10 @@ wheels = [
 
 [[package]]
 name = "pbest"
-version = "0.1.0"
+version = "0.2.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
+    { name = "bigraph-schema" },
     { name = "copasi-basico" },
     { name = "jinja2" },
     { name = "libroadrunner" },
@@ -1526,9 +1527,9 @@ dependencies = [
     { name = "spython" },
     { name = "tellurium" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/12/7a/e6c4198fece292a04de72540223142679423dfebcdbe20a29ba8ad7d485b/pbest-0.1.0.tar.gz", hash = "sha256:83c869014cbe4b04b9d511bfce7cf429356007ad32cb7ebfa4e2ff812d7a0da1", size = 152704, upload-time = "2026-01-09T13:53:18.173Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/d0/0b/3933ab5c53abfc79f5bc541ec4b7b7d5032a46ff243da6f12d7d3fbfa501/pbest-0.2.1.tar.gz", hash = "sha256:b26f5e730f58c87aab8744d53725ca9130dd1aaf81acd2663c843e30997059f4", size = 155609, upload-time = "2026-01-16T19:44:33.878Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/50/ce/b9db77f44be6c9cd51961479080a7fdd20258c5ecea420e7240437fe540c/pbest-0.1.0-py3-none-any.whl", hash = "sha256:dd965bbcad4bcc48df96eeff50ff4864a8deaa90f327cfd3749382098dd130d5", size = 27553, upload-time = "2026-01-09T13:53:19.547Z" },
+    { url = "https://files.pythonhosted.org/packages/22/6b/d43e0205b84ef36944292e10e0bf290c6984cffebe86a77121c9c5a6c3ba/pbest-0.2.1-py3-none-any.whl", hash = "sha256:c5225dffccf37187d00e06b6697b27a5e241f06e8ea73073742ed851a32a3fa9", size = 28471, upload-time = "2026-01-16T19:44:32.492Z" },
 ]
 
 [[package]]
@@ -2342,7 +2343,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "numpy", specifier = ">=2.3.4" },
-    { name = "pbest", specifier = ">=0.1.0" },
+    { name = "pbest", specifier = ">=0.2.1" },
     { name = "process-bigraph", specifier = ">=0.0.51" },
     { name = "pydantic", specifier = ">=2.12.3" },
     { name = "spython", specifier = ">=0.3.14" },

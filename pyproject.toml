@@ -1,5 +1,5 @@
 [project]
-name = "Sed"
+name = "sed"
 version = "0.0.1"
 description = ""
 authors = [{ name = "Center for Reproducable Biological Modeling", email = "evalencia@uchc.edu" }]
@@ -20,7 +20,7 @@ dependencies = [
     "numpy>=2.3.4",
     # "pandas>=2.3.3",
     # "polars>=1.35.2",
-    "pbest>=0.1.0",
+    "pbest>=0.2.1",
     "process-bigraph>=0.0.51",
     # "bigraph-schema>=0.0.77",
     "pydantic>=2.12.3",
