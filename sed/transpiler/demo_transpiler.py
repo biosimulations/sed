@@ -24,7 +24,7 @@ def demo_transpiler(demo_number: int):
             example_one_dir = PROJECT_ROOT_DIR / "examples" / "one"
             with open(example_one_dir / "sed.json") as f:
                 print(f"Sed Document:\n {f.read()}")
-            rr: RoadRunner = te.loadSBMLModel(example_one_dir / "example1.xml")
+            rr: RoadRunner = te.loadSBMLModel(str(example_one_dir / "example1.xml"))
             tellurium_result = rr.simulate(0, 20, 50, selections=["time", "S1", "S2"])
 
             copasi_df: DataFrame = run_time_course(
@@ -36,7 +36,7 @@ def demo_transpiler(demo_number: int):
                 model=load_model(str(example_one_dir / "example1.xml"))
             )
 
-            csv_df: DataFrame = pd.read_csv(example_one_dir / "example1.csv")
+            csv_df: DataFrame = pd.read_csv(example_one_dir / "experimental_data.csv")
             print(copasi_df)
             print(csv_df)
 
