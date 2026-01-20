@@ -1,14 +1,14 @@
 import json
-from enum import Enum
+import logging
 from pathlib import Path
 from typing import Any
 
-import numpy as np
-import pandas as pd
+from sed.transpiler.inputs_manager import load_inputs_section
+from sed.transpiler.outputs_manager import load_outputs_section
+from sed.transpiler.tasks_manager import load_tasks_section
 
-from inputs_manager import load_inputs_section
-from outputs_manager import load_outputs_section
-from tasks_manager import load_tasks_section, UniformTimeCourse
+
+logger = logging.getLogger(__name__)
 
 # from pbest import CompositeBuilder
 
@@ -92,8 +92,8 @@ def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> dict[str, Any]:
     seddoc['tasks']   = load_tasks_section(tasks)
     seddoc['outputs'] = load_outputs_section(outputs)
 
-    print(seddoc)
-    print("")
+    logger.debug(seddoc)
+    logger.debug("")
 
     return seddoc
 
