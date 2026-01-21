@@ -3,9 +3,9 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from sed.transpiler.inputs_manager import load_inputs_section
-from sed.transpiler.outputs_manager import load_outputs_section
-from sed.transpiler.tasks_manager import load_tasks_section
+from inputs_manager import load_inputs_section
+from outputs_manager import load_outputs_section
+from tasks_manager import load_tasks_section
 
 logger = logging.getLogger(__name__)
 
@@ -54,8 +54,15 @@ def parse_hash(var_hash):
     return var_hash[1:].split(":")[1:]
 
 
-def export_to_pbg(sed, context):
-    pbg = sed['inputs']
+def export_to_pbg(sed, context, path):
+    pbg = {"data": {},
+           "models": {}}
+
+    for data_key, data_object in sed['inputs']['data'].items():
+        pbg['data'][data_key] = data_object.load(path)
+
+    for model_key, model_object in sed['inputs']['models'].items():
+        pbg['models'][model_key] = model_object.load_model(path)
 
     for task_key, task_data in sed['tasks'].items():
         type_key = task_data.type_key
@@ -66,7 +73,7 @@ def export_to_pbg(sed, context):
         step_config = {
             "_type": "step",
             "address": f"local:{step_name}",
-            "config": {"model_source": str(pbg['models']['model1']['filepath']), "n_points": 10, "time": 1},
+            "config": {"model_source": context['root_dir'] / sed['inputs']['models']['model1'].location, "n_points": 10, "time": 1},
             "_inputs": make_inputs_schema(type_key, task_data),
             "inputs": make_inputs(type_key, task_data),
             "_outputs": make_outputs_schema(type_key, task_data),
@@ -96,9 +103,9 @@ def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> dict[str, Any]:
 
     return seddoc
 
-def translate_to_pbg(seddoc, context):
+def translate_to_pbg(seddoc, context, path):
 
-    pbg = export_to_pbg(seddoc, context)
+    pbg = export_to_pbg(seddoc, context, path)
 
     #import ipdb; ipdb.set_trace()
 
@@ -112,18 +119,22 @@ def transpile(path, filename, context={}):
         sed = json.load(sed_file)
 
     seddoc = load_sed(sed, path)
-    pbg = translate_to_pbg(seddoc, context)
+    pbg = translate_to_pbg(seddoc, context, path)
     return pbg
 
 
 if __name__ == "__main__":
+    root_dir = Path(__file__).resolve().parents[2]
     context = {
         'tasks': {
-            'sim2': 'Copasi'}}
-    pbg1 = transpile("examples/one/", "sed.json", context)
+            'sim2': 'Copasi'
+            },
+        'root_dir': root_dir,
+        }
+    pbg1 = transpile(root_dir / "examples/one/", "sed.json", context)
     print(pbg1)
     print("")
 
-    pbg2 = transpile("examples/two/", "sed.json")
+    pbg2 = transpile(root_dir / "examples/two/", "sed.json", context)
     print(pbg2)
     

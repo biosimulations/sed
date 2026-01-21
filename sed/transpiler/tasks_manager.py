@@ -37,6 +37,7 @@ class UniformTimeCourse(object):
         self.outputVariables = utc_config.pop("outputVariables", None)
         self.initialTime = utc_config.pop("initialTime", None)
         self.validate(utc_config)
+        self.executor = "Tellurium"
     
     def validate(self, leftovers={}):
         """Validate."""
@@ -44,6 +45,56 @@ class UniformTimeCourse(object):
             print("Unsaved data when creating UniformTimeCourse:", leftovers)
             return True
         return False
+    
+    def make_python(self, key):
+        if (self.executor == "Tellurium"):
+            return self.make_python_tellurium(key)
+        elif (self.executor == "Copasi"):
+            return self.make_python_copasi(key)
+        else:
+            raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
+
+    def make_python_tellurium(self, key):
+        headers = set(["import tellurium as te"])
+        modelid = self.model
+        modelid = self.model[1:]
+        modelid = modelid.replace(":", "_")
+        taskid = "tasks_" + key
+        code = taskid + "_r = te.loadSBMLModel(" + modelid + ")\n"
+        code += taskid + " = " + taskid + "_r.simulate(" + str(self.timeRange.start) + ", " + str(self.timeRange.end) + ", steps=" + str(self.timeRange.numberOfSteps) + ", selections = " + str(self.outputVariables) + ")\n"
+        return headers, code
+
+    def make_python_copasi(self, key):
+        # copasi_df: DataFrame = basico.run_time_course(
+        #     start_time=0,
+        #     duration=20,
+        #     intervals=50,
+        #     update_model=True,
+        #     use_sbml_id=True,
+        #     model=basico.load_model(str(example_one_dir / "example1.xml"))
+        # )
+        # copasi_out = {}
+        # copasi_out["time"] = np.array(copasi_df.index)
+        # copasi_out["S1"] = np.array(copasi_df["S1"])
+        # copasi_out["S2"] = np.array(copasi_df["S2"])
+        # copasi_out = DataFrame(copasi_out)
+        headers = set(["import basico"])
+        headers.add("import numpy as np")
+        headers.add("from pandas import DataFrame")
+        modelid = self.model
+        modelid = self.model[1:]
+        modelid = modelid.replace(":", "_")
+        taskid = "tasks_" + key
+        code = taskid + "_copasi = basico.run_time_course(start_time=" + str(self.timeRange.start) + ", duration=" + str(self.timeRange.end - self.timeRange.start) + ", intervals=" + str(self.timeRange.numberOfSteps) + ", update_model=True, use_sbml_id=True,model=basico.load_model(" + modelid + "))\n"
+        code += taskid + " = {}\n"
+        first = 0
+        if (self.outputVariables[0] == "time"):
+            first = 1
+            code += taskid + "['time'] = np.array(" + taskid + "_copasi.index)\n"
+        for var in self.outputVariables[first:]:
+            code += taskid + "['" + var + "'] = np.array("+ taskid + "_copasi['"+ var + "'])\n"
+        code += taskid + " = DataFrame(" + taskid + ")\n"
+        return headers, code
 
 
 class Calculation(object):
@@ -77,6 +128,13 @@ class Calculation(object):
         strlist = re.findall(r'#[a-zA-Z0-9_:.]*', self.infix)
         return set(strlist)
 
+    def make_python(self, key):
+        headers = set()
+        line = self.infix.replace(":", "_")
+        line = line.replace("#", "")
+        line = line.replace("^", "**")
+        code = "tasks_" + key + " = " + line + "\n"
+        return headers, code
 
 class SumOfSquares(object):
     """The definition of a 'sumOfSquares' task, which calculates the differences between inputs."""
@@ -92,6 +150,11 @@ class SumOfSquares(object):
             print("Unsaved data when creating SumOfSquares:", leftovers)
             return True
         return False
+
+    def make_python(self, key):
+        headers = set()
+        code = ""
+        return headers, code
 
 
 class ParameterScan(object):
@@ -111,6 +174,11 @@ class ParameterScan(object):
             print("Unsaved data when creating ParameterScan:", leftovers)
             return True
         return False
+
+    def make_python(self, key):
+        headers = set()
+        code = ""
+        return headers, code
 
 
 class SteadyState(object):
@@ -133,6 +201,11 @@ class SteadyState(object):
     def exportToProcessBigraph():
         """foo"""
         pass
+
+    def make_python(self, key):
+        headers = set()
+        code = ""
+        return headers, code
 
    
 

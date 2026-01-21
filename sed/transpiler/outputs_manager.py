@@ -91,6 +91,35 @@ class Plot2D(Plot):
             return True
         return False
     
+    def make_python(self, key):
+        headers = set(["import matplotlib.pyplot as plt"])
+        code = "fig, ax = plt.subplots()\n"
+        xref = ""
+        ys = []
+        code += "ys = np.vstack(("
+        for curve in self.curves:
+            y = self.curves[curve].y.replace(":", "_")
+            y = y.replace("#", "")
+            ys.append(y)
+            code += y + ", "
+            #TODO: check to make sure all xrefs are the same
+            xref = self.curves[curve].x.replace(":", "_")
+            xref = xref.replace("#", "")
+        code += "))\nys = ys.transpose()\n"
+        code += "x = " + xref + "\n"
+        code += "ax.plot(x, ys)\n"
+        ax_args = ""
+        if (self.xaxis):
+            ax_args += "xlabel='" + self.xaxis.label + "'"
+        if (self.yaxis):
+            ax_args += ", ylabel='" + self.yaxis.label + "'"
+        if (self.label):
+            ax_args += ", title='" + self.label + "'"
+        code += "ax.set(" + ax_args + ")\n"
+        code += "plt.show()\n"
+        
+        return headers, code
+
     
 class Plot3D(Plot):
     """A 'plot' object, used to define a 2D visual representation of data."""
@@ -112,28 +141,11 @@ class Plot3D(Plot):
             return True
         return False
     
-    
-class DataSet(object):
-    """A data set, to be exported in a Report."""
+    def make_python(self, key):
+        headers = set()
+        code = ""
+        return headers, code
 
-    def __init__(self, dataset_config: dict):
-        self.label = dataset_config.pop("label", None)
-        self.xaxis = Axis(dataset_config.pop("xaxis", {}))
-        self.yaxis = Axis(dataset_config.pop("yaxis", {}))
-        curves = dataset_config.pop("curves", {})
-        self.curves = {}
-        if (curves):
-            for key, config in curves.items():
-                self.curves[key] = Curve(config)
-        self.validate(dataset_config)
-
-    def validate(self, leftovers={}):
-        """Validate."""
-        if len(leftovers):
-            print("Unsaved data when creating DataSet:", leftovers)
-            return True
-        return False
-    
 
 class Report(object):
     """A 'report' object, for storing and reporting data."""
@@ -151,6 +163,25 @@ class Report(object):
             print("Unsaved data when creating Report:", leftovers)
             return True
         return False
+
+    def make_python(self, key):
+        headers = set(["import numpy as np"])
+        code = ""
+        repid = "outputs_reports_" + key
+        if isinstance(self.dataSets, str):
+            line = self.dataSets
+            line = line.replace("#", "")
+            line = line.replace(":", "_")
+            code = repid + " = " + line + "\n"
+        else:
+            code += repid + " = {}\n"
+            for ds_key in self.dataSets:
+                line = self.dataSets[ds_key]
+                line = line.replace("#", "")
+                line = line.replace(":", "_")
+                code += repid + "['" + ds_key + "'] = np.array(" + line + ")\n"
+        code += "print(" + repid+ ")\n"
+        return headers, code
 
 
 class Style(object):
