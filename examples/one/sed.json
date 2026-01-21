@@ -60,15 +60,15 @@
     },
     "sim1_exp_compare": {
       "_type": "calculation",
-      "math": "(#tasks:sim1 - #data:experiment1)^2"
+      "math": "(#tasks:sim1 - #inputs:data:experiment1)^2"
     },
     "sim2_exp_compare": {
       "_type": "calculation",
-      "math": "(#tasks:sim2 - #data:experiment1)^2"
+      "math": "(#tasks:sim2 - #inputs:data:experiment1)^2"
     },
     "compare_summary": {
       "_type": "calculation",
-      "math": "[sum(#tasks:sim1_sim2_compare), sum(#tasks:sim1_exp_compare), sum(#tasks:sim2_exp_compare)]"
+      "math": "[sum(#tasks:sim1_sim2_compare['S1']) + sum(#tasks:sim1_sim2_compare['S2']), sum(#tasks:sim1_exp_compare['S1']) + sum(#tasks:sim1_exp_compare['S2']), sum(#tasks:sim2_exp_compare['S1']) + sum(#tasks:sim2_exp_compare['S2'])]"
     },
     "simcompare_v2": {
       "_type": "sumOfSquares",
@@ -125,7 +125,7 @@
           },
           "Sim1_S2": {
             "x": "tasks:sim1['time']",
-            "y": "tasks:sim1:['S2']"
+            "y": "tasks:sim1['S2']"
           },
           "Sim2_S1": {
             "x": "tasks:sim1['time']",
@@ -133,16 +133,16 @@
           },
           "Sim2_S2": {
             "x": "tasks:sim1['time']",
-            "y": "tasks:sim2:['S2']"
+            "y": "tasks:sim2['S2']"
           },
           "S1_data": {
-            "x": "experiment1['time']",
-            "y": "experiment1['S1']",
+            "x": "tasks:sim1['time']",
+            "y": "inputs:data:experiment1['S1']",
             "style": "points_only"
           },
           "S2_data": {
-            "x": "experiment1['time']",
-            "y": "experiment1['S2']",
+            "x": "tasks:sim1['time']",
+            "y": "inputs:data:experiment1['S2']",
             "style": "points_only"
           }
         }
