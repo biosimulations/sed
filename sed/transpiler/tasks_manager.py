@@ -1,5 +1,9 @@
 import re
 
+from sed.transpiler.library import parse_hash
+from sed.transpiler.parse_math import default_math_visitor, visit_expression
+
+
 class Range(object):
     """A 'range' object, used to define a range in one of several ways:
         * start, end, numberOfSteps (and optional 'scale')
@@ -97,6 +101,35 @@ class UniformTimeCourse(object):
         return headers, code
 
 
+    def default_step_name(self):
+        return 'pbest.registry.simulators.tellurium_process.TelluriumUTCStep'
+
+    def make_inputs_schema(self):
+        return {
+            'model': {
+                'filepath': 'string',
+                'language': 'string'}}
+
+
+    def make_inputs(self):
+        return {
+            'model_source': parse_hash(self.model)}
+
+
+    def make_outputs_schema(self):
+        outputs = {}
+        for key in self.outputVariables:
+            outputs[key] = "array[float]"
+        return outputs
+
+
+    def make_outputs(self, task_key):
+        outputs = {}
+        for key in self.outputVariables:
+            outputs[key] = ['results', task_key, key]
+        return outputs
+
+
 class Calculation(object):
     """The definition of a 'calculation' task, which performs a calulation on inputs."""
     
@@ -106,6 +139,9 @@ class Calculation(object):
         self.infix = calc_config.pop("math", None)
         self.units = calc_config.pop("units", None)
         self.validate(calc_config)
+        self.visitor = default_math_visitor()
+        self.expression = visit_expression(self.infix, self.visitor)
+
     
     def __str__(self):
         ret = "Calculation object.  Infix: '" + self.infix + "'\n"
@@ -135,6 +171,37 @@ class Calculation(object):
         line = line.replace("^", "**")
         code = "tasks_" + key + " = " + line + "\n"
         return headers, code
+
+    def default_step_name(self):
+        return 'MathExpressionStep'
+
+    def make_inputs_schema(self):
+        import ipdb; ipdb.set_trace()
+
+        return {
+            key: 'array[float]'
+            for key in self.visitor.symbol_paths}
+
+
+    def make_inputs(self):
+        return {
+            key: path
+            for key, path in self.visitor.symbol_paths.items()}
+
+
+    def make_outputs_schema(self):
+        outputs = {}
+        for key in self.outputVariables:
+            outputs[key] = "array[float]"
+        return outputs
+
+
+    def make_outputs(self, task_key):
+        outputs = {}
+        for key in self.outputVariables:
+            outputs[key] = ['results', task_key, key]
+        return outputs
+
 
 class SumOfSquares(object):
     """The definition of a 'sumOfSquares' task, which calculates the differences between inputs."""
@@ -227,7 +294,8 @@ def load_tasks_section(tasks_section_config):
             case None:
                 raise ValueError("No '_type' provided for task " + key + ".")
             case _:
-                raise ValueError("Unknown task type " + step_type + ".")
+                print(f'unknown task type: {step_type}')
+                # raise ValueError("Unknown task type " + step_type + ".")
             
     return tasks
 

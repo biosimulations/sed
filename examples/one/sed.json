@@ -67,7 +67,7 @@
       "math": "(#tasks:sim2 - #inputs:data:experiment1)^2"
     },
     "compare_summary": {
-      "_type": "calculation",
+      "_type": "function_math",
       "math": "[sum(#tasks:sim1_sim2_compare['S1']) + sum(#tasks:sim1_sim2_compare['S2']), sum(#tasks:sim1_exp_compare['S1']) + sum(#tasks:sim1_exp_compare['S2']), sum(#tasks:sim2_exp_compare['S1']) + sum(#tasks:sim2_exp_compare['S2'])]"
     },
     "simcompare_v2": {

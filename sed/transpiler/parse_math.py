@@ -120,7 +120,8 @@ class MathVisitor(NodeVisitor):
 
 
 def visit_expression(expression, visitor):
-    parsed = math_grammar.parse(expression)
+    strip = expression.replace(' ', '')
+    parsed = math_grammar.parse(strip)
     return visitor.visit(parsed)
 
 
