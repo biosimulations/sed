@@ -8,8 +8,9 @@ math_grammar = Grammar(
     '''
     expression = term ((plus / minus) term)*
     term = factor ((times / slash) factor)*
-    factor = (variable / number / left_paren expression right_paren) (caret expression)?
+    factor = (variable / number / left_paren expression right_paren / function) (caret expression)?
     variable = hash symbol
+    function = symbol left_paren expression right_paren
     symbol = ~r"[a-zA-Z0-9_.:]+"
     number = ~r"[0-9]+"
     hash = "#"
@@ -93,6 +94,10 @@ class MathVisitor(NodeVisitor):
             self.symbol_paths[new_variable] = path
 
         return self.path_symbols[path][0]
+    
+    def visit_function(self, node, visit):
+        #TODO: Fill this in.  probably need to switch on functionName.
+        pass
 
     def visit_number(self, node, visit):
         return float(node.text)
