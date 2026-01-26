@@ -45,6 +45,7 @@ def export_to_pbg(sed, context, path):
         step_config = {
             "_type": "step",
             "address": f"local:{step_name}",
+            #TODO:  Need to change hard-coded 'sed['inputs']['models']['model1']' to instead convert from task_data.model ("#inputs:models:model1")
             "config": {"model_source": context['root_dir'] / sed['inputs']['models']['model1'].location, "n_points": 10, "time": 1},
             "_inputs": task_data.make_inputs_schema(),
             "inputs": task_data.make_inputs(),
