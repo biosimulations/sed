@@ -46,8 +46,8 @@
       "outputModel": "true"
     },
     "jacobians": {
-      "_type": "calculation",
-      "math": "jacobian(tasks:steadyStates:model)"
+      "_type": "jacobian",
+      "model": "#tasks:steadyStates:model"
     }
   },
   "outputs": {

@@ -3,9 +3,9 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from inputs_manager import load_inputs_section
-from outputs_manager import load_outputs_section
-from tasks_manager import load_tasks_section
+from sed.transpiler.inputs_manager import load_inputs_section
+from sed.transpiler.outputs_manager import load_outputs_section
+from sed.transpiler.tasks_manager import load_tasks_section
 
 logger = logging.getLogger(__name__)
 

@@ -1,0 +1,77 @@
+{
+  "inputs": {
+    "models": {
+      "init": {
+        "location": "init_with_normal.xml",
+        "language": "urn:sedml:language:sbml"
+      },
+      "ohara": {
+        "location": "init_with_normal.xml",
+        "language": "urn:sedml:language:sbml"
+      }
+    }
+  },
+  "tasks": {
+    "sim1": {
+      "_type": "oneStep",
+      "model": "#inputs:models:init",
+      "outputModel": "true",
+      "outputVariables": [],
+      "step": 1.0,
+      "repeat": 20,
+      "notes": "The fact that this has 'repeat:20' means that it runs itself 20 times, and therefore its output is a 20-item long vector of output models, not just a single model."
+    },
+    "init_ohara": {
+      "_type": "modelChange",
+      "inputModel": "#inputs:models:ohara",
+      "changes": [
+        {
+          "target": "IKr_GKr_b",
+          "value": "#tasks:sim1:model['IKr_GKr_b'][:]",
+          "notes": "Not sure about the syntax for that, but it might help to indicate 'this is a vector of values'?"
+        }
+      ]
+    },
+    "sim2": {
+      "_type": "uniformTimeCourse",
+      "model": "#tasks:init_ohara",
+      "notes": "Since init_ohara has a vector of inputs, it also has a vector of outputs.",
+      "initialTime": 0,
+      "timeRange": {
+        "start": 0,
+        "end": 900,
+        "numberOfSteps": 900
+      },
+      "outputVariables": [
+        "time",
+        "membrane.v"
+      ]
+    }
+  },
+  "outputs": {
+    "reports": {
+      "sim1Report": {
+        "dataSets": "#tasks:sim2"
+      }
+    },
+    "plots": {
+      "Fig1": {
+        "_type": "plot2D",
+        "label": "Figure 1",
+        "xAxis": {
+          "label": "Time"
+        },
+        "yAxis": {
+          "label": "Membrane voltage"
+        },
+        "curves": {
+          "membrane.v_{#tasks:sim1:repeat}": {
+            "x": "#tasks:sim2['time'][0]",
+            "y": "#tasks:sim1['membrane.v'][:]"
+          },
+          "notes": "This naming trick might work slightly better in the other version, but I'm not sure it works either place, honestly."
+        }
+      }
+    }
+  }
+}

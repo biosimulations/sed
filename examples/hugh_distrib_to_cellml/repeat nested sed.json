@@ -1,0 +1,98 @@
+{
+  "inputs": {
+    "models": {
+      "init": {
+        "location": "init_with_normal.xml",
+        "language": "urn:sedml:language:sbml",
+        "features": [
+          "http://www.sbml.org/sbml/level3/version1/distrib/version1"
+        ],
+        "notes": "Contains only a single parameter and an initial assignment that uses a 'distrib' normal."
+      },
+      "ohara": {
+        "location": "init_with_normal.xml",
+        "language": "urn:sedml:language:sbml",
+        "notes": "The model we want to initialize with a draw from a normal distribution."
+      }
+    }
+  },
+  "tasks": {
+    "repeat": {
+      "_type": "repeatedTask",
+      "range": {
+        "start": 1,
+        "end": 20,
+        "interval": 1
+      },
+      "notes": "For this version, we just make this a repeated task.  Instead of referencing the task, like we do in SED-ML, we just include them directly as children.",
+      "subTasks": {
+        "sim1": {
+          "_type": "oneStep",
+          "model": "#inputs:models:init",
+          "outputModel": "true",
+          "outputVariables": [],
+          "step": 1.0
+        },
+        "init_ohara": {
+          "_type": "modelChange",
+          "inputModel": "#inputs:models:ohara",
+          "changes": [
+            {
+              "target": "IKr_GKr_b",
+              "value": "#tasks:repeat:sim1:model['IKr_GKr_b']"
+            }
+          ],
+          "notes": "Initializes the value with the draw from a distribution from SBML-distrib."
+        },
+        "sim2": {
+          "_type": "uniformTimeCourse",
+          "model": "#tasks:repeat:init_ohara",
+          "initialTime": 0,
+          "timeRange": {
+            "start": 0,
+            "end": 900,
+            "numberOfSteps": 900
+          },
+          "outputVariables": [
+            "time",
+            "membrane.v"
+          ]
+        }
+      },
+      "exportSubTaskOutputFor": ["sim2"],
+      "notes2": "Explicitly listing which subtasks get exported lets other task outputs be internal-only, so we know we don't have to get that data out to the rest of the routine."
+    }
+  },
+  "outputs": {
+    "reports": {
+      "sim1Report": {
+        "dataSets": "#tasks:repeat:sim2"
+      }
+    },
+    "plots": {
+      "Fig1": {
+        "_type": "plot2D",
+        "label": "Figure 1",
+        "xAxis": {
+          "label": "Time"
+        },
+        "yAxis": {
+          "label": "Membrane voltage"
+        },
+        "curves": {
+          "membrane.v_{#tasks:repeat:range}": {
+            "x": "#tasks:repeat:sim2['time'][0]",
+            "y": "#tasks:repeat:sim1['membrane.v'][:]",
+            "notes": "There's a clever but perhaps too clever thing going on in the ID of the curve."
+          },
+          "membrane.v": {
+            "x": "#tasks:repeat:sim2['time'][0]",
+            "y": "#tasks:repeat:sim1['membrane.v'][:]",
+            "id_append": "#tasks:repeat:range",
+            "notes": "An alternate way of naming things?  I dunno."
+          }
+        }
+      }
+    }
+  }
+}

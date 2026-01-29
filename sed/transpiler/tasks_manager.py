@@ -139,8 +139,8 @@ class Calculation(object):
         self.infix = calc_config.pop("math", None)
         self.units = calc_config.pop("units", None)
         self.validate(calc_config)
-        self.visitor = default_math_visitor()
-        self.expression = visit_expression(self.infix, self.visitor)
+        # self.visitor = default_math_visitor()
+        # self.expression = visit_expression(self.infix, self.visitor)
 
     
     def __str__(self):
