@@ -10,8 +10,8 @@
         "notes": "Contains only a single parameter and an initial assignment that uses a 'distrib' normal."
       },
       "ohara": {
-        "location": "init_with_normal.xml",
-        "language": "urn:sedml:language:sbml",
+        "location": "ohara_rudy_cipa_v1_2017.cellml",
+        "language": "urn:sedml:language:cellml",
         "notes": "The model we want to initialize with a draw from a normal distribution."
       }
     }
@@ -39,14 +39,14 @@
           "changes": [
             {
               "target": "IKr_GKr_b",
-              "value": "#tasks:repeat:sim1:model['IKr_GKr_b']"
+              "value": "#tasks:repeat:subTasks:sim1:model['IKr_GKr_b']"
             }
           ],
           "notes": "Initializes the value with the draw from a distribution from SBML-distrib."
         },
         "sim2": {
           "_type": "uniformTimeCourse",
-          "model": "#tasks:repeat:init_ohara",
+          "model": "#tasks:repeat:subTasks:init_ohara",
           "initialTime": 0,
           "timeRange": {
             "start": 0,
@@ -66,7 +66,7 @@
   "outputs": {
     "reports": {
       "sim1Report": {
-        "dataSets": "#tasks:repeat:sim2"
+        "dataSets": "#tasks:repeat:subTasks:sim2"
       }
     },
     "plots": {
@@ -80,15 +80,15 @@
           "label": "Membrane voltage"
         },
         "curves": {
-          "membrane.v_{#tasks:repeat:range}": {
-            "x": "#tasks:repeat:sim2['time'][0]",
-            "y": "#tasks:repeat:sim1['membrane.v'][:]",
+          "membrane.v_{#tasks:repeat:subTasks:range}": {
+            "x": "#tasks:repeat:subTasks:sim2['time'][0]",
+            "y": "#tasks:repeat:subTasks:sim1['membrane.v'][:]",
             "notes": "There's a clever but perhaps too clever thing going on in the ID of the curve."
           },
           "membrane.v": {
-            "x": "#tasks:repeat:sim2['time'][0]",
-            "y": "#tasks:repeat:sim1['membrane.v'][:]",
-            "id_append": "#tasks:repeat:range",
+            "x": "#tasks:repeat:subTasks:sim2['time'][0]",
+            "y": "#tasks:repeat:subTasks:sim1['membrane.v'][:]",
+            "id_append": "#tasks:repeat:subTasks:range",
             "notes": "An alternate way of naming things?  I dunno."
           }
         }

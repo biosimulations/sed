@@ -52,10 +52,10 @@
             "ODESim": {
                 "requiredInputs": {
                     "model": "The input model or models to the simulator.  Must be an internal reference to an #input:models object, or to the output of another #task that can produce a model (or models).",
-                    "initialTime": "A double.  Required input to simulator, so it knows what the 'time' is for the input model as given.",
-                    "timeRange": "A 'range' object defining the time points at which to collect data.",
-                    "outputVariables": "A list of strings.  Defines what output to collect from the simulator.  As such, some simulators may use it as input (as is the case for tellurium).",
-                    "independentVariable": "A string.  Either a reference to an element of the model (for systems like CellML) or a reference to 'time', c.f. 'urn:sedml:symbol:time'"
+                    "variableOfIntegration": "A string.  Either a reference to an element of the model (for systems like CellML) or a reference to 'time', c.f. 'urn:sedml:symbol:time'",
+                    "variableOfIntegrationStart": "A double.  Required input to simulator, so it knows what the variable of integration is for the input model as given.",
+                    "variableOfIntegrationRange": "A 'range' object defining the variable of integration points at which to collect data.",
+                    "outputVariables": "A list of strings.  Defines what output to collect from the simulator.  As such, some simulators may use it as input (as is the case for tellurium)."
                 },
                 "optionalInputs": {
                     "outputModel": "A boolean.  True if some other process needs the model-at-the-end-of-the-simulation as its own input.  False if the model does not need to be stored.  (Maybe make this requried?)"
