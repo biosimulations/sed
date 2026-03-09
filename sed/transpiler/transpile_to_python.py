@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 #   actually run it (???)
 
 
-def export_to_python(sed, context, path):
+def export_to_python(sed: dict, context, path):
     headers = set()
     python = ""
     if 'data' in sed['inputs']:
@@ -86,6 +86,7 @@ def translate_to_python(seddoc, context, path):
 
     headers, python = export_to_python(seddoc, context, path)
 
+    headers = sorted(list(headers))
     ret = ""
     for header in headers:
         ret += header + "\n"
@@ -102,7 +103,7 @@ def transpile(path, filename, context={}):
         sed = json.load(sed_file)
 
     seddoc = load_sed(sed, path)
-    print(seddoc)
+    logger.debug(seddoc)
     python = translate_to_python(seddoc, context, path)
     return python
 
