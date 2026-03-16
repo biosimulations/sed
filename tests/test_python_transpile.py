@@ -90,9 +90,34 @@ def test_python_transpile_ex_1():
 
 
 
-# def test_python_transpile_ex_2():
-#     root_dir = Path(__file__).resolve().parents[1]
-#
-#     python2 = transpile(root_dir / "examples/two/", "sed.json")
-#     print("")
-#     print(python2)
+example_str_2 = """
+import numpy as np
+
+
+
+# inputs:models:model1
+inputs_models_model1 = r'/Users/evalencia/Documents/BioSimulators/sed/examples/two/example.xml'
+
+# tasks:paramScan_k1
+
+# tasks:paramScan_k2
+
+# tasks:steadyStates
+
+# reports:steadyStateReport
+outputs_reports_steadyStateReport = tasks_steadyStates
+print(outputs_reports_steadyStateReport)
+
+# reports:jacobianReport
+outputs_reports_jacobianReport = tasks_jacobians
+print(outputs_reports_jacobianReport)
+
+# plots:Fig1
+""".strip()
+
+
+def test_python_transpile_ex_2():
+    root_dir = Path(__file__).resolve().parents[1]
+
+    python2 = transpile(root_dir / "examples/two/", "sed.json")
+    assert example_str_2.strip() == python2.strip()
