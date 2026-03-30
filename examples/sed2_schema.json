@@ -6,7 +6,8 @@
         {
           "values": {
             "_type": "ordered_list[float]",
-            "_description": "A list of increasing-or-duplicate values.  I.e. [1, 2, 5, 10, 20] or [0, 1, 1, 2.3, 2.5].  If used, may not use any other optional input, as this completely defines the range"}
+            "_description": "A list of increasing-or-duplicate values.  I.e. [1, 2, 5, 10, 20] or [0, 1, 1, 2.3, 2.5].  If used, may not use any other optional input, as this completely defines the range"
+          }
         },
         {
           "_type": "optional_minimum[3]",
@@ -14,16 +15,20 @@
           "_options": {
             "start": {
               "_type": "float",
-              "_description": "The first point of the range."},
+              "_description": "The first point of the range."
+            },
             "end": {
               "_type": "float",
-              "_description": "The final point of the range."},
+              "_description": "The final point of the range."
+            },
             "numberOfSteps": {
               "_type": "positive_integer",
-              "_description": "The number of points after the first in the range."},
+              "_description": "The number of points after the first in the range."
+            },
             "interval": {
               "_type": "float",
-              "_description": "The size step to take after the start."}
+              "_description": "The size step to take after the start."
+            }
           },
           "scale": {
             "_type": "enum[linear,log10]",
@@ -43,11 +48,10 @@
       },
       "optionalInputs": {
         "outputModel": "A boolean.  True if some other process needs the model-at-the-end-of-the-simulation as its own input.  False if the model does not need to be stored.  (Maybe make this requried?)"
-
       },
       "Other vaidation rules": "The parameters of the range will need to be provided to the simulator (i.e. 'r.simulate(0, 10, 100)' for roadrunner.",
       "outputs": {
-        "values":  "A matrix of doubles.  The dimensions of the matrix are: models by outputVariables by range.  If only one model is used as input, the output is just a matrix of outputVariables by time points.  The outputVariables are the requried input, and the time points are determinable by the four inputs outputStartTime, outputEndTime, numberOfSteps, and timeInterval.  When used as input to other tasks or outputs, individual vectors of results for a single outputVariable may be obtained by asking for the id #tasks:timeCourseId[model#]['variableName'].  An example:  #tasks:sim1[0]['S1'].  If there is only one model input, the [model#] may be omitted, i.e. #tasks:sim1['S1'].",
+        "values": "A matrix of doubles.  The dimensions of the matrix are: models by outputVariables by range.  If only one model is used as input, the output is just a matrix of outputVariables by time points.  The outputVariables are the requried input, and the time points are determinable by the four inputs outputStartTime, outputEndTime, numberOfSteps, and timeInterval.  When used as input to other tasks or outputs, individual vectors of results for a single outputVariable may be obtained by asking for the id #tasks:timeCourseId[model#]['variableName'].  An example:  #tasks:sim1[0]['S1'].  If there is only one model input, the [model#] may be omitted, i.e. #tasks:sim1['S1'].",
         "model": "The model with its state as it is at the end of the simulation.  We know if we will need it if the 'outputModel' option is set.  Obtainable by asking for the id #tasks:timeCourseId:model, i.e. #tasks:sim1:model"
       },
       "notes": "Some systems do not have to simulate across time, but can use other variables, like space (CellML does this, and has been making due with SED-ML requiring time, but would probably like to not have to do this.  It might be time to explicitly define an independent variable for this construct, instead of assuming it's time."
@@ -70,9 +74,7 @@
         "input1": "A SED ID.",
         "input2": "A SED ID with exactly the same dimensionality as input1."
       },
-      "optionalInputs": {
-
-      },
+      "optionalInputs": {},
       "Other validation rules": "",
       "outputs": {
         "values": "Subtracts input1 from input2 element by element, squares the results, then sums them.  Returns a single double."
@@ -86,9 +88,7 @@
         "range": "A 'range' element defining the range of values to apply to the scannedVariable.",
         "outputRange": "A boolean indicating whether to output the 'range' object"
       },
-      "optionalInputs": {
-
-      },
+      "optionalInputs": {},
       "Other validation rules": "",
       "outputs": {
         "values": "A vector or matrix of models, of the dimension [input models] x [range].  The first model will be the first input model with the 'scannedVariable' changed to the first value in the 'range', the second the next, etc.",
@@ -97,12 +97,8 @@
       "notes": "Maybe we should just assume 'outputRange' is always true and not let the user set it?"
     },
     "ex2": {
-      "requiredInputs": {
-
-      },
-      "optionalInputs": {
-
-      },
+      "requiredInputs": {},
+      "optionalInputs": {},
       "Other validation rules": "",
       "outputs": {
         "values": ""
@@ -110,12 +106,8 @@
       "notes": ""
     },
     "ex3": {
-      "requiredInputs": {
-
-      },
-      "optionalInputs": {
-
-      },
+      "requiredInputs": {},
+      "optionalInputs": {},
       "Other validation rules": "",
       "outputs": {
         "values": ""
@@ -123,12 +115,8 @@
       "notes": ""
     },
     "ex4": {
-      "requiredInputs": {
-
-      },
-      "optionalInputs": {
-
-      },
+      "requiredInputs": {},
+      "optionalInputs": {},
       "Other validation rules": "",
       "outputs": {
         "values": ""
@@ -136,12 +124,8 @@
       "notes": ""
     },
     "ex5": {
-      "requiredInputs": {
-
-      },
-      "optionalInputs": {
-
-      },
+      "requiredInputs": {},
+      "optionalInputs": {},
       "Other validation rules": "",
       "outputs": {
         "values": ""

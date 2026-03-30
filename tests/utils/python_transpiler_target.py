@@ -1,26 +1,17 @@
-import json
-import sys
 from pathlib import Path
 
-import pbest.globals
-from pandas import DataFrame
-from process_bigraph import Composite
-from roadrunner import RoadRunner
-import tellurium as te
-import pandas as pd
 import numpy as np
-import math
-
+import pandas as pd
+import tellurium as te
 from basico import (
-    get_reactions,
-    get_species,
     load_model,
-    run_steadystate,
     run_time_course,
 )
-
+from pandas import DataFrame
+from roadrunner import RoadRunner
 
 PROJECT_ROOT_DIR = Path(__file__).resolve().parents[2]
+
 
 def transpiler_target(demo_number: int):
     match demo_number:
@@ -38,7 +29,7 @@ def transpiler_target(demo_number: int):
                 intervals=50,
                 update_model=True,
                 use_sbml_id=True,
-                model=load_model(str(example_one_dir / "example1.xml"))
+                model=load_model(str(example_one_dir / "example1.xml")),
             )
             copasi_out = {}
             copasi_out["time"] = np.array(copasi_df.index)
@@ -50,10 +41,10 @@ def transpiler_target(demo_number: int):
             print(csv_df)
             print(copasi_df)
             print(tellurium_result)
-            
-            copasi_exp_diff = (copasi_out - csv_df)**2
-            tellurium_exp_diff = (tellurium_result - csv_df)**2
-            copasi_tell_diff = (copasi_out - tellurium_result)**2
+
+            copasi_exp_diff = (copasi_out - csv_df) ** 2
+            tellurium_exp_diff = (tellurium_result - csv_df) ** 2
+            copasi_tell_diff = (copasi_out - tellurium_result) ** 2
             ce_sum = 0
             te_sum = 0
             ct_sum = 0
@@ -61,10 +52,8 @@ def transpiler_target(demo_number: int):
                 ce_sum += sum(copasi_exp_diff[key])
                 te_sum += sum(tellurium_exp_diff[key])
                 ct_sum += sum(copasi_tell_diff[key])
-                
-            print(ct_sum, ce_sum, te_sum)
-            
 
+            print(ct_sum, ce_sum, te_sum)
 
         case 2:
             pass
@@ -74,8 +63,5 @@ def transpiler_target(demo_number: int):
             raise RuntimeError(f"An invalid demo number was given: {demo_number}.")
 
 
-
 if __name__ == "__main__":
     transpiler_target(1)
-
-

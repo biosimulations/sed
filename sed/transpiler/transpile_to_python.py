@@ -25,44 +25,44 @@ logger = logging.getLogger(__name__)
 def export_to_python(sed: dict, context, path):
     headers = set()
     python = ""
-    if 'data' in sed['inputs']:
-        for data_key, data_object in sed['inputs']['data'].items():
+    if "data" in sed["inputs"]:
+        for data_key, data_object in sed["inputs"]["data"].items():
             h, p = data_object.make_python(data_key, path)
             headers.update(h)
             python += "\n# inputs:data:" + data_key + "\n"
             python += p
 
-    if 'models' in sed['inputs']:
-        for model_key, model_object in sed['inputs']['models'].items():
+    if "models" in sed["inputs"]:
+        for model_key, model_object in sed["inputs"]["models"].items():
             h, p = model_object.make_python(model_key, path)
             headers.update(h)
             python += "\n# inputs:models:" + model_key + "\n"
             python += p
 
-    for task_key, task_object in sed['tasks'].items():
-        if "tasks" in context and task_key in context['tasks']:
-            task_object.executor = context['tasks'][task_key]
+    for task_key, task_object in sed["tasks"].items():
+        if "tasks" in context and task_key in context["tasks"]:
+            task_object.executor = context["tasks"][task_key]
         h, p = task_object.make_python(task_key)
         headers.update(h)
         python += "\n# tasks:" + task_key + "\n"
         python += p
 
-    if 'reports' in sed['outputs']:
-        for report_key, report_object in sed['outputs']['reports'].items():
+    if "reports" in sed["outputs"]:
+        for report_key, report_object in sed["outputs"]["reports"].items():
             h, p = report_object.make_python(report_key)
             headers.update(h)
             python += "\n# reports:" + report_key + "\n"
             python += p
 
-    if 'plots' in sed['outputs']:
-        for plot_key, plot_object in sed['outputs']['plots'].items():
+    if "plots" in sed["outputs"]:
+        for plot_key, plot_object in sed["outputs"]["plots"].items():
             h, p = plot_object.make_python(plot_key)
             headers.update(h)
             python += "\n# plots:" + plot_key + "\n"
             python += p
 
     return headers, python
-    
+
 
 def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> dict[str, Any]:
     root_dir = Path(root_dir or ".")
@@ -73,17 +73,17 @@ def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> dict[str, Any]:
 
     seddoc = {}
 
-    seddoc['inputs']  = load_inputs_section(inputs, root_dir)
-    seddoc['tasks']   = load_tasks_section(tasks)
-    seddoc['outputs'] = load_outputs_section(outputs)
+    seddoc["inputs"] = load_inputs_section(inputs, root_dir)
+    seddoc["tasks"] = load_tasks_section(tasks)
+    seddoc["outputs"] = load_outputs_section(outputs)
 
     logger.debug(seddoc)
     logger.debug("")
 
     return seddoc
 
-def translate_to_python(seddoc, context, path):
 
+def translate_to_python(seddoc, context, path):
     headers, python = export_to_python(seddoc, context, path)
 
     headers = sorted(list(headers))
@@ -110,9 +110,7 @@ def transpile(path, filename, context={}):
 
 if __name__ == "__main__":
     root_dir = Path(__file__).resolve().parents[2]
-    context = {
-        'tasks': {
-            'sim2': 'Copasi'}}
+    context = {"tasks": {"sim2": "Copasi"}}
     python1 = transpile(root_dir / "examples/one/", "sed.json", context)
     print("")
     print(python1)
@@ -121,4 +119,3 @@ if __name__ == "__main__":
     python2 = transpile(root_dir / "examples/two/", "sed.json")
     print("")
     print(python2)
-    

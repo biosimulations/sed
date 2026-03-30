@@ -1,14 +1,14 @@
-from pathlib import Path
 from typing import Any
 
-class Axis(object):
+
+class Axis:
     """A 'plot' object, used to define a 2D visual representation of data."""
 
     def __init__(self, axis_config: dict):
         self.label = axis_config.pop("label", None)
         self.scale = axis_config.pop("scale", None)
         self.validate(axis_config)
-    
+
     def validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
@@ -17,7 +17,7 @@ class Axis(object):
         return False
 
 
-class Curve(object):
+class Curve:
     """A 'curve' object, used in plots to define data traces."""
 
     def __init__(self, curve_config: dict):
@@ -25,7 +25,7 @@ class Curve(object):
         self.y = curve_config.pop("y", None)
         self.style = curve_config.pop("style", None)
         self.validate(curve_config)
-    
+
     def validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
@@ -34,7 +34,7 @@ class Curve(object):
         return False
 
 
-class Surface(object):
+class Surface:
     """A 'curve' object, used in plots to define data traces."""
 
     def __init__(self, surface_config: dict):
@@ -43,7 +43,7 @@ class Surface(object):
         self.z = surface_config.pop("z", None)
         self.style = surface_config.pop("style", None)
         self.validate(surface_config)
-    
+
     def validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
@@ -52,7 +52,7 @@ class Surface(object):
         return False
 
 
-class Plot(object):
+class Plot:
     """A 'plot' object, used to define a 2D visual representation of data."""
 
     def __init__(self, plot_config: dict):
@@ -69,8 +69,8 @@ class Plot(object):
             print("Unsaved data when creating Plot2D:", leftovers)
             return True
         return False
-    
-    
+
+
 class Plot2D(Plot):
     """A 'plot' object, used to define a 2D visual representation of data."""
 
@@ -79,7 +79,7 @@ class Plot2D(Plot):
         self.rightYAxis = Axis(plot_config.pop("rightYAxis", {}))
         curves = plot_config.pop("curves", {})
         self.curves = {}
-        if (curves):
+        if curves:
             for key, config in curves.items():
                 self.curves[key] = Curve(config)
         self.validate(plot_config)
@@ -90,7 +90,7 @@ class Plot2D(Plot):
             print("Unsaved data when creating Plot2D:", leftovers)
             return True
         return False
-    
+
     def make_python(self, key):
         headers = set(["import matplotlib.pyplot as plt"])
         code = "fig, ax = plt.subplots()\n"
@@ -102,25 +102,25 @@ class Plot2D(Plot):
             y = y.replace("#", "")
             ys.append(y)
             code += y + ", "
-            #TODO: check to make sure all xrefs are the same
+            # TODO: check to make sure all xrefs are the same
             xref = self.curves[curve].x.replace(":", "_")
             xref = xref.replace("#", "")
         code += "))\nys = ys.transpose()\n"
         code += "x = " + xref + "\n"
         code += "ax.plot(x, ys)\n"
         ax_args = ""
-        if (self.xaxis):
+        if self.xaxis:
             ax_args += "xlabel='" + self.xaxis.label + "'"
-        if (self.yaxis):
+        if self.yaxis:
             ax_args += ", ylabel='" + self.yaxis.label + "'"
-        if (self.label):
+        if self.label:
             ax_args += ", title='" + self.label + "'"
         code += "ax.set(" + ax_args + ")\n"
         code += "plt.show()\n"
-        
+
         return headers, code
 
-    
+
 class Plot3D(Plot):
     """A 'plot' object, used to define a 2D visual representation of data."""
 
@@ -129,7 +129,7 @@ class Plot3D(Plot):
         self.zAxis = Axis(plot_config.pop("zAxis", {}))
         surfaces = plot_config.pop("surfaces", {})
         self.surfaces = {}
-        if (surfaces):
+        if surfaces:
             for key, config in surfaces.items():
                 self.surfaces[key] = Surface(config)
         self.validate(plot_config)
@@ -140,16 +140,17 @@ class Plot3D(Plot):
             print("Unsaved data when creating Plot2D:", leftovers)
             return True
         return False
-    
+
     def make_python(self, key):
         headers = set()
         code = ""
         return headers, code
 
 
-class Report(object):
+class Report:
     """A 'report' object, for storing and reporting data."""
-    #TODO: Make a Plot3D class and a Plot class for the overlap.
+
+    # TODO: Make a Plot3D class and a Plot class for the overlap.
 
     def __init__(self, report_config: dict):
         self.filename = report_config.pop("filename", None)
@@ -180,11 +181,11 @@ class Report(object):
                 line = line.replace("#", "")
                 line = line.replace(":", "_")
                 code += repid + "['" + ds_key + "'] = np.array(" + line + ")\n"
-        code += "print(" + repid+ ")\n"
+        code += "print(" + repid + ")\n"
         return headers, code
 
 
-class Style(object):
+class Style:
     """A style defined for visual representation of something in a plot (i.e. a curve or an axis)"""
 
     def __init__(self, style_config: dict):
@@ -205,7 +206,7 @@ def load_outputs_section(output_section: dict[Any, Any]):
     outputs["reports"] = {}
     outputs["plots"] = {}
     outputs["styles"] = {}
-    
+
     for key, config in output_section.pop("reports", {}).items():
         outputs["reports"][key] = Report(config)
 
@@ -220,12 +221,11 @@ def load_outputs_section(output_section: dict[Any, Any]):
                 raise ValueError("No '_type' provided for plot " + key + ".")
             case _:
                 raise ValueError("Unknown plot type " + plot_type + ".")
-                
 
     for key, config in output_section.pop("styles", {}).items():
         outputs["styles"][key] = Style(config)
 
     if len(output_section):
         print("Unsaved data when creating Axis:", output_section)
-    
+
     return outputs

@@ -2,7 +2,6 @@ from pathlib import Path
 
 from sed.transpiler.transpile_to_python import transpile
 
-
 expected_python_ex_1 = """
 from pandas import DataFrame
 import basico
@@ -81,13 +80,10 @@ plt.show()
 
 def test_python_transpile_ex_1():
     root_dir = Path(__file__).resolve().parents[1]
-    context = {
-        'tasks': {
-            'sim2': 'Copasi'}}
+    context = {"tasks": {"sim2": "Copasi"}}
     python1 = transpile(root_dir / "examples/one/", "sed.json", context)
 
     assert python1.strip() == expected_python_ex_1
-
 
 
 example_str_2 = """
