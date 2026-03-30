@@ -1,16 +1,15 @@
 import re
 
 from sed.transpiler.library import parse_hash
-from sed.transpiler.parse_math import default_math_visitor, visit_expression
 
 
-class Range(object):
+class Range:
     """A 'range' object, used to define a range in one of several ways:
-        * start, end, numberOfSteps (and optional 'scale')
-        * start, end, interval
-        * start, numberOfSteps, interval
-        * end, numberOfSteps, interval
-        * values
+    * start, end, numberOfSteps (and optional 'scale')
+    * start, end, interval
+    * start, numberOfSteps, interval
+    * end, numberOfSteps, interval
+    * values
     """
 
     def __init__(self, range_config: dict):
@@ -22,7 +21,7 @@ class Range(object):
         self.scale = range_config.pop("scale", None)
         self.values = range_config.pop("values", None)
         self.validate(range_config)
-    
+
     def validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
@@ -30,11 +29,12 @@ class Range(object):
             return True
         return False
 
-class UniformTimeCourse(object):
+
+class UniformTimeCourse:
     """The definition of a uniform time course simulation."""
-    
+
     def __init__(self, utc_config: dict):
-        #TODO: error checking
+        # TODO: error checking
         self.type_key = "UniformTimeCourse"
         self.model = utc_config.pop("model", None)
         self.timeRange = Range(utc_config.pop("timeRange", {}))
@@ -42,18 +42,18 @@ class UniformTimeCourse(object):
         self.initialTime = utc_config.pop("initialTime", None)
         self.validate(utc_config)
         self.executor = "Tellurium"
-    
+
     def validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating UniformTimeCourse:", leftovers)
             return True
         return False
-    
+
     def make_python(self, key):
-        if (self.executor == "Tellurium"):
+        if self.executor == "Tellurium":
             return self.make_python_tellurium(key)
-        elif (self.executor == "Copasi"):
+        elif self.executor == "Copasi":
             return self.make_python_copasi(key)
         else:
             raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
@@ -65,7 +65,20 @@ class UniformTimeCourse(object):
         modelid = modelid.replace(":", "_")
         taskid = "tasks_" + key
         code = taskid + "_r = te.loadSBMLModel(" + modelid + ")\n"
-        code += taskid + " = " + taskid + "_r.simulate(" + str(self.timeRange.start) + ", " + str(self.timeRange.end) + ", steps=" + str(self.timeRange.numberOfSteps) + ", selections = " + str(self.outputVariables) + ")\n"
+        code += (
+            taskid
+            + " = "
+            + taskid
+            + "_r.simulate("
+            + str(self.timeRange.start)
+            + ", "
+            + str(self.timeRange.end)
+            + ", steps="
+            + str(self.timeRange.numberOfSteps)
+            + ", selections = "
+            + str(self.outputVariables)
+            + ")\n"
+        )
         return headers, code
 
     def make_python_copasi(self, key):
@@ -89,32 +102,36 @@ class UniformTimeCourse(object):
         modelid = self.model[1:]
         modelid = modelid.replace(":", "_")
         taskid = "tasks_" + key
-        code = taskid + "_copasi = basico.run_time_course(start_time=" + str(self.timeRange.start) + ", duration=" + str(self.timeRange.end - self.timeRange.start) + ", intervals=" + str(self.timeRange.numberOfSteps) + ", update_model=True, use_sbml_id=True,model=basico.load_model(" + modelid + "))\n"
+        code = (
+            taskid
+            + "_copasi = basico.run_time_course(start_time="
+            + str(self.timeRange.start)
+            + ", duration="
+            + str(self.timeRange.end - self.timeRange.start)
+            + ", intervals="
+            + str(self.timeRange.numberOfSteps)
+            + ", update_model=True, use_sbml_id=True,model=basico.load_model("
+            + modelid
+            + "))\n"
+        )
         code += taskid + " = {}\n"
         first = 0
-        if (self.outputVariables[0] == "time"):
+        if self.outputVariables[0] == "time":
             first = 1
             code += taskid + "['time'] = np.array(" + taskid + "_copasi.index)\n"
         for var in self.outputVariables[first:]:
-            code += taskid + "['" + var + "'] = np.array("+ taskid + "_copasi['"+ var + "'])\n"
+            code += taskid + "['" + var + "'] = np.array(" + taskid + "_copasi['" + var + "'])\n"
         code += taskid + " = DataFrame(" + taskid + ")\n"
         return headers, code
 
-
     def default_step_name(self):
-        return 'pbest.registry.simulators.tellurium_process.TelluriumUTCStep'
+        return "pbest.registry.simulators.tellurium_process.TelluriumUTCStep"
 
     def make_inputs_schema(self):
-        return {
-            'model': {
-                'filepath': 'string',
-                'language': 'string'}}
-
+        return {"model": {"filepath": "string", "language": "string"}}
 
     def make_inputs(self):
-        return {
-            'model_source': parse_hash(self.model)}
-
+        return {"model_source": parse_hash(self.model)}
 
     def make_outputs_schema(self):
         outputs = {}
@@ -122,19 +139,18 @@ class UniformTimeCourse(object):
             outputs[key] = "array[float]"
         return outputs
 
-
     def make_outputs(self, task_key):
         outputs = {}
         for key in self.outputVariables:
-            outputs[key] = ['results', task_key, key]
+            outputs[key] = ["results", task_key, key]
         return outputs
 
 
-class Calculation(object):
+class Calculation:
     """The definition of a 'calculation' task, which performs a calulation on inputs."""
-    
+
     def __init__(self, calc_config: dict):
-        #TODO: error checking
+        # TODO: error checking
         self.type_key = "Calculation"
         self.infix = calc_config.pop("math", None)
         self.units = calc_config.pop("units", None)
@@ -142,13 +158,12 @@ class Calculation(object):
         # self.visitor = default_math_visitor()
         # self.expression = visit_expression(self.infix, self.visitor)
 
-    
     def __str__(self):
         ret = "Calculation object.  Infix: '" + self.infix + "'\n"
         if self.units:
             ret += "Units: '" + self.units + "'\n"
         return ret.strip()
-    
+
     def __repr__(self):
         return self.__str__()
 
@@ -161,7 +176,7 @@ class Calculation(object):
 
     def getInputVariables(self):
         """Parse the infix to retrieve all SED variable inputs."""
-        strlist = re.findall(r'#[a-zA-Z0-9_:.]*', self.infix)
+        strlist = re.findall(r"#[a-zA-Z0-9_:.]*", self.infix)
         return set(strlist)
 
     def make_python(self, key):
@@ -173,21 +188,17 @@ class Calculation(object):
         return headers, code
 
     def default_step_name(self):
-        return 'MathExpressionStep'
+        return "MathExpressionStep"
 
     def make_inputs_schema(self):
-        import ipdb; ipdb.set_trace()
+        import ipdb
 
-        return {
-            key: 'array[float]'
-            for key in self.visitor.symbol_paths}
+        ipdb.set_trace()
 
+        return dict.fromkeys(self.visitor.symbol_paths, "array[float]")
 
     def make_inputs(self):
-        return {
-            key: path
-            for key, path in self.visitor.symbol_paths.items()}
-
+        return {key: path for key, path in self.visitor.symbol_paths.items()}
 
     def make_outputs_schema(self):
         outputs = {}
@@ -195,22 +206,21 @@ class Calculation(object):
             outputs[key] = "array[float]"
         return outputs
 
-
     def make_outputs(self, task_key):
         outputs = {}
         for key in self.outputVariables:
-            outputs[key] = ['results', task_key, key]
+            outputs[key] = ["results", task_key, key]
         return outputs
 
 
-class SumOfSquares(object):
+class SumOfSquares:
     """The definition of a 'sumOfSquares' task, which calculates the differences between inputs."""
-    
+
     def __init__(self, sos_config: dict):
         self.type_key = "SumOfSquares"
         self.inputs = sos_config.pop("inputs", None)
         self.validate(sos_config)
-    
+
     def validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
@@ -224,9 +234,9 @@ class SumOfSquares(object):
         return headers, code
 
 
-class ParameterScan(object):
+class ParameterScan:
     """The definition of a 'parameter scan' task, which takes a model as input and outputs an array of models."""
-    
+
     def __init__(self, paramscan_config: dict):
         self.type_key = "ParameterScan"
         self.model = paramscan_config.pop("model", None)
@@ -234,7 +244,7 @@ class ParameterScan(object):
         self.range = Range(paramscan_config.pop("range", {}))
         self.outputRange = paramscan_config.pop("outputRange", None)
         self.validate(paramscan_config)
-    
+
     def validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
@@ -248,23 +258,23 @@ class ParameterScan(object):
         return headers, code
 
 
-class SteadyState(object):
+class SteadyState:
     """The definition of a 'parameter scan' task, which takes a model as input and outputs an array of models."""
-    
+
     def __init__(self, ss_config: dict):
         self.type_key = "SteadyState"
         self.model = ss_config.pop("model", None)
         self.outputVariables = ss_config.pop("outputVariables", None)
         self.outputModel = ss_config.pop("outputModel", None)
         self.validate(ss_config)
-    
+
     def validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating SteadyState:", leftovers)
             return True
         return False
-    
+
     def exportToProcessBigraph():
         """foo"""
         pass
@@ -274,7 +284,6 @@ class SteadyState(object):
         code = ""
         return headers, code
 
-   
 
 def load_tasks_section(tasks_section_config):
     tasks = {}
@@ -294,9 +303,7 @@ def load_tasks_section(tasks_section_config):
             case None:
                 raise ValueError("No '_type' provided for task " + key + ".")
             case _:
-                print(f'unknown task type: {step_type}')
+                print(f"unknown task type: {step_type}")
                 # raise ValueError("Unknown task type " + step_type + ".")
-            
+
     return tasks
-
-

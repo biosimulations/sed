@@ -1,11 +1,9 @@
-from sympy import symbols
-
 from parsimonious.grammar import Grammar
 from parsimonious.nodes import NodeVisitor
-
+from sympy import symbols
 
 math_grammar = Grammar(
-    '''
+    """
     expression = term ((plus / minus) term)*
     term = factor ((times / slash) factor)*
     factor = (variable / number / left_paren expression right_paren) (caret expression)?
@@ -20,7 +18,7 @@ math_grammar = Grammar(
     caret = "^"
     left_paren = "("
     right_paren = ")"
-    '''
+    """
 )
 #     factor = (variable / number / left_paren expression right_paren / function) (caret expression)?
 #     function = symbol left_paren expression right_paren
@@ -30,9 +28,7 @@ class MathVisitor(NodeVisitor):
     def __init__(self, variables):
         self.variables = variables
         self.allocate_index = 0
-        self.symbols = dict(zip(
-            self.variables,
-            symbols(' '.join(self.variables))))
+        self.symbols = dict(zip(self.variables, symbols(" ".join(self.variables))))
         self.path_symbols = {}
         self.symbol_paths = {}
 
@@ -52,7 +48,7 @@ class MathVisitor(NodeVisitor):
     def visit_term(self, node, visit):
         base = visit[0]
         sequence = visit[1:]
-            
+
         result = base
         if sequence:
             for step in sequence[0]:
@@ -81,11 +77,11 @@ class MathVisitor(NodeVisitor):
         return self.symbols[visit[1]]
 
     def visit_symbol(self, node, visit):
-        path = tuple(node.text.split(':'))
+        path = tuple(node.text.split(":"))
 
         if path not in self.path_symbols:
             if self.allocate_index >= len(self.variables):
-                raise Exception(f'all variables already allocated! no more for {path}')
+                raise Exception(f"all variables already allocated! no more for {path}")
 
             new_variable = self.variables[self.allocate_index]
             new_symbol = self.symbols[new_variable]
@@ -95,10 +91,10 @@ class MathVisitor(NodeVisitor):
             self.symbol_paths[new_variable] = path
 
         return self.path_symbols[path][0]
-    
-#    def visit_function(self, node, visit):
-#        #TODO: Fill this in.  probably need to switch on functionName.
-#        pass
+
+    #    def visit_function(self, node, visit):
+    #        #TODO: Fill this in.  probably need to switch on functionName.
+    #        pass
 
     def visit_number(self, node, visit):
         return float(node.text)
@@ -116,7 +112,7 @@ class MathVisitor(NodeVisitor):
         return lambda x, y: x / y
 
     def visit_caret(self, node, visit):
-        return lambda x, y: x ** y
+        return lambda x, y: x**y
 
     def visit_number(self, node, visit):
         return float(node.text)
@@ -126,26 +122,26 @@ class MathVisitor(NodeVisitor):
 
 
 def visit_expression(expression, visitor):
-    strip = expression.replace(' ', '')
+    strip = expression.replace(" ", "")
     parsed = math_grammar.parse(strip)
     return visitor.visit(parsed)
 
 
 def default_math_visitor():
-    variables = ['a', 'b', 'c', 'd', 'e', 'x', 'y', 'z', 'w', 'i', 'j', 'k', 'm', 'n']
+    variables = ["a", "b", "c", "d", "e", "x", "y", "z", "w", "i", "j", "k", "m", "n"]
     visitor = MathVisitor(variables)
     return visitor
 
 
 def parse_expression(expression):
-    variables = ['a', 'b', 'c', 'd', 'e', 'x', 'y', 'z', 'w', 'i', 'j', 'k', 'm', 'n']
+    variables = ["a", "b", "c", "d", "e", "x", "y", "z", "w", "i", "j", "k", "m", "n"]
     visitor = MathVisitor(variables)
     return visit_expression(expression, visitor)
 
 
 tests = [
-    '(#tasks:sim1-#data:experiment1)^2',
-    '((#x:y:z*#e:f:g:h)-(#y:z/#m:n:o*#k:l:m))^(#x:y+#a:b-#x:y:z)',
+    "(#tasks:sim1-#data:experiment1)^2",
+    "((#x:y:z*#e:f:g:h)-(#y:z/#m:n:o*#k:l:m))^(#x:y+#a:b-#x:y:z)",
 ]
 
 
@@ -155,7 +151,7 @@ def test_math_parser():
         result = visit_expression(test_string, visitor)
 
         print(f"{test_string} --> {result}")
-    
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     test_math_parser()

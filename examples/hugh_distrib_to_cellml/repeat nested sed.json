@@ -59,7 +59,9 @@
           ]
         }
       },
-      "exportSubTaskOutputFor": ["sim2"],
+      "exportSubTaskOutputFor": [
+        "sim2"
+      ],
       "notes2": "Explicitly listing which subtasks get exported lets other task outputs be internal-only, so we know we don't have to get that data out to the rest of the routine."
     }
   },
