@@ -4,9 +4,9 @@ import pprint
 from pathlib import Path
 from typing import Any
 
-from inputs_manager import load_inputs_section
-from outputs_manager import load_outputs_section
-from tasks_manager import load_tasks_section
+from sed.transpiler.importers.inputs import load_inputs_section
+from sed.transpiler.importers.outputs import load_outputs_section
+from sed.transpiler.importers.tasks import load_tasks_section
 
 logger = logging.getLogger(__name__)
 
