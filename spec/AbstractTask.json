@@ -1,0 +1,19 @@
+{
+    "tasks": {
+        "sim1": {
+            "_type": "example",
+            "kisaoID": "",
+            "notes": "This field can have *markdown*! ###Hooray!",
+            "annotations": [
+                {
+                    "qualifier": "bibo:Journal",
+                    "value": "Proc. Natl. Acad. Sci. U.S.A. 1997:94(17):9147-52"
+                },
+                {
+                    "qualifier": "dc:license",
+                    "value": "http://creativecommons.org/publicdomain/zero/1.0/"
+                }
+            ]
+        }
+    }
+}

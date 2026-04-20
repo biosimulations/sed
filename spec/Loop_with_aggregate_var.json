@@ -1,0 +1,41 @@
+{
+  "tasks": {
+    "repeat": {
+      "_type": "loop",
+      "range": {
+        "start": 0,
+        "end": 10,
+        "interval": 1
+      },
+      "aggregateOutputs": {
+        "avg_sim": {
+          "kisaoID": "KISAO:0000841",
+          "name": "mean",
+          "input": "#subTasks:sim1"
+        },
+        "sim_sd": {
+          "kisaoID": "KISAO:0000842",
+          "name": "standard deviation",
+          "input": "#subTasks:sim1"
+        }
+      },
+      "subTasks": {
+        "sim1": {
+          "_type": "explicitStochasticSimulation",
+          "kisaoID": "KISAO:0000319",
+          "model": "#tasks:mod1",
+          "outputModel": false,
+          "outputVariables": "['S1', 'S2', 'S3']",
+          "independentVariable": "urn:sedml:symbol:time",
+          "independentVariableRange": {
+              "start": 0,
+              "end": 20,
+              "numberOfSteps": 50
+          }
+        }
+      },
+      "outputVariables": [],
+      "notes": "The only outputs from this task are the aggregateOutputs.  They may be accumulated as they come in, therefore, instead of calculated after the fact."
+    }
+  }
+}

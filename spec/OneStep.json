@@ -1,0 +1,14 @@
+{
+    "tasks": {
+        "sim1": {
+            "_type": "oneStep",
+            "kisaoID": "KISAO:0000694",
+            "model": "#tasks:model1.model",
+            "independentVariable": "urn:sedml:symbol:time",
+            "independentInitialValue": 0,
+            "independentFinalValue": 5.0,
+            "outputVariables": ["S1", "S2"],
+            "outputModel": false
+        }
+    }
+}

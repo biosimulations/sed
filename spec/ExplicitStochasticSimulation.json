@@ -1,0 +1,18 @@
+{
+    "tasks": {
+        "sim1": {
+            "_type": "explicitStochasticSimulation",
+            "kisaoID": "KISAO:0000319",
+            "model": "#tasks:model1.model",
+            "independentVariable": "urn:sedml:symbol:time",
+            "independentInitialValue": 0,
+            "independentVariableRange": {
+                "start": 0,
+                "end": 20,
+                "numberOfSteps": 50
+            },
+            "outputVariables": ["S1", "S2"],
+            "outputModel": false
+        }
+    }
+}

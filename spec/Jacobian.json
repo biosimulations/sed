@@ -1,0 +1,10 @@
+{
+    "tasks": {
+        "mod1_jacobian": {
+            "_type": "jacobian",
+            "kisaoID": "KISAO:0000319",
+            "model": "#tasks:mod1",
+            "isFull": true
+        }
+    }
+}

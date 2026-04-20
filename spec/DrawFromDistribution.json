@@ -1,0 +1,10 @@
+{
+    "tasks": {
+        "S1_plus_noise": {
+            "_type": "drawFromDistribution",
+            "altDefinition": "http://www.sbml.org/sbml/symbols/distrib/normal",
+            "arguments": ["#tasks:sim1.model[S1]", 0.3],
+            "outputAlwaysUnique": false
+        }
+    }
+}

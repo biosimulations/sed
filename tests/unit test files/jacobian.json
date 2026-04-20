@@ -1,0 +1,26 @@
+{
+    "versionStr": "SED v2.0 alpha",
+    "versionNum": 2.0,
+    "tasks": {
+        "model1": {
+            "_type": "modelImport",
+            "location": "three_species_chain.xml",
+            "language": "urn:sedml:language:sbml"
+        },
+        "sim1": {
+            "_type": "jacobian",
+            "kisaoID": "KISAO:0000812",
+            "model": "#tasks:model1.model",
+            "isFull": false
+        }
+    },
+    "outputs": {
+        "init_all_values": {
+            "_type": "report",
+            "dataSets": {
+                "label": "#tasks:sim1.colnames",
+                "model1": "#tasks:sim1"
+            }
+        }
+    }
+}

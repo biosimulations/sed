@@ -1,13 +1,14 @@
 from typing import Any
+from base import SEDBase
 
 
-class Axis:
+class Axis(SEDBase):
     """A 'plot' object, used to define a 2D visual representation of data."""
 
-    def __init__(self, axis_config: dict):
-        self.label = axis_config.pop("label", None)
-        self.scale = axis_config.pop("scale", None)
-        self.validate(axis_config)
+    def __init__(self, config: dict):
+        self.label = config.pop("label", None)
+        self.scale = config.pop("scale", None)
+        self.validate(config)
 
     def validate(self, leftovers={}):
         """Validate."""
@@ -17,14 +18,14 @@ class Axis:
         return False
 
 
-class Curve:
+class Curve(SEDBase):
     """A 'curve' object, used in plots to define data traces."""
 
-    def __init__(self, curve_config: dict):
-        self.x = curve_config.pop("x", None)
-        self.y = curve_config.pop("y", None)
-        self.style = curve_config.pop("style", None)
-        self.validate(curve_config)
+    def __init__(self, config: dict):
+        self.x = config.pop("x", None)
+        self.y = config.pop("y", None)
+        self.style = config.pop("style", None)
+        self.validate(config)
 
     def validate(self, leftovers={}):
         """Validate."""
@@ -34,15 +35,15 @@ class Curve:
         return False
 
 
-class Surface:
+class Surface(SEDBase):
     """A 'curve' object, used in plots to define data traces."""
 
-    def __init__(self, surface_config: dict):
-        self.x = surface_config.pop("x", None)
-        self.y = surface_config.pop("y", None)
-        self.z = surface_config.pop("z", None)
-        self.style = surface_config.pop("style", None)
-        self.validate(surface_config)
+    def __init__(self, config: dict):
+        self.x = config.pop("x", None)
+        self.y = config.pop("y", None)
+        self.z = config.pop("z", None)
+        self.style = config.pop("style", None)
+        self.validate(config)
 
     def validate(self, leftovers={}):
         """Validate."""
@@ -51,17 +52,27 @@ class Surface:
             return True
         return False
 
+class Output(SEDBase):
+    """The base class for all Output objects."""
+    def __init__(self, config: dict):
+        self.kisaoID = config.pop("kisaoID", None)
+        self.altDefinition = config.pop("altDefinition", None)
+        self.algorithmParameters = config.pop("algorithmParameters", None)
 
-class Plot:
+    def validate(self, leftovers={}):
+        """Validate."""
+        return False
+
+class Plot(Output):
     """A 'plot' object, used to define a 2D visual representation of data."""
 
-    def __init__(self, plot_config: dict):
-        self.label = plot_config.pop("label", None)
-        self.height = plot_config.pop("height", None)
-        self.width = plot_config.pop("width", None)
-        self.legend = plot_config.pop("legend", None)
-        self.xaxis = Axis(plot_config.pop("xAxis", {}))
-        self.yaxis = Axis(plot_config.pop("yAxis", {}))
+    def __init__(self, config: dict):
+        self.label = config.pop("label", None)
+        self.height = config.pop("height", None)
+        self.width = config.pop("width", None)
+        self.legend = config.pop("legend", None)
+        self.xaxis = Axis(config.pop("xAxis", {}))
+        self.yaxis = Axis(config.pop("yAxis", {}))
 
     def validate(self, leftovers={}):
         """Validate."""
@@ -74,15 +85,15 @@ class Plot:
 class Plot2D(Plot):
     """A 'plot' object, used to define a 2D visual representation of data."""
 
-    def __init__(self, plot_config: dict):
-        super().__init__(plot_config)
-        self.rightYAxis = Axis(plot_config.pop("rightYAxis", {}))
-        curves = plot_config.pop("curves", {})
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.rightYAxis = Axis(config.pop("rightYAxis", {}))
+        curves = config.pop("curves", {})
         self.curves = {}
         if curves:
             for key, config in curves.items():
                 self.curves[key] = Curve(config)
-        self.validate(plot_config)
+        self.validate(config)
 
     def validate(self, leftovers={}):
         """Validate."""
@@ -124,15 +135,15 @@ class Plot2D(Plot):
 class Plot3D(Plot):
     """A 'plot' object, used to define a 2D visual representation of data."""
 
-    def __init__(self, plot_config: dict):
-        super().__init__(plot_config)
-        self.zAxis = Axis(plot_config.pop("zAxis", {}))
-        surfaces = plot_config.pop("surfaces", {})
+    def __init__(self, config: dict):
+        super().__init__(self, config)
+        self.zAxis = Axis(config.pop("zAxis", {}))
+        surfaces = config.pop("surfaces", {})
         self.surfaces = {}
         if surfaces:
             for key, config in surfaces.items():
                 self.surfaces[key] = Surface(config)
-        self.validate(plot_config)
+        self.validate(config)
 
     def validate(self, leftovers={}):
         """Validate."""
@@ -147,16 +158,14 @@ class Plot3D(Plot):
         return headers, code
 
 
-class Report:
+class Report(Output):
     """A 'report' object, for storing and reporting data."""
 
-    # TODO: Make a Plot3D class and a Plot class for the overlap.
-
-    def __init__(self, report_config: dict):
-        self.filename = report_config.pop("filename", None)
-        self.file_format = report_config.pop("file_format", None)
-        self.dataSets = report_config.pop("dataSets", None)
-        self.validate(report_config)
+    def __init__(self, config: dict):
+        self.filename = config.pop("filename", None)
+        self.file_format = config.pop("file_format", None)
+        self.dataSets = config.pop("dataSets", None)
+        self.validate(config)
 
     def validate(self, leftovers={}):
         """Validate."""
@@ -185,13 +194,13 @@ class Report:
         return headers, code
 
 
-class Style:
+class Style(SEDBase):
     """A style defined for visual representation of something in a plot (i.e. a curve or an axis)"""
 
-    def __init__(self, style_config: dict):
-        self.line = style_config.pop("line", None)
-        self.markers = style_config.pop("markers", None)
-        self.validate(style_config)
+    def __init__(self, config: dict):
+        self.line = config.pop("line", None)
+        self.markers = config.pop("markers", None)
+        self.validate(config)
 
     def validate(self, leftovers={}):
         """Validate."""
@@ -203,29 +212,18 @@ class Style:
 
 def load_outputs_section(output_section: dict[Any, Any]):
     outputs = {}
-    outputs["reports"] = {}
-    outputs["plots"] = {}
-    outputs["styles"] = {}
-
-    for key, config in output_section.pop("reports", {}).items():
-        outputs["reports"][key] = Report(config)
-
-    for key, config in output_section.pop("plots", {}).items():
-        plot_type = config.pop("_type", None)
-        match plot_type:
+    for key, config in output_section.items():
+        step_type = config.pop("_type", None)
+        match step_type:
+            case "report":
+                outputs[key] = Report(config)
             case "plot2D":
-                outputs["plots"][key] = Plot2D(config)
+                outputs[key] = Plot2D(config)
             case "plot3D":
-                outputs["plots"][key] = Plot3D(config)
+                outputs[key] = Plot3D(config)
             case None:
-                raise ValueError("No '_type' provided for plot " + key + ".")
+                raise ValueError("No '_type' provided for task " + key + ".")
             case _:
-                raise ValueError("Unknown plot type " + plot_type + ".")
-
-    for key, config in output_section.pop("styles", {}).items():
-        outputs["styles"][key] = Style(config)
-
-    if len(output_section):
-        print("Unsaved data when creating Axis:", output_section)
-
+                print(f"unknown output type: {step_type}")
+                # raise ValueError("Unknown task type " + step_type + ".")
     return outputs
