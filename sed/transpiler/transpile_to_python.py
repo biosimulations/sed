@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> dict[str, Any]:
     root_dir = Path(root_dir or ".")
 
-    seddoc = SEDDocument(sed)
+    seddoc = SedDocument(sed)
 
     logger.debug(seddoc)
     logger.debug("")
@@ -31,7 +31,7 @@ def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> dict[str, Any]:
     return seddoc
 
 
-def translate_to_python(seddoc: SEDDocument, context, path):
+def translate_to_python(seddoc: SedDocument, context, path):
     headers, python = seddoc.exportToPython(context, path)
 
     headers = sorted(list(headers))
