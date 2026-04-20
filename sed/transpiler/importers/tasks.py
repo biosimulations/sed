@@ -11,7 +11,7 @@ class AbstractTask(SedBase):
     """The base class for all tasks."""
 
     def __init__(self, config: dict):
-        super().__init__(self, config)
+        super().__init__(config)
         self.kisaoID = config.pop("kisaoID", None)
         self.altDefinition = config.pop("altDefinition", None)
         #TODO: make actual list of AlgorithmParameter objects
@@ -28,7 +28,7 @@ class ModelImport(AbstractTask):
     """A 'modelImport' object, used as input for simulators."""
 
     def __init__(self, config: dict):
-        super().__init__(self, config)
+        super().__init__(config)
         self.location = config.pop("location", None)
         self.language = config.pop("language", None)
         self.validate(config)
@@ -61,7 +61,7 @@ class DataImport(AbstractTask):
     """A 'dataImport' object, used to import data from a file."""
 
     def __init__(self, config: dict):
-        super().__init__(self, config)
+        super().__init__(config)
         self.location = config.pop("location", None)
         self.format = config.pop("format", None)
         self.parameters = config.pop("parameters", None)
@@ -252,16 +252,16 @@ class Calculation(AbstractTask):
 
     def __init__(self, config: dict):
         # TODO: error checking
-        super().__init__(self, config)
+        super().__init__(config)
         self.type_key = "Calculation"
-        self.infix = config.pop("math", None)
+        self.math = config.pop("math", None)
         self.units = config.pop("units", None)
         self.validate(config)
         # self.visitor = default_math_visitor()
-        # self.expression = visit_expression(self.infix, self.visitor)
+        # self.expression = visit_expression(self.math, self.visitor)
 
     def __str__(self):
-        ret = "Calculation object.  Infix: '" + self.infix + "'\n"
+        ret = "Calculation object.  Infix: '" + self.math + "'\n"
         if self.units:
             ret += "Units: '" + self.units + "'\n"
         return ret.strip()
@@ -278,12 +278,12 @@ class Calculation(AbstractTask):
 
     def getInputVariables(self):
         """Parse the infix to retrieve all SED variable inputs."""
-        strlist = re.findall(r"#[a-zA-Z0-9_:.]*", self.infix)
+        strlist = re.findall(r"#[a-zA-Z0-9_:.]*", self.math)
         return set(strlist)
 
     def make_python(self, key):
         headers = set()
-        line = self.infix.replace(":", "_")
+        line = self.math.replace(":", "_")
         line = line.replace("#", "")
         line = line.replace("^", "**")
         code = "tasks_" + key + " = " + line + "\n"
@@ -319,7 +319,7 @@ class SumOfSquares(AbstractTask):
     """The definition of a 'sumOfSquares' task, which calculates the differences between inputs."""
 
     def __init__(self, config: dict):
-        super().__init__(self, config)
+        super().__init__(config)
         self.type_key = "SumOfSquares"
         self.inputs = config.pop("inputs", None)
         self.validate(config)
@@ -342,7 +342,7 @@ class ParameterScan(AbstractTask):
 
     def __init__(self, config: dict):
         self.type_key = "ParameterScan"
-        super().__init__(self, config)
+        super().__init__(config)
         self.model = config.pop("model", None)
         self.scannedVariable = config.pop("scannedVariable", None)
         self.range = Range(config.pop("range", {}))
@@ -366,7 +366,7 @@ class SteadyState(AbstractTask):
     """The definition of a 'parameter scan' task, which takes a model as input and outputs an array of models."""
 
     def __init__(self, config: dict):
-        super().__init__(self, config)
+        super().__init__(config)
         self.type_key = "SteadyState"
         self.model = config.pop("model", None)
         self.outputVariables = config.pop("outputVariables", None)

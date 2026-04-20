@@ -32,7 +32,7 @@ class Range(SedBase):
     """
 
     def __init__(self, range_config: dict):
-        super().__init__(self, range_config)
+        super().__init__(range_config)
         self.type_key = "Range"
         self.start = range_config.pop("start", None)
         self.end = range_config.pop("end", None)

@@ -136,7 +136,7 @@ class Plot3D(Plot):
     """A 'plot' object, used to define a 2D visual representation of data."""
 
     def __init__(self, config: dict):
-        super().__init__(self, config)
+        super().__init__(config)
         self.zAxis = Axis(config.pop("zAxis", {}))
         surfaces = config.pop("surfaces", {})
         self.surfaces = {}
