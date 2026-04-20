@@ -68,3 +68,19 @@ class SedDocument():
             return True
         return False
 
+    def exportToPython(self, context, path):
+        headers = set()
+		python = "# Translation of SED document v" + sed.versionStr + " to python\n\n"
+        python +=  "\n# tasks:" + task_key + "\n"
+        for task in self.tasks:
+            newheaders, newpython = task.exportToPython()
+            headers.update(newheaders)
+            python += newpython
+        python +=  "\n# outputs:" + task_key + "\n"
+        for output in self.outputs:
+            newheaders, newpython = output.exportToPython()
+            headers.update(newheaders)
+            python += newpython
+        return headers, python
+
+
