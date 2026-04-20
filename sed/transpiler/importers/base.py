@@ -70,7 +70,7 @@ class SedDocument():
 
     def exportToPython(self, context, path):
         headers = set()
-		python = "# Translation of SED document v" + sed.versionStr + " to python\n\n"
+        python = "# Translation of SED document v" + sed.versionStr + " to python\n\n"
         python +=  "\n# tasks:" + task_key + "\n"
         for task in self.tasks:
             newheaders, newpython = task.exportToPython()
