@@ -1,8 +1,8 @@
 from typing import Any
-from sed.transpiler.importers.base import SEDBase
+from sed.transpiler.importers.base import SedBase
 
 
-class Axis(SEDBase):
+class Axis(SedBase):
     """A 'plot' object, used to define a 2D visual representation of data."""
 
     def __init__(self, config: dict):
@@ -18,7 +18,7 @@ class Axis(SEDBase):
         return False
 
 
-class Curve(SEDBase):
+class Curve(SedBase):
     """A 'curve' object, used in plots to define data traces."""
 
     def __init__(self, config: dict):
@@ -35,7 +35,7 @@ class Curve(SEDBase):
         return False
 
 
-class Surface(SEDBase):
+class Surface(SedBase):
     """A 'curve' object, used in plots to define data traces."""
 
     def __init__(self, config: dict):
@@ -52,7 +52,7 @@ class Surface(SEDBase):
             return True
         return False
 
-class Output(SEDBase):
+class Output(SedBase):
     """The base class for all Output objects."""
     def __init__(self, config: dict):
         self.kisaoID = config.pop("kisaoID", None)
@@ -194,7 +194,7 @@ class Report(Output):
         return headers, code
 
 
-class Style(SEDBase):
+class Style(SedBase):
     """A style defined for visual representation of something in a plot (i.e. a curve or an axis)"""
 
     def __init__(self, config: dict):

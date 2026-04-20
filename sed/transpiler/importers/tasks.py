@@ -1,13 +1,13 @@
 import re
 
 from sed.transpiler.library import parse_hash
-from sed.transpiler.importers.base import SEDBase, Range
+from sed.transpiler.importers.base import SedBase, Range
 import pandas as pd
 from pathlib import Path
 #from typing import Any
 
 
-class AbstractTask(SEDBase):
+class AbstractTask(SedBase):
     """The base class for all tasks."""
 
     def __init__(self, config: dict):
