@@ -1,29 +1,25 @@
 {
-  "inputs": {
-    "models": {
-      "model1": {
-        "location": "example1.xml",
-        "language": "urn:sedml:language:sbml"
+  "tasks": {
+    "model1": {
+      "_type": "importModel",
+      "location": "example1.xml",
+      "language": "urn:sedml:language:sbml"
+    },
+    "experiment1": {
+      "_type": "importData",
+      "location": "experimental_data.csv",
+      "format": "http://purl.org/NET/mediatypes/text/csv",
+      "parameters": {
+        "organization": "column-based",
+        "ncols": 3,
+        "nrows": 52,
+        "units": [
+          "seconds",
+          "mMol",
+          "mMol"
+        ]
       }
     },
-    "data": {
-      "experiment1": {
-        "location": "experimental_data.csv",
-        "format": "http://purl.org/NET/mediatypes/text/csv",
-        "parameters": {
-          "organization": "column-based",
-          "ncols": 3,
-          "nrows": 52,
-          "units": [
-            "seconds",
-            "mMol",
-            "mMol"
-          ]
-        }
-      }
-    }
-  },
-  "tasks": {
     "sim1": {
       "_type": "uniformTimeCourse",
       "model": "#inputs:models:model1",
@@ -80,71 +76,71 @@
     }
   },
   "outputs": {
-    "reports": {
-      "sim1Report": {
-        "dataSets": "#tasks:sim1",
-        "filename": "sim1.csv",
-        "file_format": "http://purl.org/NET/mediatypes/text/csv"
-      },
-      "sim2Report": {
-        "dataSets": "#tasks:sim2",
-        "filename": "sim2.csv",
-        "file_format": "http://purl.org/NET/mediatypes/text/csv"
-      },
-      "comparisonReport": {
-        "dataSets": {
-          "time": "#tasks:sim1['time']",
-          "S1_ssq_sim1sim2": "#tasks:sim1_sim2_compare['S1']",
-          "S1_ssq_sim1exp": "#tasks:sim1_exp_compare['S1']",
-          "S1_ssq_sim2exp": "#tasks:sim2_exp_compare['S1']",
-          "S2_ssq_sim1sim2": "#tasks:sim1_sim2_compare['S2']",
-          "S2_ssq_sim1exp": "#tasks:sim1_exp_compare['S2']",
-          "S2_ssq_sim2exp": "#tasks:sim2_exp_compare['S2']"
-        },
-        "filename": "all_comparisons.csv",
-        "file_format": "http://purl.org/NET/mediatypes/text/csv"
-      },
-      "comparisonSummary": {
-        "dataSets": "#tasks:compare_summary"
-      }
+    "sim1Report": {
+      "_type": "report",
+      "dataSets": "#tasks:sim1",
+      "filename": "sim1.csv",
+      "file_format": "http://purl.org/NET/mediatypes/text/csv"
     },
-    "plots": {
-      "Fig1": {
-        "_type": "plot2D",
-        "label": "Figure 1",
-        "xAxis": {
-          "label": "Time"
+    "sim2Report": {
+      "_type": "report",
+      "dataSets": "#tasks:sim2",
+      "filename": "sim2.csv",
+      "file_format": "http://purl.org/NET/mediatypes/text/csv"
+    },
+    "comparisonReport": {
+      "_type": "report",
+      "dataSets": {
+        "time": "#tasks:sim1['time']",
+        "S1_ssq_sim1sim2": "#tasks:sim1_sim2_compare['S1']",
+        "S1_ssq_sim1exp": "#tasks:sim1_exp_compare['S1']",
+        "S1_ssq_sim2exp": "#tasks:sim2_exp_compare['S1']",
+        "S2_ssq_sim1sim2": "#tasks:sim1_sim2_compare['S2']",
+        "S2_ssq_sim1exp": "#tasks:sim1_exp_compare['S2']",
+        "S2_ssq_sim2exp": "#tasks:sim2_exp_compare['S2']"
+      },
+      "filename": "all_comparisons.csv",
+      "file_format": "http://purl.org/NET/mediatypes/text/csv"
+    },
+    "comparisonSummary": {
+      "_type": "report",
+      "dataSets": "#tasks:compare_summary"
+    },
+    "Fig1": {
+      "_type": "plot2D",
+      "label": "Figure 1",
+      "xAxis": {
+        "label": "Time"
+      },
+      "yAxis": {
+        "label": "Concentrations"
+      },
+      "curves": {
+        "Sim1_S1": {
+          "x": "#tasks:sim1['time']",
+          "y": "#tasks:sim1['S1']"
         },
-        "yAxis": {
-          "label": "Concentrations"
+        "Sim1_S2": {
+          "x": "#tasks:sim1['time']",
+          "y": "#tasks:sim1['S2']"
         },
-        "curves": {
-          "Sim1_S1": {
-            "x": "#tasks:sim1['time']",
-            "y": "#tasks:sim1['S1']"
-          },
-          "Sim1_S2": {
-            "x": "#tasks:sim1['time']",
-            "y": "#tasks:sim1['S2']"
-          },
-          "Sim2_S1": {
-            "x": "#tasks:sim1['time']",
-            "y": "#tasks:sim2['S1']"
-          },
-          "Sim2_S2": {
-            "x": "#tasks:sim1['time']",
-            "y": "#tasks:sim2['S2']"
-          },
-          "S1_data": {
-            "x": "#tasks:sim1['time']",
-            "y": "#inputs:data:experiment1['S1']",
-            "style": "points_only"
-          },
-          "S2_data": {
-            "x": "#tasks:sim1['time']",
-            "y": "#inputs:data:experiment1['S2']",
-            "style": "points_only"
-          }
+        "Sim2_S1": {
+          "x": "#tasks:sim1['time']",
+          "y": "#tasks:sim2['S1']"
+        },
+        "Sim2_S2": {
+          "x": "#tasks:sim1['time']",
+          "y": "#tasks:sim2['S2']"
+        },
+        "S1_data": {
+          "x": "#tasks:sim1['time']",
+          "y": "#inputs:data:experiment1['S1']",
+          "style": "points_only"
+        },
+        "S2_data": {
+          "x": "#tasks:sim1['time']",
+          "y": "#inputs:data:experiment1['S2']",
+          "style": "points_only"
         }
       }
     },
