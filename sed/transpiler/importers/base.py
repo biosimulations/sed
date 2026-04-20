@@ -1,7 +1,7 @@
 from pathlib import Path
 from typing import Any
-from tasks import load_tasks_section
-from outputs import load_outputs_section
+from sed.transpiler.importers.tasks import load_tasks_section
+from sed.transpiler.importers.outputs import load_outputs_section
 
 import pandas as pd
 

@@ -1,5 +1,5 @@
 from typing import Any
-from base import SEDBase
+from sed.transpiler.importers.base import SEDBase
 
 
 class Axis(SEDBase):

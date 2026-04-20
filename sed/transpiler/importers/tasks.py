@@ -1,7 +1,7 @@
 import re
 
 from sed.transpiler.library import parse_hash
-from base import SEDBase, Range
+from sed.transpiler.importers.base import SEDBase, Range
 import pandas as pd
 from pathlib import Path
 #from typing import Any
