@@ -3,7 +3,7 @@ import logging
 from pathlib import Path
 from typing import Any
 
-from sed.transpiler.importers.base import SEDDocument
+from sed.transpiler.importers.document import SEDDocument
 
 logger = logging.getLogger(__name__)
 
