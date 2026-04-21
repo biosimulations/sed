@@ -33,13 +33,13 @@ class SedDocument():
         python +=  "\n# All tasks:\n"
         for task in self.tasks:
             python +=  "\n# Task " + task + ":\n"
-            newheaders, newpython = task.exportToPython()
+            newheaders, newpython = self.tasks[task].exportToPython()
             headers.update(newheaders)
             python += newpython
         python +=  "\n# All Outputs:\n"
         for output in self.outputs:
             python +=  "\n# Output " + output + ":\n"
-            newheaders, newpython = output.exportToPython()
+            newheaders, newpython = self.outputs[output].exportToPython()
             headers.update(newheaders)
             python += newpython
         return headers, python
