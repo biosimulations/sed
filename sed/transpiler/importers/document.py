@@ -17,7 +17,7 @@ class SedDocument():
         self.tasks = load_tasks_section(config.pop("tasks", None))
         self.outputs = load_outputs_section(config.pop("outputs", None))
         # TODO: actually load styles.
-        self.styles = config.pop("style", None)
+        self.styles = config.pop("styles", None)
         self.__validate(config)
 
     def __validate(self, leftovers={}):

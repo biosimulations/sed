@@ -107,19 +107,20 @@ class ODESimulation(AbstractTask):
     def __init__(self, config: dict):
         super().__init__(config)
         # TODO: error checking
-        self.model = config.pop("model", None)
-        self.independentVariable = config
-        self.independentVariableRange = Range(config.pop("independentVariableRange", {}))
+        self.model = config.pop("model")
+        print(self.model)
+        self.independentVariable = config.pop("independentVariable", None)
+        self.independentInitialValue = config.pop("independentInitialValue", None)
         self.outputVariables = config.pop("outputVariables", None)
-        self.initialTime = config.pop("initialTime", None)
+        self.outputModel = config.pop("outputModel", None)
         self.__validate(config)
         self.executor = "Tellurium"
 
     def __validate(self, leftovers={}):
         """Validate."""
-        if len(leftovers):
-            print("Unsaved data when creating explicitODESimulation:", leftovers)
-            return True
+        # if len(leftovers):
+        #     print("Unsaved data when creating explicitODESimulation:", leftovers)
+        #     return True
         return False
 
 class ExplicitODESimulation(ODESimulation):
@@ -128,13 +129,9 @@ class ExplicitODESimulation(ODESimulation):
     def __init__(self, config: dict):
         # TODO: error checking
         super().__init__(config)
+        print("In child class:", self.model)
         self.type_key = "explicitODESimulation"
-        self.model = config.pop("model", None)
-        self.independentVariable = config.pop("independentVariable", None)
-        self.independentVariableInit = config.pop("independentVariableInit", None)
         self.independentVariableRange = Range(config.pop("independentVariableRange", {}))
-        self.outputVariables = config.pop("outputVariables", None)
-        self.initialTime = config.pop("initialTime", None)
         self.__validate(config)
         self.executor = "Tellurium"
 
@@ -158,7 +155,6 @@ class ExplicitODESimulation(ODESimulation):
             print("Unable to simulate with tellurium: independent variable is not 'time'.")
             return
         headers = set(["import tellurium as te"])
-        modelid = self.model
         modelid = self.model[1:]
         modelid = modelid.replace(":", "_")
         taskid = "tasks_" + key
