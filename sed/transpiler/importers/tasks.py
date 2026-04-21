@@ -110,7 +110,7 @@ class ODESimulation(AbstractTask):
         self.model = config.pop("model")
         print(self.model)
         self.independentVariable = config.pop("independentVariable", None)
-        self.independentInitialValue = config.pop("independentInitialValue", None)
+        self.independentVariableInit = config.pop("independentVariableInit", None)
         self.outputVariables = config.pop("outputVariables", None)
         self.outputModel = config.pop("outputModel", None)
         self.__validate(config)
