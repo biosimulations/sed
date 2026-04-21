@@ -1,5 +1,7 @@
 {
-  "tasks": {
+    "versionStr": "SED v2.0 alpha",
+    "versionNum": 2.0,
+    "tasks": {
     "model1": {
       "_type": "modelImport",
       "location": "example1.xml",
