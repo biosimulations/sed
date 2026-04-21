@@ -29,14 +29,16 @@ class ModelImport(AbstractTask):
 
     def __init__(self, config: dict):
         super().__init__(config)
+        print("ModelImport config before pop:", config)
         self.location = config.pop("location", None)
         self.language = config.pop("language", None)
+        print("ModelImport config after pop:", config)
         self.validate(config)
 
     def validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
-            print("Unsaved data when creating Model:", leftovers)
+            print("Unsaved data when creating ModelImport:", leftovers)
             return True
         return False
 
@@ -71,7 +73,7 @@ class DataImport(AbstractTask):
     def validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
-            print("Unsaved data when creating Data:", leftovers)
+            print("Unsaved data when creating DataImport:", leftovers)
             return True
         return False
 
@@ -127,7 +129,7 @@ class ExplicitODESimulation(ODESimulation):
 
     def __init__(self, config: dict):
         # TODO: error checking
-        super().init(self, config)
+        super().__init__(self, config)
         self.type_key = "explicitODESimulation"
         self.model = config.pop("model", None)
         self.independentVariable = config.pop("independentVariable", None)
