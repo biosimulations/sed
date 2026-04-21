@@ -102,7 +102,7 @@ class Plot2D(Plot):
             return True
         return False
 
-    def make_python(self, key):
+    def exportToPython(self, key):
         headers = set(["import matplotlib.pyplot as plt"])
         code = "fig, ax = plt.subplots()\n"
         xref = ""
@@ -152,7 +152,7 @@ class Plot3D(Plot):
             return True
         return False
 
-    def make_python(self, key):
+    def exportToPython(self, key):
         headers = set()
         code = ""
         return headers, code
@@ -174,7 +174,7 @@ class Report(Output):
             return True
         return False
 
-    def make_python(self, key):
+    def exportToPython(self, key):
         headers = set(["import numpy as np"])
         code = ""
         repid = "outputs_reports_" + key

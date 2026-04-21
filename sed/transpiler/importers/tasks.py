@@ -42,7 +42,7 @@ class ModelImport(AbstractTask):
             return True
         return False
 
-    def make_python(self, key, root_dir):
+    def exportToPython(self, key, root_dir):
         headers = set()
         code = "inputs_models_" + key + " = r'" + str(Path(root_dir) / self.location) + "'\n"
         return headers, code
@@ -85,7 +85,7 @@ class DataImport(AbstractTask):
         df = pd.read_csv(root / self.location)
         return {key: list(series) for key, series in df.items()}
 
-    def make_python(self, key, root_dir):
+    def exportToPython(self, key, root_dir):
         if self.format == "http://purl.org/NET/mediatypes/text/csv":
             headers = set(["import pandas as pd"])
             code = "inputs_data_" + key + " = pd.read_csv(r'" + str(Path(root_dir) / self.location) + "')\n"
@@ -107,8 +107,8 @@ class ODESimulation(AbstractTask):
     """The definition of a uniform time course simulation."""
 
     def __init__(self, config: dict):
+        self.__init__(config)
         # TODO: error checking
-        self.type_key = "explicitODESimulation"
         self.model = config.pop("model", None)
         self.independentVariable = config
         self.independentVariableRange = Range(config.pop("independentVariableRange", {}))
@@ -147,15 +147,15 @@ class ExplicitODESimulation(ODESimulation):
             return True
         return False
 
-    def make_python(self, key):
+    def exportToPython(self, key):
         if self.executor == "Tellurium":
-            return self.make_python_tellurium(key)
+            return self.exportToPython_tellurium(key)
         elif self.executor == "Copasi":
-            return self.make_python_copasi(key)
+            return self.exportToPython_copasi(key)
         else:
             raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
 
-    def make_python_tellurium(self, key):
+    def exportToPython_tellurium(self, key):
         if self.independentVariable != "urn:sedml:symbol:time":
             print("Unable to simulate with tellurium: independent variable is not 'time'.")
             return
@@ -181,7 +181,7 @@ class ExplicitODESimulation(ODESimulation):
         )
         return headers, code
 
-    def make_python_copasi(self, key):
+    def exportToPython_copasi(self, key):
         # copasi_df: DataFrame = basico.run_time_course(
         #     start_time=0,
         #     duration=20,
@@ -283,7 +283,7 @@ class Calculation(AbstractTask):
         strlist = re.findall(r"#[a-zA-Z0-9_:.]*", self.math)
         return set(strlist)
 
-    def make_python(self, key):
+    def exportToPython(self, key):
         headers = set()
         line = self.math.replace(":", "_")
         line = line.replace("#", "")
@@ -333,7 +333,7 @@ class SumOfSquares(AbstractTask):
             return True
         return False
 
-    def make_python(self, key):
+    def exportToPython(self, key):
         headers = set()
         code = ""
         return headers, code
@@ -358,7 +358,7 @@ class ParameterScan(AbstractTask):
             return True
         return False
 
-    def make_python(self, key):
+    def exportToPython(self, key):
         headers = set()
         code = ""
         return headers, code
@@ -386,7 +386,7 @@ class SteadyState(AbstractTask):
         """foo"""
         pass
 
-    def make_python(self, key):
+    def exportToPython(self, key):
         headers = set()
         code = ""
         return headers, code
