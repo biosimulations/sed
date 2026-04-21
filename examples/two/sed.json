@@ -1,91 +1,88 @@
 {
-  "inputs": {
-    "models": {
-      "model1": {
-        "location": "example.xml",
-        "language": "urn:sedml:language:sbml"
-      }
-    }
-  },
   "tasks": {
-    "paramScan_k1": {
-      "_type": "parameterScan",
-      "model": "model1",
-      "scannedVariable": "k1",
-      "range": {
-        "start": 0.1,
-        "end": 1.5,
-        "interval": 0.1
-      },
-      "outputRange": "true"
+    "model1": {
+      "_type": "modelImport",
+      "location": "example.xml",
+      "language": "urn:sedml:language:sbml"
     },
-    "paramScan_k2": {
+    "scan_k1_and_k2": {
       "_type": "parameterScan",
-      "model": "tasks:paramScan_k1:models",
-      "scannedVariable": "k2",
-      "range": {
-        "values": [
-          0.1,
-          0.2,
-          0.5,
-          1.0,
-          2.0,
-          5.0,
-          10.0
-        ]
-      },
-      "outputRange": "true"
-    },
-    "steadyStates": {
-      "_type": "steadyState",
-      "model": "tasks:paramScan_k2:models",
-      "outputVariables": [
-        "S1",
-        "S2"
+      "model": "#tasks:mod1",
+      "ranges": [
+        {
+          "modelElement": "k1",
+          "start": 0.1,
+          "end": 1.5,
+          "interval": 0.1
+        },
+        {
+          "modelElement": "k2",
+          "values": [
+            0.1,
+            0.2,
+            0.5,
+            1.0,
+            2.0,
+            5.0,
+            10.0
+          ]
+        }
       ],
-      "outputModel": "true"
-    },
-    "jacobians": {
-      "_type": "jacobian",
-      "model": "#tasks:steadyStates:model"
+      "subTasks": {
+        "sim1": {
+          "_type": "steadyState",
+          "kisaoID": "KISAO:0000319",
+          "model": "#tasks:model1.model",
+          "outputModel": true,
+          "outputVariables": "['S1', 'S2', 'S3']",
+          "independentVariable": "urn:sedml:symbol:time",
+          "independentVariableRange": {
+              "start": 0,
+              "end": 20,
+              "numberOfSteps": 50
+          },
+          "jacobians": {
+            "_type": "jacobian",
+            "model": "#tasks:scan_k1_and_k2:subTasks:steadyState.model"
+          }
+        }
+      }
     }
   },
   "outputs": {
-    "reports": {
-      "steadyStateReport": {
-        "dataSets": "tasks:steadyStates"
-      },
-      "jacobianReport": {
-        "dataSets": "tasks:jacobians"
-      }
+    "steadyStateReport": {
+      "_type": "report",
+      "dataSets": "#tasks:scan_k1_and_k2:subTasks:steadyState"
     },
-    "plots": {
-      "Fig1": {
-        "_type": "plot3D",
-        "label": "Figure 1",
-        "xAxis": {
-          "label": "k1",
-          "scale": "linear"
+    "jacobianReport": {
+      "_type": "report",
+      "dataSets": "#tasks:scan_k1_and_k2:subTasks:jacobians"
+    },
+    "Fig1": {
+      "_type": "plot3D",
+      "label": "Figure 1",
+      "xAxis": {
+        "label": "k1",
+        "scale": "linear"
+      },
+      "yAxis": {
+        "label": "k2",
+        "scale": "log"
+      },
+      "zAxis": {
+        "label": "Concentrations",
+        "scale": "linear"
+      },
+      "surfaces": {
+        "S1": {
+          "x": "#tasks:scan_k1_and_k2:ranges[0]",
+          "y": "#tasks:scan_k1_and_k2:ranges[1]",
+          "z": "#tasks:steadyStates['S1']"
         },
-        "yAxis": {
-          "label": "k2",
-          "scale": "log"
-        },
-        "zAxis": {
-          "label": "Concentrations",
-          "scale": "linear"
-        },
-        "surfaces": {
-          "S1": {
-            "x": "tasks:paramScan_k1:range",
-            "y": "tasks:paramScan_k2:range",
-            "z": "tasks:steadyStates['S1']"
-          },
-          "S2": {
-            "x": "tasks:paramScan_k1:range",
-            "y": "tasks:paramScan_k2:range",
-            "z": "tasks:steadyStates['S2']"
-          }
+        "S2": {
+          "x": "#tasks:scan_k1_and_k2:ranges[0]",
+          "y": "#tasks:scan_k1_and_k2:ranges[1]",
+          "z": "#tasks:steadyStates['S2']"
         }
       }
     }
