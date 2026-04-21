@@ -107,7 +107,7 @@ class ODESimulation(AbstractTask):
     """The definition of a uniform time course simulation."""
 
     def __init__(self, config: dict):
-        self.__init__(config)
+        super().__init__(config)
         # TODO: error checking
         self.model = config.pop("model", None)
         self.independentVariable = config
