@@ -29,10 +29,8 @@ class ModelImport(AbstractTask):
 
     def __init__(self, config: dict):
         super().__init__(config)
-        print("ModelImport config before pop:", config)
         self.location = config.pop("location", None)
         self.language = config.pop("language", None)
-        print("ModelImport config after pop:", config)
         self.__validate(config)
 
     def __validate(self, leftovers={}):
@@ -147,7 +145,7 @@ class ExplicitODESimulation(ODESimulation):
             return True
         return False
 
-    def exportToPython(self, key):
+    def exportToPython(self, key, root_dir):
         if self.executor == "Tellurium":
             return self.exportToPython_tellurium(key)
         elif self.executor == "Copasi":
@@ -181,7 +179,7 @@ class ExplicitODESimulation(ODESimulation):
         )
         return headers, code
 
-    def exportToPython_copasi(self, key):
+    def exportToPython_copasi(self, key, root_dir):
         # copasi_df: DataFrame = basico.run_time_course(
         #     start_time=0,
         #     duration=20,
@@ -283,7 +281,7 @@ class Calculation(AbstractTask):
         strlist = re.findall(r"#[a-zA-Z0-9_:.]*", self.math)
         return set(strlist)
 
-    def exportToPython(self, key):
+    def exportToPython(self, key, root_dir):
         headers = set()
         line = self.math.replace(":", "_")
         line = line.replace("#", "")
@@ -333,7 +331,7 @@ class SumOfSquares(AbstractTask):
             return True
         return False
 
-    def exportToPython(self, key):
+    def exportToPython(self, key, root_dir):
         headers = set()
         code = ""
         return headers, code
@@ -358,7 +356,7 @@ class ParameterScan(AbstractTask):
             return True
         return False
 
-    def exportToPython(self, key):
+    def exportToPython(self, key, root_dir):
         headers = set()
         code = ""
         return headers, code
@@ -386,7 +384,7 @@ class SteadyState(AbstractTask):
         """foo"""
         pass
 
-    def exportToPython(self, key):
+    def exportToPython(self, key, root_dir):
         headers = set()
         code = ""
         return headers, code
