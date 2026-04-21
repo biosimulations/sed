@@ -1,12 +1,12 @@
 {
   "tasks": {
     "model1": {
-      "_type": "importModel",
+      "_type": "modelImport",
       "location": "example1.xml",
       "language": "urn:sedml:language:sbml"
     },
     "experiment1": {
-      "_type": "importData",
+      "_type": "dataImport",
       "location": "experimental_data.csv",
       "format": "http://purl.org/NET/mediatypes/text/csv",
       "parameters": {
@@ -21,34 +21,34 @@
       }
     },
     "sim1": {
-      "_type": "uniformTimeCourse",
+      "_type": "explicitODESimulation",
+      "kisaoID": "KISAO:0000694",
       "model": "#inputs:models:model1",
-      "initialTime": 0,
-      "timeRange": {
+      "independentVariable": "urn:sedml:symbol:time",
+      "independentVariableInit": 0,
+      "independentVariableRange": {
         "start": 0,
         "end": 20,
         "numberOfSteps": 50
       },
-      "outputVariables": [
-        "time",
-        "S1",
-        "S2"
-      ]
+      "outputVariables": ["S1", "S2"]
     },
     "sim2": {
-      "_type": "uniformTimeCourse",
+      "_type": "explicitODESimulation",
+      "kisaoID": "KISAO:0000694",
+      "algorithmParameters": {
+        "altDefinition": "urn:sedml:algorithms:compareWith",
+        "value": "#tasks:sim1"
+      },
       "model": "#inputs:models:model1",
-      "initialTime": 0,
-      "timeRange": {
+      "independentVariable": "urn:sedml:symbol:time",
+      "independentVariableInit": 0,
+      "independentVariableRange": {
         "start": 0,
         "end": 20,
         "numberOfSteps": 50
       },
-      "outputVariables": [
-        "time",
-        "S1",
-        "S2"
-      ]
+      "outputVariables": ["S1", "S2"]
     },
     "sim1_sim2_compare": {
       "_type": "calculation",
@@ -143,12 +143,12 @@
           "style": "points_only"
         }
       }
-    },
-    "styles": {
-      "points_only": {
-        "line": false,
-        "markers": true
-      }
+    }
+  },
+  "styles": {
+    "points_only": {
+      "line": false,
+      "markers": true
     }
   }
 }
