@@ -8,9 +8,9 @@ class Axis(SedBase):
     def __init__(self, config: dict):
         self.label = config.pop("label", None)
         self.scale = config.pop("scale", None)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Axis:", leftovers)
@@ -25,9 +25,9 @@ class Curve(SedBase):
         self.x = config.pop("x", None)
         self.y = config.pop("y", None)
         self.style = config.pop("style", None)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Curve:", leftovers)
@@ -43,9 +43,9 @@ class Surface(SedBase):
         self.y = config.pop("y", None)
         self.z = config.pop("z", None)
         self.style = config.pop("style", None)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Curve:", leftovers)
@@ -59,7 +59,7 @@ class Output(SedBase):
         self.altDefinition = config.pop("altDefinition", None)
         self.algorithmParameters = config.pop("algorithmParameters", None)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         return False
 
@@ -74,7 +74,7 @@ class Plot(Output):
         self.xaxis = Axis(config.pop("xAxis", {}))
         self.yaxis = Axis(config.pop("yAxis", {}))
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Plot2D:", leftovers)
@@ -93,9 +93,9 @@ class Plot2D(Plot):
         if curves:
             for key, config in curves.items():
                 self.curves[key] = Curve(config)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Plot2D:", leftovers)
@@ -143,9 +143,9 @@ class Plot3D(Plot):
         if surfaces:
             for key, config in surfaces.items():
                 self.surfaces[key] = Surface(config)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Plot2D:", leftovers)
@@ -165,9 +165,9 @@ class Report(Output):
         self.filename = config.pop("filename", None)
         self.file_format = config.pop("file_format", None)
         self.dataSets = config.pop("dataSets", None)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Report:", leftovers)
@@ -200,9 +200,9 @@ class Style(SedBase):
     def __init__(self, config: dict):
         self.line = config.pop("line", None)
         self.markers = config.pop("markers", None)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Style:", leftovers)

@@ -18,9 +18,9 @@ class SedDocument():
         self.outputs = load_outputs_section(config.pop("outputs", None))
         # TODO: actually load styles.
         self.styles = config.pop("style", None)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating SEDDocument:", leftovers)
@@ -29,14 +29,16 @@ class SedDocument():
 
     def exportToPython(self, context, path):
         headers = set()
-        python = "# Translation of SED document v" + sed.versionStr + " to python\n\n"
-        python +=  "\n# tasks:" + task_key + "\n"
+        python = "# Translation of SED document v" + self.versionStr + " to python\n\n"
+        python +=  "\n# All tasks:\n"
         for task in self.tasks:
+            python +=  "\n# Task " + task + ":\n"
             newheaders, newpython = task.exportToPython()
             headers.update(newheaders)
             python += newpython
-        python +=  "\n# outputs:" + task_key + "\n"
+        python +=  "\n# All Outputs:\n"
         for output in self.outputs:
+            python +=  "\n# Output " + output + ":\n"
             newheaders, newpython = output.exportToPython()
             headers.update(newheaders)
             python += newpython

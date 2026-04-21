@@ -14,9 +14,9 @@ class SedBase:
         self.description = model_config.pop("description", None)
         self.notes = model_config.pop("notes", None)
         self.annotations = model_config.pop("annotations", None)
-        self.validate(model_config)
+        self.__validate(model_config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         #TODO: check format for children.
         return False
@@ -40,9 +40,9 @@ class Range(SedBase):
         self.interval = range_config.pop("interval", None)
         self.scale = range_config.pop("scale", None)
         self.values = range_config.pop("values", None)
-        self.validate(range_config)
+        self.__validate(range_config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Range:", leftovers)

@@ -16,9 +16,9 @@ class AbstractTask(SedBase):
         self.altDefinition = config.pop("altDefinition", None)
         #TODO: make actual list of AlgorithmParameter objects
         self.algorithmParameters = config.pop("algorithmParameters", None)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         #TODO: check if kisao is valid, and if altDefinition is URI.
         return False
@@ -33,9 +33,9 @@ class ModelImport(AbstractTask):
         self.location = config.pop("location", None)
         self.language = config.pop("language", None)
         print("ModelImport config after pop:", config)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating ModelImport:", leftovers)
@@ -67,10 +67,10 @@ class DataImport(AbstractTask):
         self.location = config.pop("location", None)
         self.format = config.pop("format", None)
         self.parameters = config.pop("parameters", None)
-        self.validate(config)
+        self.__validate(config)
         self.MEDIA_TYPES = {"http://purl.org/NET/mediatypes/text/csv": self.load_csv}
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating DataImport:", leftovers)
@@ -114,10 +114,10 @@ class ODESimulation(AbstractTask):
         self.independentVariableRange = Range(config.pop("independentVariableRange", {}))
         self.outputVariables = config.pop("outputVariables", None)
         self.initialTime = config.pop("initialTime", None)
-        self.validate(config)
+        self.__validate(config)
         self.executor = "Tellurium"
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating explicitODESimulation:", leftovers)
@@ -129,7 +129,7 @@ class ExplicitODESimulation(ODESimulation):
 
     def __init__(self, config: dict):
         # TODO: error checking
-        super().__init__(self, config)
+        super().__init__(config)
         self.type_key = "explicitODESimulation"
         self.model = config.pop("model", None)
         self.independentVariable = config.pop("independentVariable", None)
@@ -137,10 +137,10 @@ class ExplicitODESimulation(ODESimulation):
         self.independentVariableRange = Range(config.pop("independentVariableRange", {}))
         self.outputVariables = config.pop("outputVariables", None)
         self.initialTime = config.pop("initialTime", None)
-        self.validate(config)
+        self.__validate(config)
         self.executor = "Tellurium"
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating explicitODESimulation:", leftovers)
@@ -258,7 +258,7 @@ class Calculation(AbstractTask):
         self.type_key = "Calculation"
         self.math = config.pop("math", None)
         self.units = config.pop("units", None)
-        self.validate(config)
+        self.__validate(config)
         # self.visitor = default_math_visitor()
         # self.expression = visit_expression(self.math, self.visitor)
 
@@ -271,7 +271,7 @@ class Calculation(AbstractTask):
     def __repr__(self):
         return self.__str__()
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Calculation:", leftovers)
@@ -324,9 +324,9 @@ class SumOfSquares(AbstractTask):
         super().__init__(config)
         self.type_key = "SumOfSquares"
         self.inputs = config.pop("inputs", None)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating SumOfSquares:", leftovers)
@@ -349,9 +349,9 @@ class ParameterScan(AbstractTask):
         self.scannedVariable = config.pop("scannedVariable", None)
         self.range = Range(config.pop("range", {}))
         self.outputRange = config.pop("outputRange", None)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating ParameterScan:", leftovers)
@@ -373,9 +373,9 @@ class SteadyState(AbstractTask):
         self.model = config.pop("model", None)
         self.outputVariables = config.pop("outputVariables", None)
         self.outputModel = config.pop("outputModel", None)
-        self.validate(config)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating SteadyState:", leftovers)
