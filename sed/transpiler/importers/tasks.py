@@ -122,6 +122,9 @@ class ODESimulation(AbstractTask):
         #     return True
         return False
 
+    def setContext(self, val):
+        self.executor = val;
+
 class ExplicitODESimulation(ODESimulation):
     """The definition of a uniform time course simulation."""
 
@@ -152,7 +155,7 @@ class ExplicitODESimulation(ODESimulation):
         if self.independentVariable != "urn:sedml:symbol:time":
             print("Unable to simulate with tellurium: independent variable is not 'time'.")
             return
-        headers = set(["import tellurium as te"])
+        headers = set(["import tellurium as te", "import pandas as pd"])
         modelid = self.model[1:]
         modelid = modelid.replace(":", "_")
         taskid = "tasks_" + key
@@ -171,9 +174,18 @@ class ExplicitODESimulation(ODESimulation):
             + str(['time'] + self.outputVariables)
             + ")\n"
         )
+        # Convert to pandas dataframe
+        code += (
+            taskid
+            + " = pd.DataFrame("
+            + taskid
+            + ", columns="
+            + taskid
+            + ".colnames)\n"
+        )
         return headers, code
 
-    def exportToPython_copasi(self, key, root_dir):
+    def exportToPython_copasi(self, key):
         # copasi_df: DataFrame = basico.run_time_course(
         #     start_time=0,
         #     duration=20,
@@ -202,7 +214,7 @@ class ExplicitODESimulation(ODESimulation):
             + "_copasi = basico.run_time_course(start_time="
             + str(self.independentVariableRange.start)
             + ", duration="
-            + str(self.independentVariableRange.end - self.timeRange.start)
+            + str(self.independentVariableRange.end - self.independentVariableRange.start)
             + ", intervals="
             + str(self.independentVariableRange.numberOfSteps)
             + ", update_model=True, use_sbml_id=True,model=basico.load_model("

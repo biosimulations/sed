@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> dict[str, Any]:
     root_dir = Path(root_dir or ".")
 
-    seddoc = SedDocument(sed)
+    seddoc = SedDocument(sed, context)
 
     logger.debug(seddoc)
     logger.debug("")
@@ -31,8 +31,8 @@ def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> dict[str, Any]:
     return seddoc
 
 
-def translate_to_python(seddoc: SedDocument, context, path):
-    headers, python = seddoc.exportToPython(context, path)
+def translate_to_python(seddoc: SedDocument, path):
+    headers, python = seddoc.exportToPython(path)
 
     headers = sorted(list(headers))
     ret = ""
@@ -50,9 +50,9 @@ def transpile(path, filename, context={}):
     with open(sed_path) as sed_file:
         sed = json.load(sed_file)
 
-    seddoc = load_sed(sed, path)
+    seddoc = load_sed(sed, path, context)
     logger.debug(seddoc)
-    python = translate_to_python(seddoc, context, path)
+    python = translate_to_python(seddoc, path)
     return python
 
 

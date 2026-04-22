@@ -33,9 +33,9 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://biosimulators.github.io/bsedic/"
-Repository = "https://github.com/biosimulators/bsedic"
-Documentation = "https://biosimulators.github.io/bsedic/"
+Homepage = "https://biosimulations.github.io/sed/"
+Repository = "https://github.com/biosimulations/sed"
+Documentation = "https://biosimulations.github.io/sed/"
 
 [dependency-groups]
 dev = [
@@ -58,10 +58,10 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["bsedic"]
+packages = ["sed"]
 
 [tool.mypy]
-files = ["bsedic"]
+files = ["sed"]
 disallow_untyped_defs = true
 disallow_any_unimported = false
 no_implicit_optional = true
@@ -133,7 +133,7 @@ skip_empty = true
 
 [tool.coverage.run]
 branch = true
-source = ["bsedic"]
+source = ["sed"]
 
 [tool.uv.sources]
 biocompose = { git = "https://github.com/vivarium-collective/biocompose", rev = "numerical-types" }

@@ -10,7 +10,7 @@ import pandas as pd
 
 class SedDocument():
     """The document itself."""
-    def __init__(self, config: dict):
+    def __init__(self, config: dict, context):
         self.versionStr = config.pop("versionStr", None)
         self.versionNum = config.pop("versionNum", None)
         self.constants = config.pop("constants", None)
@@ -18,6 +18,11 @@ class SedDocument():
         self.outputs = load_outputs_section(config.pop("outputs", None))
         # TODO: actually load styles.
         self.styles = config.pop("styles", None)
+        # context = {"tasks": {"sim2": "Copasi"}}
+        for tag in context:
+            if tag == "tasks":
+                for task in context[tag]:
+                    self.tasks[task].setContext(context[tag][task])
         self.__validate(config)
 
     def __validate(self, leftovers={}):
@@ -27,9 +32,9 @@ class SedDocument():
             return True
         return False
 
-    def exportToPython(self, context, path):
+    def exportToPython(self, path):
         headers = set()
-        python = "# Translation of SED document v" + self.versionStr + " to python\n\n"
+        python = "# Translation of SED document v" + self.versionStr + " to python\n"
         python +=  "\n# All tasks:\n"
         for task in self.tasks:
             python +=  "\n# Task " + task + ":\n"
