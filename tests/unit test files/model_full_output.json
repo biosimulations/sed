@@ -1,0 +1,19 @@
+{
+    "versionStr": "SED v2.0 alpha",
+    "versionNum": 2.0,
+    "tasks": {
+        "model1": {
+            "_type": "modelImport",
+            "location": "three_species_chain.xml",
+            "language": "urn:sedml:language:sbml"
+        }
+    },
+    "outputs": {
+        "init_all_values": {
+            "_type": "report",
+            "dataSets": {
+                "model1": "#tasks:model1.model"
+            }
+        }
+    }
+}

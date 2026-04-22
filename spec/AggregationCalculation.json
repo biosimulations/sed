@@ -1,0 +1,10 @@
+{
+    "tasks": {
+        "data1": {
+            "_type": "aggregationCalculation",
+            "kisaoID": "KISAO:0000849",
+            "name": "cumulativeSum",
+            "input": "#tasks:sim1.model['S1']"
+        }
+    }
+}

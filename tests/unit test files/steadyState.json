@@ -1,0 +1,27 @@
+{
+    "versionStr": "SED v2.0 alpha",
+    "versionNum": 2.0,
+    "tasks": {
+        "model1": {
+            "_type": "modelImport",
+            "location": "three_species_chain.xml",
+            "language": "urn:sedml:language:sbml"
+        },
+        "sim1": {
+            "_type": "steadyState",
+            "kisaoID": "KISAO:0000407",
+            "model": "#tasks:model1.model",
+            "independentVariable": "urn:sedml:symbol:time",
+            "outputVariables": ["S1", "S2", "S3"],
+            "outputModel": false
+        }
+    },
+    "outputs": {
+        "init_all_values": {
+            "_type": "report",
+            "dataSets": {
+                "model1": "#tasks:sim1"
+            }
+        }
+    }
+}

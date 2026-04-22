@@ -1,66 +1,161 @@
 import re
 
 from sed.transpiler.library import parse_hash
+from sed.transpiler.importers.base import SedBase, Range
+import pandas as pd
+from pathlib import Path
+#from typing import Any
 
 
-class Range:
-    """A 'range' object, used to define a range in one of several ways:
-    * start, end, numberOfSteps (and optional 'scale')
-    * start, end, interval
-    * start, numberOfSteps, interval
-    * end, numberOfSteps, interval
-    * values
-    """
+class AbstractTask(SedBase):
+    """The base class for all tasks."""
 
-    def __init__(self, range_config: dict):
-        self.type_key = "Range"
-        self.start = range_config.pop("start", None)
-        self.end = range_config.pop("end", None)
-        self.numberOfSteps = range_config.pop("numberOfSteps", None)
-        self.interval = range_config.pop("interval", None)
-        self.scale = range_config.pop("scale", None)
-        self.values = range_config.pop("values", None)
-        self.validate(range_config)
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.kisaoID = config.pop("kisaoID", None)
+        self.altDefinition = config.pop("altDefinition", None)
+        #TODO: make actual list of AlgorithmParameter objects
+        self.algorithmParameters = config.pop("algorithmParameters", None)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
+        """Validate."""
+        #TODO: check if kisao is valid, and if altDefinition is URI.
+        return False
+    
+
+class ModelImport(AbstractTask):
+    """A 'modelImport' object, used as input for simulators."""
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.location = config.pop("location", None)
+        self.language = config.pop("language", None)
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
-            print("Unsaved data when creating Range:", leftovers)
+            print("Unsaved data when creating ModelImport:", leftovers)
             return True
         return False
 
+    def exportToPython(self, key, root_dir):
+        headers = set()
+        code = "inputs_models_" + key + " = r'" + str(Path(root_dir) / self.location) + "'\n"
+        return headers, code
 
-class UniformTimeCourse:
+    # No processing, pass the file location to appropiate step/process
+    # For each reference to model in question, replace with file location
+    # (In reference to specific task in question, and its config)
+    # (ex. UTCCopais config: model_path=[said model])
+    def load_model(self, root_dir):
+        # TODO: error handling
+        path = root_dir / self.location
+        language = self.language
+        model = {"filepath": path, "language": language}
+        return model
+
+
+class DataImport(AbstractTask):
+    """A 'dataImport' object, used to import data from a file."""
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.location = config.pop("location", None)
+        self.format = config.pop("format", None)
+        self.parameters = config.pop("parameters", None)
+        self.__validate(config)
+        self.MEDIA_TYPES = {"http://purl.org/NET/mediatypes/text/csv": self.load_csv}
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating DataImport:", leftovers)
+            return True
+        return False
+
+    def load(self, root):
+        return self.MEDIA_TYPES[self.format](root)
+
+    def load_csv(self, root):
+        # TODO: deal with parameters (!)
+        df = pd.read_csv(root / self.location)
+        return {key: list(series) for key, series in df.items()}
+
+    def exportToPython(self, key, root_dir):
+        if self.format == "http://purl.org/NET/mediatypes/text/csv":
+            headers = set(["import pandas as pd"])
+            code = "inputs_data_" + key + " = pd.read_csv(r'" + str(Path(root_dir) / self.location) + "')\n"
+            return headers, code
+        else:
+            raise ValueError("Unable to translate reading data in format '" + self.format + "'.")
+
+    def load_data(self, root):
+        # TODO: deal with all error handling (!)
+
+        load_file = self.MEDIA_TYPES[self.format]
+        path = root / self.location
+        data = load_file(path, self.parameters)
+
+        return data
+
+
+class ODESimulation(AbstractTask):
     """The definition of a uniform time course simulation."""
 
-    def __init__(self, utc_config: dict):
+    def __init__(self, config: dict):
+        super().__init__(config)
         # TODO: error checking
-        self.type_key = "UniformTimeCourse"
-        self.model = utc_config.pop("model", None)
-        self.timeRange = Range(utc_config.pop("timeRange", {}))
-        self.outputVariables = utc_config.pop("outputVariables", None)
-        self.initialTime = utc_config.pop("initialTime", None)
-        self.validate(utc_config)
+        self.model = config.pop("model")
+        self.independentVariable = config.pop("independentVariable", None)
+        self.independentVariableInit = config.pop("independentVariableInit", None)
+        self.outputVariables = config.pop("outputVariables", None)
+        self.outputModel = config.pop("outputModel", None)
+        self.__validate(config)
         self.executor = "Tellurium"
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
+        """Validate."""
+        # if len(leftovers):
+        #     print("Unsaved data when creating explicitODESimulation:", leftovers)
+        #     return True
+        return False
+
+    def setContext(self, val):
+        self.executor = val;
+
+class ExplicitODESimulation(ODESimulation):
+    """The definition of a uniform time course simulation."""
+
+    def __init__(self, config: dict):
+        # TODO: error checking
+        super().__init__(config)
+        self.type_key = "explicitODESimulation"
+        self.independentVariableRange = Range(config.pop("independentVariableRange", {}))
+        self.__validate(config)
+        self.executor = "Tellurium"
+
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
-            print("Unsaved data when creating UniformTimeCourse:", leftovers)
+            print("Unsaved data when creating explicitODESimulation:", leftovers)
             return True
         return False
 
-    def make_python(self, key):
+    def exportToPython(self, key, root_dir):
         if self.executor == "Tellurium":
-            return self.make_python_tellurium(key)
+            return self.exportToPython_tellurium(key)
         elif self.executor == "Copasi":
-            return self.make_python_copasi(key)
+            return self.exportToPython_copasi(key)
         else:
             raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
 
-    def make_python_tellurium(self, key):
-        headers = set(["import tellurium as te"])
-        modelid = self.model
+    def exportToPython_tellurium(self, key):
+        if self.independentVariable != "urn:sedml:symbol:time":
+            print("Unable to simulate with tellurium: independent variable is not 'time'.")
+            return
+        headers = set(["import tellurium as te", "import pandas as pd"])
         modelid = self.model[1:]
         modelid = modelid.replace(":", "_")
         taskid = "tasks_" + key
@@ -70,18 +165,27 @@ class UniformTimeCourse:
             + " = "
             + taskid
             + "_r.simulate("
-            + str(self.timeRange.start)
+            + str(self.independentVariableRange.start)
             + ", "
-            + str(self.timeRange.end)
+            + str(self.independentVariableRange.end)
             + ", steps="
-            + str(self.timeRange.numberOfSteps)
+            + str(self.independentVariableRange.numberOfSteps)
             + ", selections = "
-            + str(self.outputVariables)
+            + str(['time'] + self.outputVariables)
             + ")\n"
+        )
+        # Convert to pandas dataframe
+        code += (
+            taskid
+            + " = pd.DataFrame("
+            + taskid
+            + ", columns="
+            + taskid
+            + ".colnames)\n"
         )
         return headers, code
 
-    def make_python_copasi(self, key):
+    def exportToPython_copasi(self, key):
         # copasi_df: DataFrame = basico.run_time_course(
         #     start_time=0,
         #     duration=20,
@@ -95,6 +199,9 @@ class UniformTimeCourse:
         # copasi_out["S1"] = np.array(copasi_df["S1"])
         # copasi_out["S2"] = np.array(copasi_df["S2"])
         # copasi_out = DataFrame(copasi_out)
+        if self.independentVariable != "urn:sedml:symbol:time":
+            print("Unable to simulate with tellurium: independent variable is not 'time'.")
+            return
         headers = set(["import basico"])
         headers.add("import numpy as np")
         headers.add("from pandas import DataFrame")
@@ -105,11 +212,11 @@ class UniformTimeCourse:
         code = (
             taskid
             + "_copasi = basico.run_time_course(start_time="
-            + str(self.timeRange.start)
+            + str(self.independentVariableRange.start)
             + ", duration="
-            + str(self.timeRange.end - self.timeRange.start)
+            + str(self.independentVariableRange.end - self.independentVariableRange.start)
             + ", intervals="
-            + str(self.timeRange.numberOfSteps)
+            + str(self.independentVariableRange.numberOfSteps)
             + ", update_model=True, use_sbml_id=True,model=basico.load_model("
             + modelid
             + "))\n"
@@ -146,20 +253,21 @@ class UniformTimeCourse:
         return outputs
 
 
-class Calculation:
+class Calculation(AbstractTask):
     """The definition of a 'calculation' task, which performs a calulation on inputs."""
 
-    def __init__(self, calc_config: dict):
+    def __init__(self, config: dict):
         # TODO: error checking
+        super().__init__(config)
         self.type_key = "Calculation"
-        self.infix = calc_config.pop("math", None)
-        self.units = calc_config.pop("units", None)
-        self.validate(calc_config)
+        self.math = config.pop("math", None)
+        self.units = config.pop("units", None)
+        self.__validate(config)
         # self.visitor = default_math_visitor()
-        # self.expression = visit_expression(self.infix, self.visitor)
+        # self.expression = visit_expression(self.math, self.visitor)
 
     def __str__(self):
-        ret = "Calculation object.  Infix: '" + self.infix + "'\n"
+        ret = "Calculation object.  Infix: '" + self.math + "'\n"
         if self.units:
             ret += "Units: '" + self.units + "'\n"
         return ret.strip()
@@ -167,7 +275,7 @@ class Calculation:
     def __repr__(self):
         return self.__str__()
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Calculation:", leftovers)
@@ -176,12 +284,12 @@ class Calculation:
 
     def getInputVariables(self):
         """Parse the infix to retrieve all SED variable inputs."""
-        strlist = re.findall(r"#[a-zA-Z0-9_:.]*", self.infix)
+        strlist = re.findall(r"#[a-zA-Z0-9_:.]*", self.math)
         return set(strlist)
 
-    def make_python(self, key):
+    def exportToPython(self, key, root_dir):
         headers = set()
-        line = self.infix.replace(":", "_")
+        line = self.math.replace(":", "_")
         line = line.replace("#", "")
         line = line.replace("^", "**")
         code = "tasks_" + key + " = " + line + "\n"
@@ -213,62 +321,65 @@ class Calculation:
         return outputs
 
 
-class SumOfSquares:
+class SumOfSquares(AbstractTask):
     """The definition of a 'sumOfSquares' task, which calculates the differences between inputs."""
 
-    def __init__(self, sos_config: dict):
+    def __init__(self, config: dict):
+        super().__init__(config)
         self.type_key = "SumOfSquares"
-        self.inputs = sos_config.pop("inputs", None)
-        self.validate(sos_config)
+        self.inputs = config.pop("inputs", None)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating SumOfSquares:", leftovers)
             return True
         return False
 
-    def make_python(self, key):
+    def exportToPython(self, key, root_dir):
         headers = set()
         code = ""
         return headers, code
 
 
-class ParameterScan:
+class ParameterScan(AbstractTask):
     """The definition of a 'parameter scan' task, which takes a model as input and outputs an array of models."""
 
-    def __init__(self, paramscan_config: dict):
+    def __init__(self, config: dict):
         self.type_key = "ParameterScan"
-        self.model = paramscan_config.pop("model", None)
-        self.scannedVariable = paramscan_config.pop("scannedVariable", None)
-        self.range = Range(paramscan_config.pop("range", {}))
-        self.outputRange = paramscan_config.pop("outputRange", None)
-        self.validate(paramscan_config)
+        super().__init__(config)
+        self.model = config.pop("model", None)
+        self.scannedVariable = config.pop("scannedVariable", None)
+        self.range = Range(config.pop("range", {}))
+        self.outputRange = config.pop("outputRange", None)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating ParameterScan:", leftovers)
             return True
         return False
 
-    def make_python(self, key):
+    def exportToPython(self, key, root_dir):
         headers = set()
         code = ""
         return headers, code
 
 
-class SteadyState:
+class SteadyState(AbstractTask):
     """The definition of a 'parameter scan' task, which takes a model as input and outputs an array of models."""
 
-    def __init__(self, ss_config: dict):
+    def __init__(self, config: dict):
+        super().__init__(config)
         self.type_key = "SteadyState"
-        self.model = ss_config.pop("model", None)
-        self.outputVariables = ss_config.pop("outputVariables", None)
-        self.outputModel = ss_config.pop("outputModel", None)
-        self.validate(ss_config)
+        self.model = config.pop("model", None)
+        self.outputVariables = config.pop("outputVariables", None)
+        self.outputModel = config.pop("outputModel", None)
+        self.__validate(config)
 
-    def validate(self, leftovers={}):
+    def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating SteadyState:", leftovers)
@@ -279,7 +390,7 @@ class SteadyState:
         """foo"""
         pass
 
-    def make_python(self, key):
+    def exportToPython(self, key, root_dir):
         headers = set()
         code = ""
         return headers, code
@@ -290,8 +401,12 @@ def load_tasks_section(tasks_section_config):
     for key, config in tasks_section_config.items():
         step_type = config.pop("_type", None)
         match step_type:
-            case "uniformTimeCourse":
-                tasks[key] = UniformTimeCourse(config)
+            case "modelImport":
+                tasks[key] = ModelImport(config)
+            case "dataImport":
+                tasks[key] = DataImport(config)
+            case "explicitODESimulation":
+                tasks[key] = ExplicitODESimulation(config)
             case "calculation":
                 tasks[key] = Calculation(config)
             case "sumOfSquares":
@@ -305,5 +420,4 @@ def load_tasks_section(tasks_section_config):
             case _:
                 print(f"unknown task type: {step_type}")
                 # raise ValueError("Unknown task type " + step_type + ".")
-
     return tasks

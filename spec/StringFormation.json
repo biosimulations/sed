@@ -1,0 +1,8 @@
+{
+  "tasks": {
+    "n_labels": {
+      "_type": "stringFormation",
+      "concatenate": [ "n = ", "#tasks:loop1:range"]
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+    "tasks": {
+        "sim1": {
+            "_type": "boundedODESimulation",
+            "kisaoID": "KISAO:0000694",
+            "model": "#tasks:model1.model",
+            "independentVariable": "urn:sedml:symbol:time",
+            "independentInitialValue": 0,
+            "independentVariableSpan": {
+                "start": 0,
+                "end": 20
+            },
+            "outputVariables": ["S1", "S2"],
+            "outputModel": false
+        }
+    }
+}

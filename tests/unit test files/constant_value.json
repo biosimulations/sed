@@ -1,0 +1,15 @@
+{
+    "versionStr": "SED v2.0 alpha",
+    "versionNum": 2.0,
+    "constants": {
+        "X": 5
+    },
+    "outputs": {
+        "report": {
+            "_type": "report",
+            "dataSets": {
+                "X": "#constants:X"
+            }
+        }
+    }
+}

@@ -1,0 +1,23 @@
+{
+    "tasks": {
+        "data1": {
+            "_type": "dataImport",
+            "location": "filename.csv",
+            "format": "http://purl.org/NET/mediatypes/text/csv",
+            "algorithmParameters": [
+                {
+                    "kisaoID": "KISAO:9999999",
+                    "name": "delimiter",
+                    "value": "\t",
+                    "altDefinition": "https://en.wikipedia.org/wiki/Delimiter-separated_values"
+                },
+                {
+                    "kisaoID": "KISAO:9999999",
+                    "name": "Header row",
+                    "value": true,
+                    "altDefinition": "https://support.ecwid.com/hc/en-us/articles/8578428241436-Format-guidelines-for-the-CSV-file#-header"
+                }
+            ]
+        }
+    }
+}

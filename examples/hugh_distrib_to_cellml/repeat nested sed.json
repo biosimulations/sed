@@ -29,17 +29,18 @@
         "sim1": {
           "_type": "oneStep",
           "model": "#inputs:models:init",
-          "outputModel": "true",
-          "outputVariables": [],
+          "outputModel": "false",
+          "outputVariables": "['IKr_GKr_b']",
           "step": 1.0
         },
         "init_ohara": {
           "_type": "modelChange",
           "inputModel": "#inputs:models:ohara",
+          "language": "urn:sedml:language:cellml",
           "changes": [
             {
               "target": "IKr_GKr_b",
-              "value": "#tasks:repeat:subTasks:sim1:model['IKr_GKr_b']"
+              "value": "#tasks:repeat:subTasks:sim1['IKr_GKr_b']"
             }
           ],
           "notes": "Initializes the value with the draw from a distribution from SBML-distrib."
@@ -56,12 +57,12 @@
           "outputVariables": [
             "time",
             "membrane.v"
-          ]
+          ],
+          "outputDimensions": []
         }
       },
-      "exportSubTaskOutputFor": [
-        "sim2"
-      ],
+      "exportSubTaskOutputFor": ["#tasks:repeat:subTasks:sim2"],
+      "dimensions": ["#repeat", "ids", "timeCourse"],
       "notes2": "Explicitly listing which subtasks get exported lets other task outputs be internal-only, so we know we don't have to get that data out to the rest of the routine."
     }
   },
@@ -83,8 +84,8 @@
         },
         "curves": {
           "membrane.v_{#tasks:repeat:subTasks:range}": {
-            "x": "#tasks:repeat:subTasks:sim2['time'][0]",
-            "y": "#tasks:repeat:subTasks:sim1['membrane.v'][:]",
+            "x": "#tasks:repeat:subTasks:sim2[0]['time'][:]",
+            "y": "#tasks:repeat:subTasks:sim1[:]['membrane.v'][:]",
             "notes": "There's a clever but perhaps too clever thing going on in the ID of the curve."
           },
           "membrane.v": {

@@ -1,0 +1,9 @@
+{
+    "tasks": {
+        "model1": {
+            "_type": "modelImport",
+            "location": "filename.xml",
+            "language": "urn:sedml:language:sbml"
+        }
+    }
+}

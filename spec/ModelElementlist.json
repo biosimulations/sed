@@ -1,0 +1,11 @@
+{
+    "tasks": {
+        "mod1_list": {
+            "_type": "modelElementList",
+            "model": "#tasks:mod1",
+            "includeElements": ["J0", "J1"],
+            "includeTypes": ["species"],
+            "excludeElements": ["S1"]
+        }
+    }
+}
