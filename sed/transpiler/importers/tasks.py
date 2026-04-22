@@ -108,7 +108,6 @@ class ODESimulation(AbstractTask):
         super().__init__(config)
         # TODO: error checking
         self.model = config.pop("model")
-        print(self.model)
         self.independentVariable = config.pop("independentVariable", None)
         self.independentVariableInit = config.pop("independentVariableInit", None)
         self.outputVariables = config.pop("outputVariables", None)
@@ -129,7 +128,6 @@ class ExplicitODESimulation(ODESimulation):
     def __init__(self, config: dict):
         # TODO: error checking
         super().__init__(config)
-        print("In child class:", self.model)
         self.type_key = "explicitODESimulation"
         self.independentVariableRange = Range(config.pop("independentVariableRange", {}))
         self.__validate(config)
