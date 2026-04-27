@@ -1,7 +1,9 @@
 import re
 
+from pbest import CompositeBuilder
+
 from sed.transpiler.library import parse_hash
-from sed.transpiler.importers.base import SedBase, Range
+from sed.transpiler.importers.base import SedBase, Range, from_attribute_to_list_path
 import pandas as pd
 from pathlib import Path
 #from typing import Any
@@ -39,6 +41,22 @@ class ModelImport(AbstractTask):
             print("Unsaved data when creating ModelImport:", leftovers)
             return True
         return False
+
+    def exportToPBG(self, key, builder: CompositeBuilder, root_dir):
+        list_path: list[str] = from_attribute_to_list_path(f"#tasks:{key}.model")
+
+        dict_in_q = builder.get_builder_state()
+        for k in range(len(list_path)):
+            if k == len(list_path) - 1 and k in dict_in_q:
+                raise ValueError(f"Path should not have any values in it. Path: {list_path}, State: {builder.get_builder_state()}")
+            elif k == len(list_path) - 1:
+                dict_in_q[k] = self.location
+            elif k in dict_in_q:
+                dict_in_q = dict_in_q[k]
+            else:
+                dict_in_q[k] = {}
+
+
 
     def exportToPython(self, key, root_dir):
         headers = set()
@@ -230,6 +248,32 @@ class ExplicitODESimulation(ODESimulation):
             code += taskid + "['" + var + "'] = np.array(" + taskid + "_copasi['" + var + "'])\n"
         code += taskid + " = DataFrame(" + taskid + ")\n"
         return headers, code
+
+    # Chain problem,
+    # Get model,
+    # SED provides start, end, num_steps, initialValue, model, outputVariables (we'll probably output everything for now)
+    # PBG Requires model source, time, n_steps, output dir
+    def zekes_case(self, builder: CompositeBuilder) -> CompositeBuilder:
+
+        inputs = {
+            "model": from_attribute_to_list_path(self.model),
+            "independentVariable": from_attribute_to_list_path(self.independentVariableRange)
+        }
+        outputs = {}
+
+        # builder.add_step(address=self.executor, config={}, inputs=)
+        builder.add_step(
+            address="TelluriumUTCStep",
+            config={"model_source": self.model, "time": self.independentVariableRange.end,
+                    "n_points": self.independentVariableRange.numberOfSteps, "output_dir": ""},
+            inputs={},
+            outputs={"result": ['sim', 'tellurium']}
+        )
+        return builder
+
+    # Worry about conflicts higher up
+    def logans_case(self) -> dict[str, str]:
+        return {}
 
     def default_step_name(self):
         return "pbest.registry.simulators.tellurium_process.TelluriumUTCStep"
