@@ -1,3 +1,4 @@
+import typing
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +21,14 @@ class SedBase:
         """Validate."""
         #TODO: check format for children.
         return False
+
+def from_attribute_to_list_path(attribute: str | bool | int | SedBase) -> Any:
+    if type(attribute) is bool:
+        return attribute
+    if type(attribute) is int:
+        return attribute
+    # [#tasks, model1.model], [model1, model]
+    return attribute.split(":")[1].split(".") if attribute[0] == "#" else attribute
 
 
 class Range(SedBase):
