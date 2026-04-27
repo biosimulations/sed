@@ -5,7 +5,7 @@ description = ""
 authors = [{ name = "Center for Reproducable Biological Modeling", email = "evalencia@uchc.edu" }]
 readme = "README.md"
 keywords = ['python']
-requires-python = ">=3.11,<3.13"
+requires-python = ">=3.12,<3.13"
 classifiers = [
     "Intended Audience :: Developers",
     "Programming Language :: Python",
@@ -20,7 +20,7 @@ dependencies = [
     "numpy>=2.3.4",
     # "pandas>=2.3.3",
     # "polars>=1.35.2",
-    "pbest>=0.2.1",
+    "pbest>=0.5.4",
     "process-bigraph>=0.0.51",
     # "bigraph-schema>=0.0.77",
     "pydantic>=2.12.3",
@@ -136,5 +136,5 @@ branch = true
 source = ["sed"]
 
 [tool.uv.sources]
-biocompose = { git = "https://github.com/vivarium-collective/biocompose", rev = "numerical-types" }
+ biocompose = { git = "https://github.com/vivarium-collective/biocompose" }
 # biocompose =  { path = "../biocompose", editable = true }
