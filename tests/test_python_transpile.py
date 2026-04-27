@@ -1,19 +1,13 @@
 from pathlib import Path
 
 from sed.transpiler.transpile_to_python import transpile
-import unittest
+import subprocess, sys, os
 
+root_dir = Path(__file__).resolve().parents[1]
+ex1 = Path(root_dir, "examples", "one", "example1.xml")
+data = Path(root_dir, "examples", "one", "experimental_data.csv")
 
-class PythonTests(unittest.TestCase):
-
-    def tearDown(self) -> None:
-        pass
-
-    def setUp(self) -> None:
-        root_dir = Path(__file__).resolve().parents[1]
-        ex1 = Path(root_dir, "examples", "one", "example1.xml")
-        data = Path(root_dir, "examples", "one", "experimental_data.csv")
-        self.expected_python_ex_1 = """
+expected_python_ex_1 = """
 from pandas import DataFrame
 import basico
 import matplotlib.pyplot as plt
@@ -92,8 +86,8 @@ ax.plot(x, ys)
 ax.set(xlabel='Time', ylabel='Concentrations', title='Figure 1')
 plt.show()""".strip()
 
-        ex2 = Path(root_dir, "examples", "two", "example.xml")
-        self.expected_python_ex_2 = """
+ex2 = Path(root_dir, "examples", "two", "example.xml")
+expected_python_ex_2 = """
 import numpy as np
 
 
@@ -120,33 +114,43 @@ print(outputs_reports_jacobianReport)
 """.strip()
 
 
-    def test_python_transpile_ex_1(self):
-        root_dir = Path(__file__).resolve().parents[1]
-        context = {"tasks": {"sim2": "Copasi"}}
-        python1 = transpile(root_dir / "examples/one/", "sed.json", context)
-    
-        # print("Exported python:")
-        # print("-----")
-        # print(python1.strip())
-        # print("-----")
-        # print("Expected python:")
-        # print(self.expected_python_ex_1)
-        # print("-----")
-        assert python1.strip() == self.expected_python_ex_1.strip()
+def test_python_transpile_ex_1(tmp_path):
+    root_dir = Path(__file__).resolve().parents[1]
+    context = {"tasks": {"sim2": "Copasi"}}
+    python1 = transpile(root_dir / "examples/one/", "sed.json", context)
 
+    # print("Exported python:")
+    # print("-----")
+    # print(python1.strip())
+    # print("-----")
+    # print("Expected python:")
+    # print(expected_python_ex_1)
+    # print("-----")
+    assert python1.strip() == expected_python_ex_1.strip()
 
-    def test_python_transpile_ex_2(self):
-        root_dir = Path(__file__).resolve().parents[1]
-    
-        python2 = transpile(root_dir / "examples/two/", "sed.json")
-        # print("Exported python:")
-        # print(python2.strip())
-        # print("-----")
-        # print("Expected python:")
-        # print(self.expected_python_ex_2)
-        # print("-----")
-        assert self.expected_python_ex_2.strip() == python2.strip()
+    script = tmp_path / "t.py"
+    script.write_text(python1, encoding="utf-8")
+    result = subprocess.run(
+        [sys.executable, str(script)],
+        capture_output=True, text=True, timeout=500,
+        env={**os.environ, "MPLBACKEND": "Agg"},
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stdout.strip() == "expected"
+
+def test_python_transpile_ex_2(tmp_path):
+    root_dir = Path(__file__).resolve().parents[1]
+
+    python2 = transpile(root_dir / "examples/two/", "sed.json")
+    # print("Exported python:")
+    # print(python2.strip())
+    # print("-----")
+    # print("Expected python:")
+    # print(expected_python_ex_2)
+    # print("-----")
+    assert expected_python_ex_2.strip() == python2.strip()
 
 
 if __name__ == "__main__":
-    unittest.main()
+    import pytest
+    pytest.main([__file__, "-v"])

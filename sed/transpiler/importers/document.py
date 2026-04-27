@@ -14,7 +14,7 @@ class SedDocument():
     def __init__(self, config: dict, context):
         self.versionStr = config.pop("versionStr", None)
         self.versionNum = config.pop("versionNum", None)
-        self.constants = config.pop("constants", None)
+        self.constants = config.pop("constants", {})
         self.tasks: dict[str, AbstractTask] = load_tasks_section(config.pop("tasks", None))
         self.outputs = load_outputs_section(config.pop("outputs", None))
         # TODO: actually load styles.
@@ -43,6 +43,10 @@ class SedDocument():
     def exportToPython(self, path):
         headers = set()
         python = "# Translation of SED document v" + self.versionStr + " to python\n"
+        if len(self.constants):
+            python += "\n# Constants:\n"
+            for constid in self.constants:
+                python += constid + " = " + str(self.constants[constid]) + "\n"
         python +=  "\n# All tasks:\n"
         for task in self.tasks:
             python +=  "\n# Task " + task + ":\n"
