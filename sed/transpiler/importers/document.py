@@ -1,7 +1,8 @@
 from pathlib import Path
 from typing import Any
-from sed.transpiler.importers.tasks import load_tasks_section
+from sed.transpiler.importers.tasks import load_tasks_section, AbstractTask
 from sed.transpiler.importers.outputs import load_outputs_section
+from pbest.utils.builder import CompositeBuilder
 
 import pandas as pd
 
@@ -14,7 +15,7 @@ class SedDocument():
         self.versionStr = config.pop("versionStr", None)
         self.versionNum = config.pop("versionNum", None)
         self.constants = config.pop("constants", None)
-        self.tasks = load_tasks_section(config.pop("tasks", None))
+        self.tasks: dict[str, AbstractTask] = load_tasks_section(config.pop("tasks", None))
         self.outputs = load_outputs_section(config.pop("outputs", None))
         # TODO: actually load styles.
         self.styles = config.pop("styles", None)
@@ -31,6 +32,13 @@ class SedDocument():
             print("Unsaved data when creating SEDDocument:", leftovers)
             return True
         return False
+
+    def exportToPBG(self, root_dir: Path) -> dict[str, Any]:
+        defaults_for_now = {}
+        builder = CompositeBuilder()
+        for task in self.tasks:
+            self.tasks[task].exportToPBG()
+
 
     def exportToPython(self, path):
         headers = set()
