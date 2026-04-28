@@ -28,7 +28,21 @@ def assert_dirs_equal(actual: Path, expected: Path):
 
     # Non-image files: byte-exact
     _, mismatch, errors = filecmp.cmpfiles(actual, expected, other_files, shallow=False)
-    assert not mismatch, f"These files differ: {mismatch}"
+    if mismatch:
+        diffs = []
+        for name in mismatch:
+            actual_path = Path(actual) / name
+            expected_path = Path(expected) / name
+            actual_lines = actual_path.read_text().splitlines(keepends=True)
+            expected_lines = expected_path.read_text().splitlines(keepends=True)
+            diff = difflib.unified_diff(
+                expected_lines,
+                actual_lines,
+                fromfile=str(expected_path),
+                tofile=str(actual_path),
+            )
+            diffs.append("".join(diff))
+        assert False, f"These files differ: {mismatch}\n\n" + "\n".join(diffs)
     assert not errors,   f"These files are unreadable: {errors}"
 
     # Image files: tolerance-based
