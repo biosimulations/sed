@@ -13,4 +13,6 @@ constants_X = {'time': [0, 1, 2, 5, 10, 20, 50], 'S1': [0, 1, 2, 3, 4, 5, 6], 'k
 
 # Output report:
 outputs_report = constants_X
+for key in outputs_report:
+   outputs_report[key] = np.atleast_1d(outputs_report[key])
 pd.DataFrame(outputs_report).to_csv("outputs_report.csv", index=False)
