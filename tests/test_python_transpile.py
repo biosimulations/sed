@@ -96,27 +96,28 @@ def test_python_transpile_ex_2(tmp_path):
 
 # Unit tests
 
+def unittest(tmp_path, testname):
+    unittest_dir = root_dir / "tests" / "unit test files"
+    expected_dir = root_dir / "tests" / "expected test results" / "unit tests"
+    filename = testname + ".json"
+    expected = expected_dir / testname
+    python_transpile_test(tmp_path, unittest_dir, filename, expected)
+
 def test_py_constant_value(tmp_path):
-    testdir = root_dir / "tests" / "unit test files"
-    filename = "constant_value.json"
-    expected = root_dir / "tests" / "expected test results" / "unit tests" / "constant_value"
-    python_transpile_test(tmp_path, testdir, filename, expected)
+    unittest(tmp_path, "constant_value")
 
 def test_py_constant_list(tmp_path):
-    testdir = root_dir / "tests" / "unit test files"
-    filename = "constant_list.json"
-    expected = root_dir / "tests" / "expected test results" / "unit tests" / "constant_list"
-    python_transpile_test(tmp_path, testdir, filename, expected)
+    unittest(tmp_path, "constant_list")
 
-def test_py_constant_dict(tmp_path):
-    testdir = root_dir / "tests" / "unit test files"
-    filename = "constant_dict.json"
-    expected = root_dir / "tests" / "expected test results" / "unit tests" / "constant_dict"
-    python_transpile_test(tmp_path, testdir, filename, expected)
+def test_py_constant_dict_list(tmp_path):
+    unittest(tmp_path, "constant_dict_list")
+
+def test_py_constant_dict_num(tmp_path):
+    unittest(tmp_path, "constant_dict_num")
 
 if __name__ == "__main__":
     # import pytest
     # pytest.main([__file__, "-v"])
     tmp_path = Path(tempfile.mkdtemp())
     print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
-    test_python_transpile_ex_1(tmp_path)
+    test_py_constant_dict_num(tmp_path)

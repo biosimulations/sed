@@ -12,9 +12,7 @@
     "outputs": {
         "report": {
             "_type": "report",
-            "dataSets": {
-                "X": "#constants:X"
-            }
+            "dataSets": "#constants:X"
         }
     }
 }

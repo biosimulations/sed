@@ -184,6 +184,8 @@ class Report(Output):
             line = line.replace("#", "")
             line = line.replace(":", "_")
             code = repid + " = " + line + "\n"
+            code += f"for key in {repid}:\n"
+            code += f"   {repid}[key] = np.atleast_1d({repid}[key])\n"
         else:
             code += repid + " = {}\n"
             for ds_key in self.dataSets:
