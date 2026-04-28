@@ -5,6 +5,7 @@ import subprocess
 import sys
 import os
 import filecmp
+import difflib
 from matplotlib.testing.compare import compare_images
 
 IMAGE_EXTS = {".png", ".pdf", ".svg", ".jpg", ".jpeg"}
