@@ -103,6 +103,18 @@ def test_py_constant_value(tmp_path):
     expected = root_dir / "tests" / "expected test results" / "unit tests" / "constant_value"
     python_transpile_test(tmp_path, testdir, filename, expected)
 
+def test_py_constant_list(tmp_path):
+    testdir = root_dir / "tests" / "unit test files"
+    filename = "constant_list.json"
+    expected = root_dir / "tests" / "expected test results" / "unit tests" / "constant_list"
+    python_transpile_test(tmp_path, testdir, filename, expected)
+
+def test_py_constant_dict(tmp_path):
+    testdir = root_dir / "tests" / "unit test files"
+    filename = "constant_dict.json"
+    expected = root_dir / "tests" / "expected test results" / "unit tests" / "constant_dict"
+    python_transpile_test(tmp_path, testdir, filename, expected)
+
 if __name__ == "__main__":
     # import pytest
     # pytest.main([__file__, "-v"])

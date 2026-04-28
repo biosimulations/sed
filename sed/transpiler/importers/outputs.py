@@ -192,7 +192,7 @@ class Report(Output):
                 line = line.replace(":", "_")
                 code += repid + "['" + ds_key + "'] = np.atleast_1d(" + line + ")\n"
         #code += "print(" + repid + ")\n"
-                code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False)\n'
+        code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False)\n'
         return headers, code
 
 
