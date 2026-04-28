@@ -49,10 +49,14 @@ tasks_compare_summary = [sum(tasks_sim1_sim2_compare['S1']) + sum(tasks_sim1_sim
 
 # Output sim1Report:
 outputs_sim1Report = tasks_sim1
+for key in outputs_sim1Report:
+   outputs_sim1Report[key] = np.atleast_1d(outputs_sim1Report[key])
 pd.DataFrame(outputs_sim1Report).to_csv("outputs_sim1Report.csv", index=False)
 
 # Output sim2Report:
 outputs_sim2Report = tasks_sim2
+for key in outputs_sim2Report:
+   outputs_sim2Report[key] = np.atleast_1d(outputs_sim2Report[key])
 pd.DataFrame(outputs_sim2Report).to_csv("outputs_sim2Report.csv", index=False)
 
 # Output comparisonReport:
