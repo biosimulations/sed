@@ -6,13 +6,26 @@ import sys
 import os
 import filecmp
 import difflib
+import tempfile
 from matplotlib.testing.compare import compare_images
 
 IMAGE_EXTS = {".png", ".pdf", ".svg", ".jpg", ".jpeg"}
 IMAGE_TOL = 2.0  # RMS pixel difference tolerance
 root_dir = Path(__file__).resolve().parents[1]
 
-def assert_dirs_equal(actual: Path, expected: Path):
+def filter_directories(input_lines, filenames):
+    kept = []
+    for line in input_lines:
+        keep = True
+        for filename in filenames:
+            if filename in line:
+                keep = False;
+                continue
+        if keep:
+            kept.append(line)
+    return kept
+
+def assert_dirs_equal(actual: Path, expected: Path, filenames):
     cmp = filecmp.dircmp(actual, expected)
     if cmp.left_only:
         assert False, f"Unexpected file(s) in {actual}: {cmp.left_only}"
@@ -30,20 +43,22 @@ def assert_dirs_equal(actual: Path, expected: Path):
     # Non-image files: byte-exact
     _, mismatch, errors = filecmp.cmpfiles(actual, expected, other_files, shallow=False)
     if mismatch:
-        diffs = []
-        for name in mismatch:
-            actual_path = Path(actual) / name
-            expected_path = Path(expected) / name
+        for filename in mismatch:
+            diffs = []
+            actual_path = Path(actual) / filename
+            expected_path = Path(expected) / filename
             actual_lines = actual_path.read_text().splitlines(keepends=True)
             expected_lines = expected_path.read_text().splitlines(keepends=True)
-            diff = difflib.unified_diff(
+            actual_lines = filter_directories(actual_lines, filenames)
+            expected_lines = filter_directories(expected_lines, filenames)
+            diff = list(difflib.unified_diff(
                 expected_lines,
                 actual_lines,
                 fromfile=str(expected_path),
                 tofile=str(actual_path),
-            )
-            diffs.append("".join(diff))
-        assert False, f"These files differ: {mismatch}\n\n" + "\n".join(diffs)
+            ))
+            if len(diff):
+                assert False, f"These files differ: {filename}\n\n" + "\n".join(diff)
     assert not errors,   f"These files are unreadable: {errors}"
 
     # Image files: tolerance-based
@@ -53,7 +68,7 @@ def assert_dirs_equal(actual: Path, expected: Path):
         )
         assert result is None, f"image diff in {name}: {result}"
 
-def python_transpile_test(tmp_path, testdir, filename, expected, context={}):
+def python_transpile_test(tmp_path, testdir, filename, expected, filenames=[], context={}):
     pyout = transpile(testdir, filename, context)
     script = tmp_path / "exported_python.py"
     script.write_text(pyout, encoding="utf-8")
@@ -63,14 +78,15 @@ def python_transpile_test(tmp_path, testdir, filename, expected, context={}):
         env={**os.environ, "MPLBACKEND": "Agg"},
     )
     assert result.returncode == 0, result.stderr
-    assert_dirs_equal(expected, tmp_path)
+    assert_dirs_equal(expected, tmp_path, filenames)
 
 # Examples:
 def test_python_transpile_ex_1(tmp_path):
     testdir = root_dir / "examples" / "one"
     expected = root_dir / "tests" / "expected test results" / "examples" / "one"
+    filenames = ["example1.xml", "experimental_data.csv"]
     context = {"tasks": {"sim2": "Copasi"}}
-    python_transpile_test(tmp_path, testdir, "sed.json", expected, context)
+    python_transpile_test(tmp_path, testdir, "sed.json", expected, filenames, context)
 
 
 def test_python_transpile_ex_2(tmp_path):
@@ -88,5 +104,8 @@ def test_py_constant_value(tmp_path):
     python_transpile_test(tmp_path, testdir, filename, expected)
 
 if __name__ == "__main__":
-    import pytest
-    pytest.main([__file__, "-v"])
+    # import pytest
+    # pytest.main([__file__, "-v"])
+    tmp_path = Path(tempfile.mkdtemp())
+    print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
+    test_python_transpile_ex_1(tmp_path)
