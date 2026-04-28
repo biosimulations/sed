@@ -1,6 +1,13 @@
 {
     "versionStr": "SED v2.0 alpha",
     "versionNum": 2.0,
+    "constants": {
+      "compare_labels": [
+        "Compare sim1 to sim2",
+        "Compare sim1 to data",
+        "Compare sim2 to data"
+      ]
+    },
     "tasks": {
     "model1": {
       "_type": "modelImport",
@@ -100,7 +107,10 @@
     },
     "comparisonSummary": {
       "_type": "report",
-      "dataSets": "#tasks:compare_summary"
+      "dataSets": {
+        "comparison": "#constants:compare_labels",
+        "sum of squares": "#tasks:compare_summary"
+      }
     },
     "Fig1": {
       "_type": "plot2D",

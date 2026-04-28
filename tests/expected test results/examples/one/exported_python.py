@@ -8,6 +8,9 @@ import tellurium as te
 
 # Translation of SED document vSED v2.0 alpha to python
 
+# Constants:
+constants_compare_labels = ['Compare sim1 to sim2', 'Compare sim1 to data', 'Compare sim2 to data']
+
 # All tasks:
 
 # Task model1:
@@ -46,29 +49,28 @@ tasks_compare_summary = [sum(tasks_sim1_sim2_compare['S1']) + sum(tasks_sim1_sim
 
 # Output sim1Report:
 outputs_sim1Report = tasks_sim1
+pd.DataFrame(outputs_sim1Report).to_csv("outputs_sim1Report.csv", index=False)
 
 # Output sim2Report:
 outputs_sim2Report = tasks_sim2
+pd.DataFrame(outputs_sim2Report).to_csv("outputs_sim2Report.csv", index=False)
 
 # Output comparisonReport:
 outputs_comparisonReport = {}
 outputs_comparisonReport['time'] = np.atleast_1d(tasks_sim1['time'])
-pd.DataFrame(outputs_comparisonReport).to_csv("outputs_comparisonReport.csv", index=False)
 outputs_comparisonReport['S1_ssq_sim1sim2'] = np.atleast_1d(tasks_sim1_sim2_compare['S1'])
-pd.DataFrame(outputs_comparisonReport).to_csv("outputs_comparisonReport.csv", index=False)
 outputs_comparisonReport['S1_ssq_sim1exp'] = np.atleast_1d(tasks_sim1_exp_compare['S1'])
-pd.DataFrame(outputs_comparisonReport).to_csv("outputs_comparisonReport.csv", index=False)
 outputs_comparisonReport['S1_ssq_sim2exp'] = np.atleast_1d(tasks_sim2_exp_compare['S1'])
-pd.DataFrame(outputs_comparisonReport).to_csv("outputs_comparisonReport.csv", index=False)
 outputs_comparisonReport['S2_ssq_sim1sim2'] = np.atleast_1d(tasks_sim1_sim2_compare['S2'])
-pd.DataFrame(outputs_comparisonReport).to_csv("outputs_comparisonReport.csv", index=False)
 outputs_comparisonReport['S2_ssq_sim1exp'] = np.atleast_1d(tasks_sim1_exp_compare['S2'])
-pd.DataFrame(outputs_comparisonReport).to_csv("outputs_comparisonReport.csv", index=False)
 outputs_comparisonReport['S2_ssq_sim2exp'] = np.atleast_1d(tasks_sim2_exp_compare['S2'])
 pd.DataFrame(outputs_comparisonReport).to_csv("outputs_comparisonReport.csv", index=False)
 
 # Output comparisonSummary:
-outputs_comparisonSummary = tasks_compare_summary
+outputs_comparisonSummary = {}
+outputs_comparisonSummary['comparison'] = np.atleast_1d(constants_compare_labels)
+outputs_comparisonSummary['sum of squares'] = np.atleast_1d(tasks_compare_summary)
+pd.DataFrame(outputs_comparisonSummary).to_csv("outputs_comparisonSummary.csv", index=False)
 
 # Output Fig1:
 fig, ax = plt.subplots()

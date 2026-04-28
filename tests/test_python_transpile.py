@@ -44,7 +44,6 @@ def assert_dirs_equal(actual: Path, expected: Path, filenames):
     _, mismatch, errors = filecmp.cmpfiles(actual, expected, other_files, shallow=False)
     if mismatch:
         for filename in mismatch:
-            diffs = []
             actual_path = Path(actual) / filename
             expected_path = Path(expected) / filename
             actual_lines = actual_path.read_text().splitlines(keepends=True)
