@@ -177,15 +177,21 @@ class Report(Output):
 
     def exportToPython(self, key, root_dir):
         headers = set(["import numpy as np", "import pandas as pd"])
-        code = ""
         repid = "outputs_" + key
+        code = ""
         if isinstance(self.dataSets, str):
             line = self.dataSets
             line = line.replace("#", "")
             line = line.replace(":", "_")
-            code = repid + " = " + line + "\n"
-            code += f"for key in {repid}:\n"
-            code += f"   {repid}[key] = np.atleast_1d({repid}[key])\n"
+            code = "header = True\n"
+            code += repid + " = " + line + "\n"
+            headers.add("import collections")
+            code += f"if isinstance({repid}, (collections.abc.Mapping, pd.DataFrame)):\n"
+            code += f"   for key in {repid}:\n"
+            code += f"      {repid}[key] = np.atleast_1d({repid}[key])\n"
+            code +=  "else:\n"
+            code +=  "   header = False\n"
+            code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False, header=header)\n'
         else:
             code += repid + " = {}\n"
             for ds_key in self.dataSets:
@@ -193,8 +199,8 @@ class Report(Output):
                 line = line.replace("#", "")
                 line = line.replace(":", "_")
                 code += repid + "['" + ds_key + "'] = np.atleast_1d(" + line + ")\n"
-        #code += "print(" + repid + ")\n"
-        code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False)\n'
+            #code += "print(" + repid + ")\n"
+            code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False)\n'
         return headers, code
 
 

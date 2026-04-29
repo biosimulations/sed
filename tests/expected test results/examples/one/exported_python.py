@@ -1,5 +1,6 @@
 from pandas import DataFrame
 import basico
+import collections
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
@@ -48,16 +49,24 @@ tasks_compare_summary = [sum(tasks_sim1_sim2_compare['S1']) + sum(tasks_sim1_sim
 # All Outputs:
 
 # Output sim1Report:
+header = True
 outputs_sim1Report = tasks_sim1
-for key in outputs_sim1Report:
-   outputs_sim1Report[key] = np.atleast_1d(outputs_sim1Report[key])
-pd.DataFrame(outputs_sim1Report).to_csv("outputs_sim1Report.csv", index=False)
+if isinstance(outputs_sim1Report, (collections.abc.Mapping, pd.DataFrame)):
+   for key in outputs_sim1Report:
+      outputs_sim1Report[key] = np.atleast_1d(outputs_sim1Report[key])
+else:
+   header = False
+pd.DataFrame(outputs_sim1Report).to_csv("outputs_sim1Report.csv", index=False, header=header)
 
 # Output sim2Report:
+header = True
 outputs_sim2Report = tasks_sim2
-for key in outputs_sim2Report:
-   outputs_sim2Report[key] = np.atleast_1d(outputs_sim2Report[key])
-pd.DataFrame(outputs_sim2Report).to_csv("outputs_sim2Report.csv", index=False)
+if isinstance(outputs_sim2Report, (collections.abc.Mapping, pd.DataFrame)):
+   for key in outputs_sim2Report:
+      outputs_sim2Report[key] = np.atleast_1d(outputs_sim2Report[key])
+else:
+   header = False
+pd.DataFrame(outputs_sim2Report).to_csv("outputs_sim2Report.csv", index=False, header=header)
 
 # Output comparisonReport:
 outputs_comparisonReport = {}

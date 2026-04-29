@@ -96,12 +96,12 @@ def test_python_transpile_ex_2(tmp_path):
 
 # Unit tests
 
-def unittest(tmp_path, testname):
+def unittest(tmp_path, testname, filenames=[]):
     unittest_dir = root_dir / "tests" / "unit test files"
     expected_dir = root_dir / "tests" / "expected test results" / "unit tests"
     filename = testname + ".json"
     expected = expected_dir / testname
-    python_transpile_test(tmp_path, unittest_dir, filename, expected)
+    python_transpile_test(tmp_path, unittest_dir, filename, expected, filenames)
 
 def test_py_constant_value(tmp_path):
     unittest(tmp_path, "constant_value")
@@ -115,9 +115,12 @@ def test_py_constant_dict_list(tmp_path):
 def test_py_constant_dict_num(tmp_path):
     unittest(tmp_path, "constant_dict_num")
 
+def test_py_constant_matrix(tmp_path):
+    unittest(tmp_path, "constant_matrix")
+
 if __name__ == "__main__":
-    # import pytest
-    # pytest.main([__file__, "-v"])
-    tmp_path = Path(tempfile.mkdtemp())
-    print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
-    test_python_transpile_ex_1(tmp_path)
+    import pytest
+    pytest.main([__file__, "-v"])
+    # tmp_path = Path(tempfile.mkdtemp())
+    # print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
+    # test_py_constant_matrix(tmp_path)
