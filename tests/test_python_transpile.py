@@ -128,7 +128,7 @@ def test_py_data_import(tmp_path):
     unittest(tmp_path, "data_import", ["experimental_data.csv"])
 
 def test_py_ode_sim(tmp_path):
-    unittest(tmp_path, "explicit_ode_simulation", ["three_species_chain.csv"])
+    unittest(tmp_path, "explicit_ode_simulation", ["three_species_chain.xml"])
 
 if __name__ == "__main__":
     # import pytest
