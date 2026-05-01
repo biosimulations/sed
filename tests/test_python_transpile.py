@@ -124,9 +124,12 @@ def test_py_constant_matrix(tmp_path):
 def test_py_model_import(tmp_path):
     unittest(tmp_path, "model_import", ["three_species_chain.xml"])
 
+def test_py_data_import(tmp_path):
+    unittest(tmp_path, "data_import", ["experimental_data.csv"])
+
 if __name__ == "__main__":
     # import pytest
     # pytest.main([__file__, "-v"])
     tmp_path = Path(tempfile.mkdtemp())
     print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
-    test_python_transpile_ex_1(tmp_path)
+    test_py_data_import(tmp_path)
