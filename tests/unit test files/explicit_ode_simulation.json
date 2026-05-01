@@ -8,7 +8,7 @@
             "language": "urn:sedml:language:sbml"
         },
         "sim1": {
-            "_type": "ExplicitODESimulation",
+            "_type": "explicitODESimulation",
             "kisaoID": "KISAO:0000694",
             "model": "#tasks:model1.model",
             "independentVariable": "urn:sedml:symbol:time",
@@ -16,18 +16,17 @@
             "independentVariableRange": {
                 "start": 0,
                 "end": 20,
-                "numberOfSteps": 100
+                "numberOfSteps": 100,
+                "scale": "linear"
             },
             "outputVariables": ["S1", "S2", "S3"],
             "outputModel": false
         }
     },
     "outputs": {
-        "init_all_values": {
+        "sim1_out": {
             "_type": "report",
-            "dataSets": {
-                "model1": "#tasks:sim1"
-            }
+            "dataSets": "#tasks:sim1"
         }
     }
 }
