@@ -129,4 +129,4 @@ if __name__ == "__main__":
     # pytest.main([__file__, "-v"])
     tmp_path = Path(tempfile.mkdtemp())
     print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
-    test_py_model_import(tmp_path)
+    test_python_transpile_ex_1(tmp_path)

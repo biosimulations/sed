@@ -104,7 +104,7 @@ class DataImport(AbstractTask):
     def exportToPython(self, key, root_dir):
         if self.format == "http://purl.org/NET/mediatypes/text/csv":
             headers = set(["import pandas as pd"])
-            code = "inputs_data_" + key + " = pd.read_csv(r'" + str(Path(root_dir) / self.location) + "')\n"
+            code = "tasks_" + key + " = pd.read_csv(r'" + str(Path(root_dir) / self.location) + "')\n"
             return headers, code
         else:
             raise ValueError("Unable to translate reading data in format '" + self.format + "'.")
@@ -181,7 +181,7 @@ class ExplicitODESimulation(ODESimulation):
             taskid
             + " = "
             + taskid
-            + "_r.simulate("
+            + "_model.simulate("
             + str(self.independentVariableRange.start)
             + ", "
             + str(self.independentVariableRange.end)
@@ -234,7 +234,7 @@ class ExplicitODESimulation(ODESimulation):
             + str(self.independentVariableRange.numberOfSteps)
             + ", update_model=True, use_sbml_id=True,model=basico.load_model("
             + modelid
-            + "))\n"
+            + ".getCurrentSBML()))\n"
         )
         code += taskid + " = {}\n"
         first = 0

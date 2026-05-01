@@ -15,18 +15,18 @@ constants_compare_labels = ['Compare sim1 to sim2', 'Compare sim1 to data', 'Com
 # All tasks:
 
 # Task model1:
-inputs_models_model1 = r'C:\Users\Lucian\Desktop\sed\examples\one\example1.xml'
+tasks_model1_model = te.loadSBMLModel(r'C:\Users\Lucian\Desktop\sed\examples\one\example1.xml')
 
 # Task experiment1:
-inputs_data_experiment1 = pd.read_csv(r'C:\Users\Lucian\Desktop\sed\examples\one\experimental_data.csv')
+tasks_experiment1 = pd.read_csv(r'C:\Users\Lucian\Desktop\sed\examples\one\experimental_data.csv')
 
 # Task sim1:
-tasks_sim1_r = te.loadSBMLModel(inputs_models_model1)
-tasks_sim1 = tasks_sim1_r.simulate(0, 20, steps=50, selections = ['time', 'S1', 'S2'])
+tasks_sim1_model = te.loadSBMLModel(tasks_model1_model.getCurrentSBML())
+tasks_sim1 = tasks_sim1_model.simulate(0, 20, steps=50, selections = ['time', 'S1', 'S2'])
 tasks_sim1 = pd.DataFrame(tasks_sim1, columns=tasks_sim1.colnames)
 
 # Task sim2:
-tasks_sim2_copasi = basico.run_time_course(start_time=0, duration=20, intervals=50, update_model=True, use_sbml_id=True,model=basico.load_model(inputs_models_model1))
+tasks_sim2_copasi = basico.run_time_course(start_time=0, duration=20, intervals=50, update_model=True, use_sbml_id=True,model=basico.load_model(tasks_model1_model.getCurrentSBML()))
 tasks_sim2 = {}
 tasks_sim2['S1'] = np.array(tasks_sim2_copasi['S1'])
 tasks_sim2['S2'] = np.array(tasks_sim2_copasi['S2'])
@@ -36,10 +36,10 @@ tasks_sim2 = DataFrame(tasks_sim2)
 tasks_sim1_sim2_compare = (tasks_sim1 - tasks_sim2)**2
 
 # Task sim1_exp_compare:
-tasks_sim1_exp_compare = (tasks_sim1 - inputs_data_experiment1)**2
+tasks_sim1_exp_compare = (tasks_sim1 - tasks_experiment1)**2
 
 # Task sim2_exp_compare:
-tasks_sim2_exp_compare = (tasks_sim2 - inputs_data_experiment1)**2
+tasks_sim2_exp_compare = (tasks_sim2 - tasks_experiment1)**2
 
 # Task compare_summary:
 tasks_compare_summary = [sum(tasks_sim1_sim2_compare['S1']) + sum(tasks_sim1_sim2_compare['S2']), sum(tasks_sim1_exp_compare['S1']) + sum(tasks_sim1_exp_compare['S2']), sum(tasks_sim2_exp_compare['S1']) + sum(tasks_sim2_exp_compare['S2'])]
@@ -87,7 +87,7 @@ pd.DataFrame(outputs_comparisonSummary).to_csv("outputs_comparisonSummary.csv", 
 
 # Output Fig1:
 fig, ax = plt.subplots()
-ys = np.vstack((tasks_sim1['S1'], tasks_sim1['S2'], tasks_sim2['S1'], tasks_sim2['S2'], inputs_data_experiment1['S1'], inputs_data_experiment1['S2'], ))
+ys = np.vstack((tasks_sim1['S1'], tasks_sim1['S2'], tasks_sim2['S1'], tasks_sim2['S2'], tasks_experiment1['S1'], tasks_experiment1['S2'], ))
 ys = ys.transpose()
 x = tasks_sim1['time']
 ax.plot(x, ys)

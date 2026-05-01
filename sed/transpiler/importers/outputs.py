@@ -181,7 +181,7 @@ class Report(Output):
             line = str_to_py_str(self.dataSets)
             code = "header = True\n"
             code += repid + " = " + line + "\n"
-            headers.add(["import collections"])
+            headers.add("import collections")
             code += f"if isinstance({repid}, (collections.abc.Mapping, pd.DataFrame)):\n"
             code += f"   for key in {repid}:\n"
             code += f"      {repid}[key] = np.atleast_1d({repid}[key])\n"
