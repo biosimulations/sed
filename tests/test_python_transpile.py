@@ -127,12 +127,15 @@ def test_py_model_import(tmp_path):
 def test_py_data_import(tmp_path):
     unittest(tmp_path, "data_import", ["experimental_data.csv"])
 
-def test_py_ode_sim(tmp_path):
+def test_py_explicit_ode_simulation(tmp_path):
     unittest(tmp_path, "explicit_ode_simulation", ["three_species_chain.xml"])
+
+def test_py_bounded_ode_simulation(tmp_path):
+    unittest(tmp_path, "bounded_ode_simulation", ["three_species_chain.xml"])
 
 if __name__ == "__main__":
     # import pytest
     # pytest.main([__file__, "-v"])
     tmp_path = Path(tempfile.mkdtemp())
     print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
-    test_py_ode_sim(tmp_path)
+    test_py_bounded_ode_simulation(tmp_path)

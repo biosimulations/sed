@@ -8,16 +8,14 @@
             "language": "urn:sedml:language:sbml"
         },
         "sim1": {
-            "_type": "explicitODESimulation",
+            "_type": "boundedODESimulation",
             "kisaoID": "KISAO:0000694",
             "model": "#tasks:model1.model",
             "independentVariable": "urn:sedml:symbol:time",
             "independentVariableInit": 0,
-            "independentVariableRange": {
+            "independentVariableSpan": {
                 "start": 0,
-                "end": 20,
-                "numberOfSteps": 100,
-                "scale": "linear"
+                "end": 20
             },
             "outputVariables": ["S1", "S2", "S3"],
             "outputModel": false

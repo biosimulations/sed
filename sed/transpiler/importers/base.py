@@ -65,3 +65,22 @@ class Range(SedBase):
             print("Unsaved data when creating Range:", leftovers)
             return True
         return False
+
+
+class Span(SedBase):
+    """A 'span' object, used to define the bounds of a range but not any internal steps.
+    """
+
+    def __init__(self, range_config: dict):
+        super().__init__(range_config)
+        self.type_key = "Range"
+        self.start = range_config.pop("start", None)
+        self.end = range_config.pop("end", None)
+        self.__validate(range_config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating Span:", leftovers)
+            return True
+        return False
