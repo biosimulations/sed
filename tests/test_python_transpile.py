@@ -103,6 +103,9 @@ def unittest(tmp_path, testname, filenames=[]):
     expected = expected_dir / testname
     python_transpile_test(tmp_path, unittest_dir, filename, expected, filenames)
 
+def test_py_empty_doc(tmp_path):
+    unittest(tmp_path, "SEDDocument_empty")
+
 def test_py_constant_value(tmp_path):
     unittest(tmp_path, "constant_value")
 
@@ -118,9 +121,12 @@ def test_py_constant_dict_num(tmp_path):
 def test_py_constant_matrix(tmp_path):
     unittest(tmp_path, "constant_matrix")
 
+def test_py_model_import(tmp_path):
+    unittest(tmp_path, "model_import", ["three_species_chain.xml"])
+
 if __name__ == "__main__":
-    import pytest
-    pytest.main([__file__, "-v"])
-    # tmp_path = Path(tempfile.mkdtemp())
-    # print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
-    # test_py_constant_matrix(tmp_path)
+    # import pytest
+    # pytest.main([__file__, "-v"])
+    tmp_path = Path(tempfile.mkdtemp())
+    print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
+    test_py_model_import(tmp_path)

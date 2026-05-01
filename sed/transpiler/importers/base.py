@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+import regex as re
 
 # from basico import load_model_from_string
 
@@ -30,6 +31,13 @@ def from_attribute_to_list_path(attribute: str | bool | int | SedBase) -> Any:
     # [#tasks, model1.model], [model1, model]
     return attribute.split(":")[1].split(".") if attribute[0] == "#" else attribute
 
+
+def str_to_py_str(sedstr):
+    ret = sedstr.replace("#", "")
+    ret = ret.replace(":", "_")
+    ret = re.sub(r'\.(?=[A-Za-z])', '_', ret)
+    return ret
+    
 
 class Range(SedBase):
     """A 'range' object, used to define a range in one of several ways:

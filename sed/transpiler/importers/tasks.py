@@ -3,7 +3,7 @@ import re
 from pbest import CompositeBuilder
 
 from sed.transpiler.library import parse_hash
-from sed.transpiler.importers.base import SedBase, Range, from_attribute_to_list_path
+from sed.transpiler.importers.base import SedBase, Range, from_attribute_to_list_path, str_to_py_str
 import pandas as pd
 from pathlib import Path
 #from typing import Any
@@ -59,8 +59,8 @@ class ModelImport(AbstractTask):
 
 
     def exportToPython(self, key, root_dir):
-        headers = set()
-        code = "inputs_models_" + key + " = r'" + str(Path(root_dir) / self.location) + "'\n"
+        headers = set(["import tellurium as te"])
+        code = f"tasks_{key}_model = te.loadSBMLModel(r'{str(Path(root_dir) / self.location)}')\n"
         return headers, code
 
     # No processing, pass the file location to appropiate step/process
@@ -174,10 +174,9 @@ class ExplicitODESimulation(ODESimulation):
             print("Unable to simulate with tellurium: independent variable is not 'time'.")
             return
         headers = set(["import tellurium as te", "import pandas as pd"])
-        modelid = self.model[1:]
-        modelid = modelid.replace(":", "_")
+        modelid = str_to_py_str(self.model)
         taskid = "tasks_" + key
-        code = taskid + "_r = te.loadSBMLModel(" + modelid + ")\n"
+        code = taskid + f"_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
         code += (
             taskid
             + " = "
@@ -223,9 +222,7 @@ class ExplicitODESimulation(ODESimulation):
         headers = set(["import basico"])
         headers.add("import numpy as np")
         headers.add("from pandas import DataFrame")
-        modelid = self.model
-        modelid = self.model[1:]
-        modelid = modelid.replace(":", "_")
+        modelid = str_to_py_str(self.model)
         taskid = "tasks_" + key
         code = (
             taskid
@@ -333,8 +330,7 @@ class Calculation(AbstractTask):
 
     def exportToPython(self, key, root_dir):
         headers = set()
-        line = self.math.replace(":", "_")
-        line = line.replace("#", "")
+        line = str_to_py_str(self.math)
         line = line.replace("^", "**")
         code = "tasks_" + key + " = " + line + "\n"
         return headers, code

@@ -1,5 +1,5 @@
 from typing import Any
-from sed.transpiler.importers.base import SedBase
+from sed.transpiler.importers.base import SedBase, str_to_py_str
 
 
 class Axis(SedBase):
@@ -109,13 +109,11 @@ class Plot2D(Plot):
         ys = []
         code += "ys = np.vstack(("
         for curve in self.curves:
-            y = self.curves[curve].y.replace(":", "_")
-            y = y.replace("#", "")
+            y = str_to_py_str(self.curves[curve].y)
             ys.append(y)
             code += y + ", "
             # TODO: check to make sure all xrefs are the same
-            xref = self.curves[curve].x.replace(":", "_")
-            xref = xref.replace("#", "")
+            xref = str_to_py_str(self.curves[curve].x)
         code += "))\nys = ys.transpose()\n"
         code += "x = " + xref + "\n"
         code += "ax.plot(x, ys)\n"
@@ -180,12 +178,10 @@ class Report(Output):
         repid = "outputs_" + key
         code = ""
         if isinstance(self.dataSets, str):
-            line = self.dataSets
-            line = line.replace("#", "")
-            line = line.replace(":", "_")
+            line = str_to_py_str(self.dataSets)
             code = "header = True\n"
             code += repid + " = " + line + "\n"
-            headers.add("import collections")
+            headers.add(["import collections"])
             code += f"if isinstance({repid}, (collections.abc.Mapping, pd.DataFrame)):\n"
             code += f"   for key in {repid}:\n"
             code += f"      {repid}[key] = np.atleast_1d({repid}[key])\n"
@@ -195,9 +191,7 @@ class Report(Output):
         else:
             code += repid + " = {}\n"
             for ds_key in self.dataSets:
-                line = self.dataSets[ds_key]
-                line = line.replace("#", "")
-                line = line.replace(":", "_")
+                line = str_to_py_str(self.dataSets[ds_key])
                 code += repid + "['" + ds_key + "'] = np.atleast_1d(" + line + ")\n"
             #code += "print(" + repid + ")\n"
             code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False)\n'
