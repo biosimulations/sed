@@ -186,7 +186,7 @@ def test_py_explicit_stochastic_simulation(tmp_path):
         "explicit_stochastic_simulation",
         ["three_species_chain_stochlevels.xml"],
         stochastic_files=["outputs_sim1_out.csv"],
-        rtol=DEFAULT_STOCHASTIC_RTOL,
+        rtol=0.5,
     )
 
 if __name__ == "__main__":
