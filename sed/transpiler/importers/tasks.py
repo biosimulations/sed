@@ -396,6 +396,91 @@ class BoundedODESimulation(ODESimulation):
         return headers, code
 
 
+class StochasticSimulation(AbstractTask):
+    """The base class for a stochastic simulation."""
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        # TODO: error checking
+        self.model = config.pop("model")
+        self.independentVariable = config.pop("independentVariable", None)
+        self.independentVariableInit = config.pop("independentVariableInit", None)
+        self.outputVariables = config.pop("outputVariables", None)
+        self.outputModel = config.pop("outputModel", None)
+        self.__validate(config)
+        self.executor = "Tellurium"
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        # if len(leftovers):
+        #     print("Unsaved data when creating explicitODESimulation:", leftovers)
+        #     return True
+        return False
+
+    def setContext(self, val):
+        self.executor = val;
+
+class ExplicitStochasticSimulation(ODESimulation):
+    """The definition of a stochastic simulation with explicit output points."""
+
+    def __init__(self, config: dict):
+        # TODO: error checking
+        super().__init__(config)
+        self.type_key = "explicitStochasticSimulation"
+        self.independentVariableRange = Range(config.pop("independentVariableRange", {}))
+        self.__validate(config)
+        self.executor = "Tellurium"
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating explicitStochasticSimulation:", leftovers)
+            return True
+        return False
+
+    def exportToPython(self, key, root_dir):
+        if self.executor == "Tellurium":
+            return self.exportToPython_tellurium(key)
+        elif self.executor == "Copasi":
+            raise ValueError("Copasi implementation of stochastic simulation is not yet implemented.")
+        else:
+            raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
+
+    def exportToPython_tellurium(self, key):
+        if self.independentVariable != "urn:sedml:symbol:time":
+            print("Unable to simulate with tellurium: independent variable is not 'time'.")
+            return
+        headers = set(["import tellurium as te", "import pandas as pd"])
+        modelid = str_to_py_str(self.model)
+        taskid = "tasks_" + key
+        code = f"{taskid}_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
+        code += f"{taskid}_model.setIntegrator('gillespie')\n"
+        code += (
+            taskid
+            + " = "
+            + taskid
+            + "_model.simulate("
+            + str(self.independentVariableRange.start)
+            + ", "
+            + str(self.independentVariableRange.end)
+            + ", steps="
+            + str(self.independentVariableRange.numberOfSteps)
+            + ", selections = "
+            + str(['time'] + self.outputVariables)
+            + ")\n"
+        )
+        # Convert to pandas dataframe
+        code += (
+            taskid
+            + " = pd.DataFrame("
+            + taskid
+            + ", columns="
+            + taskid
+            + ".colnames)\n"
+        )
+        return headers, code
+
+
 class Calculation(AbstractTask):
     """The definition of a 'calculation' task, which performs a calulation on inputs."""
 
@@ -551,6 +636,8 @@ def load_tasks_section(tasks_section_config):
                 tasks[key] = ExplicitODESimulation(config)
             case "boundedODESimulation":
                 tasks[key] = BoundedODESimulation(config)
+            case "explicitStochasticSimulation":
+                tasks[key] = ExplicitStochasticSimulation(config)
             case "calculation":
                 tasks[key] = Calculation(config)
             case "sumOfSquares":
