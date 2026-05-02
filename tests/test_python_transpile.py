@@ -184,7 +184,7 @@ def test_py_explicit_stochastic_simulation(tmp_path):
     unittest(
         tmp_path,
         "explicit_stochastic_simulation",
-        ["three_species_chain.xml"],
+        ["three_species_chain_stochlevels.xml"],
         stochastic_files=["outputs_sim1_out.csv"],
         rtol=DEFAULT_STOCHASTIC_RTOL,
     )
