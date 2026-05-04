@@ -11,4 +11,4 @@ The simplest 'complete' SED2 file is 'ode_simulation.json'.  It loads a model, r
 The other tests:
 * constant_*.json:  These files all declare a constant, then ask for that constant in an output report.  Use these tests to check to make sure constants are being declared properly, and that reports can report the different kinds of output.
 * model_import.json:  This file imports a model, then asks for elements of that model as an output report.
-* model_full_output.json:  This file imports a model, then asks for 'the model' as an output report.  This should be the same as the output for a dictionary: a
+* model_full_output.json:  This file imports a model, then asks for 'the model' as an output report.  This should be the same as the output for a dictionary: a list of model ids and their corresponding values.

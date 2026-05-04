@@ -1,0 +1,32 @@
+{
+  "outputs": {
+    "Fig1": {
+      "_type": "plot3D",
+      "label": "Figure 1",
+      "xAxis": {
+        "label": "k1",
+        "scale": "linear"
+      },
+      "yAxis": {
+        "label": "k2",
+        "scale": "log"
+      },
+      "zAxis": {
+        "label": "Concentrations",
+        "scale": "linear"
+      },
+      "surfaces": {
+        "S1": {
+          "x": "#tasks:scan_k1_and_k2:ranges[0]",
+          "y": "#tasks:scan_k1_and_k2:ranges[1]",
+          "z": "#tasks:steadyStates['S1']"
+        },
+        "S2": {
+          "x": "#tasks:scan_k1_and_k2:ranges[0]",
+          "y": "#tasks:scan_k1_and_k2:ranges[1]",
+          "z": "#tasks:steadyStates['S2']"
+        }
+      }
+    }
+  }
+}

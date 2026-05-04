@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+import regex as re
 
 # from basico import load_model_from_string
 
@@ -31,6 +32,13 @@ def from_attribute_to_list_path(attribute: str | bool | int | SedBase) -> Any:
     return attribute.split(":")[1].split(".") if attribute[0] == "#" else attribute
 
 
+def str_to_py_str(sedstr):
+    ret = sedstr.replace("#", "")
+    ret = ret.replace(":", "_")
+    ret = re.sub(r'\.(?=[A-Za-z])', '_', ret)
+    return ret
+    
+
 class Range(SedBase):
     """A 'range' object, used to define a range in one of several ways:
     * start, end, numberOfSteps (and optional 'scale')
@@ -55,5 +63,24 @@ class Range(SedBase):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Range:", leftovers)
+            return True
+        return False
+
+
+class Span(SedBase):
+    """A 'span' object, used to define the bounds of a range but not any internal steps.
+    """
+
+    def __init__(self, range_config: dict):
+        super().__init__(range_config)
+        self.type_key = "Range"
+        self.start = range_config.pop("start", None)
+        self.end = range_config.pop("end", None)
+        self.__validate(range_config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating Span:", leftovers)
             return True
         return False

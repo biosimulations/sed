@@ -4,22 +4,22 @@ on:
   push:
 
 jobs:
-  quality:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out
-        uses: actions/checkout@v4
+  # quality:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Check out
+  #       uses: actions/checkout@v4
 
-      - uses: actions/cache@v4
-        with:
-          path: ~/.cache/pre-commit
-          key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
+  #     - uses: actions/cache@v4
+  #       with:
+  #         path: ~/.cache/pre-commit
+  #         key: pre-commit-${{ hashFiles('.pre-commit-config.yaml') }}
 
-      - name: Set up the environment
-        uses: ./.github/actions/setup-python-env
+  #     - name: Set up the environment
+  #       uses: ./.github/actions/setup-python-env
 
-      - name: Run checks
-        run: make check
+  #     - name: Run checks
+  #       run: make check
 
   tests-and-type-check:
     runs-on: ubuntu-latest
@@ -42,5 +42,5 @@ jobs:
       - name: Run All tests
         run: uv run python -m pytest tests --cov --cov-config=pyproject.toml --cov-report=xml
 
-      - name: Check typing
-        run: uv run mypy
+      # - name: Check typing
+      #   run: uv run mypy

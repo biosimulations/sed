@@ -1,0 +1,21 @@
+{
+    "versionStr": "SED v2.0 alpha",
+    "versionNum": 2.0,
+    "tasks": {
+        "data1": {
+            "_type": "dataImport",
+            "location": "experimental_data.csv",
+            "format": "http://purl.org/NET/mediatypes/text/csv"
+        }
+    },
+    "outputs": {
+        "experimental_species_values": {
+            "_type": "report",
+            "dataSets": {
+                "data1_S1": "#tasks:data1['S1']",
+                "data1_S2": "#tasks:data1['S2']",
+                "data1_S3": "#tasks:data1['S3']"
+            }
+        }
+    }
+}

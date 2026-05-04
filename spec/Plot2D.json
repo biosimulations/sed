@@ -1,0 +1,24 @@
+{
+  "outputs": {
+    "Fig1": {
+      "_type": "plot2D",
+      "label": "Figure 1",
+      "xAxis": {
+        "label": "Time"
+      },
+      "yAxis": {
+        "label": "Concentrations"
+      },
+      "curves": {
+        "Sim1_S1": {
+          "x": "#tasks:sim1['time']",
+          "y": "#tasks:sim1['S1']"
+        },
+        "Sim1_S2": {
+          "x": "#tasks:sim1['time']",
+          "y": "#tasks:sim1['S2']"
+        }
+      }
+    }
+  }
+}

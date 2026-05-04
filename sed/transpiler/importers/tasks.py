@@ -3,7 +3,7 @@ import re
 from pbest import CompositeBuilder
 
 from sed.transpiler.library import parse_hash
-from sed.transpiler.importers.base import SedBase, Range, from_attribute_to_list_path
+from sed.transpiler.importers.base import SedBase, Range, Span, from_attribute_to_list_path, str_to_py_str
 import pandas as pd
 from pathlib import Path
 #from typing import Any
@@ -59,8 +59,8 @@ class ModelImport(AbstractTask):
 
 
     def exportToPython(self, key, root_dir):
-        headers = set()
-        code = "inputs_models_" + key + " = r'" + str(Path(root_dir) / self.location) + "'\n"
+        headers = set(["import tellurium as te"])
+        code = f"tasks_{key}_model = te.loadSBMLModel(r'{str(Path(root_dir) / self.location)}')\n"
         return headers, code
 
     # No processing, pass the file location to appropiate step/process
@@ -104,7 +104,7 @@ class DataImport(AbstractTask):
     def exportToPython(self, key, root_dir):
         if self.format == "http://purl.org/NET/mediatypes/text/csv":
             headers = set(["import pandas as pd"])
-            code = "inputs_data_" + key + " = pd.read_csv(r'" + str(Path(root_dir) / self.location) + "')\n"
+            code = "tasks_" + key + " = pd.read_csv(r'" + str(Path(root_dir) / self.location) + "')\n"
             return headers, code
         else:
             raise ValueError("Unable to translate reading data in format '" + self.format + "'.")
@@ -174,15 +174,14 @@ class ExplicitODESimulation(ODESimulation):
             print("Unable to simulate with tellurium: independent variable is not 'time'.")
             return
         headers = set(["import tellurium as te", "import pandas as pd"])
-        modelid = self.model[1:]
-        modelid = modelid.replace(":", "_")
+        modelid = str_to_py_str(self.model)
         taskid = "tasks_" + key
-        code = taskid + "_r = te.loadSBMLModel(" + modelid + ")\n"
+        code = taskid + f"_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
         code += (
             taskid
             + " = "
             + taskid
-            + "_r.simulate("
+            + "_model.simulate("
             + str(self.independentVariableRange.start)
             + ", "
             + str(self.independentVariableRange.end)
@@ -223,9 +222,7 @@ class ExplicitODESimulation(ODESimulation):
         headers = set(["import basico"])
         headers.add("import numpy as np")
         headers.add("from pandas import DataFrame")
-        modelid = self.model
-        modelid = self.model[1:]
-        modelid = modelid.replace(":", "_")
+        modelid = str_to_py_str(self.model)
         taskid = "tasks_" + key
         code = (
             taskid
@@ -237,7 +234,7 @@ class ExplicitODESimulation(ODESimulation):
             + str(self.independentVariableRange.numberOfSteps)
             + ", update_model=True, use_sbml_id=True,model=basico.load_model("
             + modelid
-            + "))\n"
+            + ".getCurrentSBML()))\n"
         )
         code += taskid + " = {}\n"
         first = 0
@@ -297,6 +294,193 @@ class ExplicitODESimulation(ODESimulation):
         return outputs
 
 
+class BoundedODESimulation(ODESimulation):
+    """The definition of a uniform time course simulation."""
+
+    def __init__(self, config: dict):
+        # TODO: error checking
+        super().__init__(config)
+        self.type_key = "boundedODESimulation"
+        self.independentVariableSpan = Span(config.pop("independentVariableSpan", {}))
+        self.__validate(config)
+        self.executor = "Tellurium"
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating boundedODESimulation:", leftovers)
+            return True
+        return False
+
+    def exportToPython(self, key, root_dir):
+        if self.executor == "Tellurium":
+            return self.exportToPython_tellurium(key)
+        elif self.executor == "Copasi":
+            raise ValueError("Copasi export not yet implemented.")
+        else:
+            raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
+
+    def exportToPython_tellurium(self, key):
+        if self.independentVariable != "urn:sedml:symbol:time":
+            print("Unable to simulate with tellurium: independent variable is not 'time'.")
+            return
+        headers = set(["import tellurium as te", "import pandas as pd"])
+        modelid = str_to_py_str(self.model)
+        taskid = "tasks_" + key
+        code = taskid + f"_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
+        code += (
+            taskid
+            + " = "
+            + taskid
+            + "_model.simulate("
+            + str(self.independentVariableSpan.start)
+            + ", "
+            + str(self.independentVariableSpan.end)
+            + ", selections = "
+            + str(['time'] + self.outputVariables)
+            + ")\n"
+        )
+        # Convert to pandas dataframe
+        code += (
+            taskid
+            + " = pd.DataFrame("
+            + taskid
+            + ", columns="
+            + taskid
+            + ".colnames)\n"
+        )
+        return headers, code
+
+    def exportToPython_copasi(self, key):
+        # copasi_df: DataFrame = basico.run_time_course(
+        #     start_time=0,
+        #     duration=20,
+        #     intervals=50,
+        #     update_model=True,
+        #     use_sbml_id=True,
+        #     model=basico.load_model(str(example_one_dir / "example1.xml"))
+        # )
+        # copasi_out = {}
+        # copasi_out["time"] = np.array(copasi_df.index)
+        # copasi_out["S1"] = np.array(copasi_df["S1"])
+        # copasi_out["S2"] = np.array(copasi_df["S2"])
+        # copasi_out = DataFrame(copasi_out)
+        if self.independentVariable != "urn:sedml:symbol:time":
+            print("Unable to simulate with tellurium: independent variable is not 'time'.")
+            return
+        headers = set(["import basico"])
+        headers.add("import numpy as np")
+        headers.add("from pandas import DataFrame")
+        modelid = str_to_py_str(self.model)
+        taskid = "tasks_" + key
+        code = (
+            taskid
+            + "_copasi = basico.run_time_course(start_time="
+            + str(self.independentVariableRange.start)
+            + ", duration="
+            + str(self.independentVariableRange.end - self.independentVariableRange.start)
+            + ", intervals="
+            + str(self.independentVariableRange.numberOfSteps)
+            + ", update_model=True, use_sbml_id=True,model=basico.load_model("
+            + modelid
+            + ".getCurrentSBML()))\n"
+        )
+        code += taskid + " = {}\n"
+        first = 0
+        if self.outputVariables[0] == "time":
+            first = 1
+            code += taskid + "['time'] = np.array(" + taskid + "_copasi.index)\n"
+        for var in self.outputVariables[first:]:
+            code += taskid + "['" + var + "'] = np.array(" + taskid + "_copasi['" + var + "'])\n"
+        code += taskid + " = DataFrame(" + taskid + ")\n"
+        return headers, code
+
+
+class StochasticSimulation(AbstractTask):
+    """The base class for a stochastic simulation."""
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        # TODO: error checking
+        self.model = config.pop("model")
+        self.independentVariable = config.pop("independentVariable", None)
+        self.independentVariableInit = config.pop("independentVariableInit", None)
+        self.outputVariables = config.pop("outputVariables", None)
+        self.outputModel = config.pop("outputModel", None)
+        self.__validate(config)
+        self.executor = "Tellurium"
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        # if len(leftovers):
+        #     print("Unsaved data when creating explicitODESimulation:", leftovers)
+        #     return True
+        return False
+
+    def setContext(self, val):
+        self.executor = val;
+
+class ExplicitStochasticSimulation(ODESimulation):
+    """The definition of a stochastic simulation with explicit output points."""
+
+    def __init__(self, config: dict):
+        # TODO: error checking
+        super().__init__(config)
+        self.type_key = "explicitStochasticSimulation"
+        self.independentVariableRange = Range(config.pop("independentVariableRange", {}))
+        self.__validate(config)
+        self.executor = "Tellurium"
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating explicitStochasticSimulation:", leftovers)
+            return True
+        return False
+
+    def exportToPython(self, key, root_dir):
+        if self.executor == "Tellurium":
+            return self.exportToPython_tellurium(key)
+        elif self.executor == "Copasi":
+            raise ValueError("Copasi implementation of stochastic simulation is not yet implemented.")
+        else:
+            raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
+
+    def exportToPython_tellurium(self, key):
+        if self.independentVariable != "urn:sedml:symbol:time":
+            print("Unable to simulate with tellurium: independent variable is not 'time'.")
+            return
+        headers = set(["import tellurium as te", "import pandas as pd"])
+        modelid = str_to_py_str(self.model)
+        taskid = "tasks_" + key
+        code = f"{taskid}_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
+        code += f"{taskid}_model.setIntegrator('gillespie')\n"
+        code += (
+            taskid
+            + " = "
+            + taskid
+            + "_model.simulate("
+            + str(self.independentVariableRange.start)
+            + ", "
+            + str(self.independentVariableRange.end)
+            + ", steps="
+            + str(self.independentVariableRange.numberOfSteps)
+            + ", selections = "
+            + str(['time'] + self.outputVariables)
+            + ")\n"
+        )
+        # Convert to pandas dataframe
+        code += (
+            taskid
+            + " = pd.DataFrame("
+            + taskid
+            + ", columns="
+            + taskid
+            + ".colnames)\n"
+        )
+        return headers, code
+
+
 class Calculation(AbstractTask):
     """The definition of a 'calculation' task, which performs a calulation on inputs."""
 
@@ -333,8 +517,7 @@ class Calculation(AbstractTask):
 
     def exportToPython(self, key, root_dir):
         headers = set()
-        line = self.math.replace(":", "_")
-        line = line.replace("#", "")
+        line = str_to_py_str(self.math)
         line = line.replace("^", "**")
         code = "tasks_" + key + " = " + line + "\n"
         return headers, code
@@ -451,6 +634,10 @@ def load_tasks_section(tasks_section_config):
                 tasks[key] = DataImport(config)
             case "explicitODESimulation":
                 tasks[key] = ExplicitODESimulation(config)
+            case "boundedODESimulation":
+                tasks[key] = BoundedODESimulation(config)
+            case "explicitStochasticSimulation":
+                tasks[key] = ExplicitStochasticSimulation(config)
             case "calculation":
                 tasks[key] = Calculation(config)
             case "sumOfSquares":
