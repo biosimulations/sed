@@ -8,11 +8,18 @@
         [0, 1.209872, 2.29062, 5e20, 1.23465e-3, 0.0001, 400.2456]]
     },
     "outputs": {
-        "report": {
+        "report_labels": {
             "_type": "report",
             "dataSets": {
-                "X": "#constants:X"
+                "X1": "#constants:X[0]",
+                "X2": "#constants:X[1]",
+                "X3": "#constants:X[2]",
+                "X4": "#constants:X[3]"
             }
+        },
+        "report_no_labels": {
+            "_type": "report",
+            "dataSets": "#constants:X"
         }
     }
 }

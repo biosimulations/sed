@@ -1,0 +1,36 @@
+{
+    "tasks": {
+        "ex1": {
+            "range": {
+                "values": [1, 2, 5, 10, 20, 50, 100]
+            }
+        },
+        "ex2": {
+            "range": {
+                "values": ["S1", "S2", "S3", "S5"]
+            }
+        },
+        "ex3": {
+            "range": {
+                "start": 0,
+                "end": 10,
+                "numberOfSteps": 100
+            }
+        },
+        "ex4": {
+            "range": {
+                "start": 0,
+                "end": 10,
+                "interval": 0.01
+            }
+        },
+        "ex5": {
+            "range": {
+                "start": 1,
+                "end": 1000,
+                "numberOfSteps": 3,
+                "scale": "log10"
+            }
+        }
+    }
+}

@@ -1,0 +1,11 @@
+{
+    "tasks": {
+        "sim1": {
+            "_type": "steadyState",
+            "kisaoID": "KISAO:0000437",
+            "model": "#tasks:model1.model",
+            "outputVariables": ["J1", "J2", "J3"],
+            "outputModel": false
+        }
+    }
+}
