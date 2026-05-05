@@ -3,7 +3,7 @@ import re
 from pbest import CompositeBuilder
 
 from sed.transpiler.library import parse_hash
-from sed.transpiler.importers.base import SedBase, Range, Span, from_attribute_to_list_path, str_to_py_str
+from sed.transpiler.importers.base import SedBase, Range, Span, LoopVariable, from_attribute_to_list_path, str_to_py_str
 import pandas as pd
 from pathlib import Path
 #from typing import Any
@@ -60,7 +60,7 @@ class ModelImport(AbstractTask):
 
     def exportToPython(self, key, root_dir):
         headers = set(["import tellurium as te"])
-        code = f"tasks_{key}_model = te.loadSBMLModel(r'{str(Path(root_dir) / self.location)}')\n"
+        code = f"{str_to_py_str(key)}_model = te.loadSBMLModel(r'{str(Path(root_dir) / self.location)}')\n"
         return headers, code
 
     # No processing, pass the file location to appropiate step/process
@@ -104,7 +104,7 @@ class DataImport(AbstractTask):
     def exportToPython(self, key, root_dir):
         if self.format == "http://purl.org/NET/mediatypes/text/csv":
             headers = set(["import pandas as pd"])
-            code = "tasks_" + key + " = pd.read_csv(r'" + str(Path(root_dir) / self.location) + "')\n"
+            code = f"{str_to_py_str(key)} = pd.read_csv(r'{str(Path(root_dir) / self.location)}')\n"
             return headers, code
         else:
             raise ValueError("Unable to translate reading data in format '" + self.format + "'.")
@@ -117,6 +117,24 @@ class DataImport(AbstractTask):
         data = load_file(path, self.parameters)
 
         return data
+
+
+class AggregationCalculation(AbstractTask):
+    """An 'aggregationCalculation' object, used for calculations of average, max, etc.  Also used for defined export variables from a Loop.
+    """
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.type_key = "aggregationCalculation"
+        self.input = config.pop("input", None)
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating AggregationCalculation:", leftovers)
+            return True
+        return False
 
 
 class ODESimulation(AbstractTask):
@@ -175,7 +193,7 @@ class ExplicitODESimulation(ODESimulation):
             return
         headers = set(["import tellurium as te", "import pandas as pd"])
         modelid = str_to_py_str(self.model)
-        taskid = "tasks_" + key
+        taskid = str_to_py_str(key)
         code = taskid + f"_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
         code += (
             taskid
@@ -223,7 +241,7 @@ class ExplicitODESimulation(ODESimulation):
         headers.add("import numpy as np")
         headers.add("from pandas import DataFrame")
         modelid = str_to_py_str(self.model)
-        taskid = "tasks_" + key
+        taskid = str_to_py_str(key)
         code = (
             taskid
             + "_copasi = basico.run_time_course(start_time="
@@ -326,7 +344,7 @@ class BoundedODESimulation(ODESimulation):
             return
         headers = set(["import tellurium as te", "import pandas as pd"])
         modelid = str_to_py_str(self.model)
-        taskid = "tasks_" + key
+        taskid = str_to_py_str(key)
         code = taskid + f"_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
         code += (
             taskid
@@ -372,7 +390,7 @@ class BoundedODESimulation(ODESimulation):
         headers.add("import numpy as np")
         headers.add("from pandas import DataFrame")
         modelid = str_to_py_str(self.model)
-        taskid = "tasks_" + key
+        taskid = str_to_py_str(key)
         code = (
             taskid
             + "_copasi = basico.run_time_course(start_time="
@@ -452,7 +470,7 @@ class ExplicitStochasticSimulation(ODESimulation):
             return
         headers = set(["import tellurium as te", "import pandas as pd"])
         modelid = str_to_py_str(self.model)
-        taskid = "tasks_" + key
+        taskid = str_to_py_str(key)
         code = f"{taskid}_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
         code += f"{taskid}_model.setIntegrator('gillespie')\n"
         code += (
@@ -487,7 +505,7 @@ class Calculation(AbstractTask):
     def __init__(self, config: dict):
         # TODO: error checking
         super().__init__(config)
-        self.type_key = "Calculation"
+        self.type_key = "calculation"
         self.math = config.pop("math", None)
         self.units = config.pop("units", None)
         self.__validate(config)
@@ -519,7 +537,7 @@ class Calculation(AbstractTask):
         headers = set()
         line = str_to_py_str(self.math)
         line = line.replace("^", "**")
-        code = "tasks_" + key + " = " + line + "\n"
+        code = f"{str_to_py_str(key)} = {line}\n"
         return headers, code
 
     def default_step_name(self):
@@ -553,7 +571,7 @@ class SumOfSquares(AbstractTask):
 
     def __init__(self, config: dict):
         super().__init__(config)
-        self.type_key = "SumOfSquares"
+        self.type_key = "sumOfSquares"
         self.inputs = config.pop("inputs", None)
         self.__validate(config)
 
@@ -574,7 +592,7 @@ class ParameterScan(AbstractTask):
     """The definition of a 'parameter scan' task, which takes a model as input and outputs an array of models."""
 
     def __init__(self, config: dict):
-        self.type_key = "ParameterScan"
+        self.type_key = "parameterScan"
         super().__init__(config)
         self.model = config.pop("model", None)
         self.scannedVariable = config.pop("scannedVariable", None)
@@ -600,7 +618,7 @@ class SteadyState(AbstractTask):
 
     def __init__(self, config: dict):
         super().__init__(config)
-        self.type_key = "SteadyState"
+        self.type_key = "steadyState"
         self.model = config.pop("model", None)
         self.outputVariables = config.pop("outputVariables", None)
         self.outputModel = config.pop("outputModel", None)
@@ -621,6 +639,44 @@ class SteadyState(AbstractTask):
         headers = set()
         code = ""
         return headers, code
+
+
+class Loop(AbstractTask):
+    """The definition of a 'loop' task, which takes a model as input and outputs an array of models."""
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.type_key = "loop"
+        self.outputVariables = config.pop("outputVariables", None)
+        self.range = Range(config.pop("range", {}))
+        self.loopVariables = {}
+        loopVariables = config.pop("loopVariables", {})
+        if loopVariables:
+            for key, config in loopVariables.items():
+                self.loopVariables[key] = LoopVariable(config)
+        aggregateOutputs = config.pop("aggregateOutputs", {})
+        if aggregateOutputs:
+            for key, config in aggregateOutputs.items():
+                self.aggregateOutputs[key] = AggregationCalculation(config)
+        subTasks = load_tasks_section(config.pop("subTasks", {}))
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating SteadyState:", leftovers)
+            return True
+        return False
+
+    def exportToProcessBigraph():
+        """foo"""
+        pass
+
+    def exportToPython(self, key, root_dir):
+        headers = set()
+        code = ""
+        return headers, code
+
 
 
 def load_tasks_section(tasks_section_config):

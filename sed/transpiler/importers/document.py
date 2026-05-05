@@ -48,9 +48,9 @@ class SedDocument():
             for constid in self.constants:
                 python += "constants_" + constid + " = " + str(self.constants[constid]) + "\n"
         python +=  "\n# All tasks:\n"
-        for task in self.tasks:
-            python +=  "\n# Task " + task + ":\n"
-            newheaders, newpython = self.tasks[task].exportToPython(task, path)
+        for taskid in self.tasks:
+            python +=  f"\n# Task {taskid}:\n"
+            newheaders, newpython = self.tasks[taskid].exportToPython("#tasks:" + taskid, path)
             headers.update(newheaders)
             python += newpython
         python +=  "\n# All Outputs:\n"

@@ -48,16 +48,16 @@ class Range(SedBase):
     * values
     """
 
-    def __init__(self, range_config: dict):
-        super().__init__(range_config)
+    def __init__(self, config: dict):
+        super().__init__(config)
         self.type_key = "Range"
-        self.start = range_config.pop("start", None)
-        self.end = range_config.pop("end", None)
-        self.numberOfSteps = range_config.pop("numberOfSteps", None)
-        self.interval = range_config.pop("interval", None)
-        self.scale = range_config.pop("scale", None)
-        self.values = range_config.pop("values", None)
-        self.__validate(range_config)
+        self.start = config.pop("start", None)
+        self.end = config.pop("end", None)
+        self.numberOfSteps = config.pop("numberOfSteps", None)
+        self.interval = config.pop("interval", None)
+        self.scale = config.pop("scale", None)
+        self.values = config.pop("values", None)
+        self.__validate(config)
 
     def __validate(self, leftovers={}):
         """Validate."""
@@ -71,16 +71,34 @@ class Span(SedBase):
     """A 'span' object, used to define the bounds of a range but not any internal steps.
     """
 
-    def __init__(self, range_config: dict):
-        super().__init__(range_config)
+    def __init__(self, config: dict):
+        super().__init__(config)
         self.type_key = "Range"
-        self.start = range_config.pop("start", None)
-        self.end = range_config.pop("end", None)
-        self.__validate(range_config)
+        self.start = config.pop("start", None)
+        self.end = config.pop("end", None)
+        self.__validate(config)
 
     def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
             print("Unsaved data when creating Span:", leftovers)
+            return True
+        return False
+
+class LoopVariable(SedBase):
+    """A 'loopVariable' object, used to define elements of a loop that change for every cycle.
+    """
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.type_key = "loopVariable"
+        self.initialValue = config.pop("initialValue", None)
+        self.postLoopValues = config.pop("postLoopValues", None)
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating LoopVariable:", leftovers)
             return True
         return False
