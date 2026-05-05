@@ -42,20 +42,20 @@ class SedDocument():
 
     def exportToPython(self, path):
         headers = set()
-        python = "# Translation of SED document v" + self.versionStr + " to python\n"
+        python = f"# Translation of SED document v{self.versionStr} to python\n"
         if len(self.constants):
             python += "\n# Constants:\n"
             for constid in self.constants:
-                python += "constants_" + constid + " = " + str(self.constants[constid]) + "\n"
+                python += f"constants_{constid} = {self.constants[constid]}\n"
         python +=  "\n# All tasks:\n"
         for taskid in self.tasks:
             python +=  f"\n# Task {taskid}:\n"
-            newheaders, newpython = self.tasks[taskid].exportToPython("#tasks:" + taskid, path)
+            newheaders, newpython = self.tasks[taskid].exportToPython(f"#tasks:{taskid}", path)
             headers.update(newheaders)
             python += newpython
         python +=  "\n# All Outputs:\n"
         for output in self.outputs:
-            python +=  "\n# Output " + output + ":\n"
+            python +=  f"\n# Output {output}:\n"
             newheaders, newpython = self.outputs[output].exportToPython(output, path)
             headers.update(newheaders)
             python += newpython

@@ -145,7 +145,7 @@ def unittest(tmp_path, testname, filenames=[], stochastic_files=None,
              rtol=DEFAULT_STOCHASTIC_RTOL):
     unittest_dir = root_dir / "tests" / "unit test files"
     expected_dir = root_dir / "tests" / "expected test results" / "unit tests"
-    filename = testname + ".json"
+    filename = f"{testname}.json"
     expected = expected_dir / testname
     python_transpile_test(tmp_path, unittest_dir, filename, expected, filenames,
                           stochastic_files=stochastic_files, rtol=rtol)
@@ -190,8 +190,8 @@ def test_py_explicit_stochastic_simulation(tmp_path):
     )
 
 if __name__ == "__main__":
-    # import pytest
-    # pytest.main([__file__, "-v"])
-    tmp_path = Path(tempfile.mkdtemp())
-    print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
-    test_py_explicit_stochastic_simulation(tmp_path)
+    import pytest
+    pytest.main([__file__, "-v"])
+    # tmp_path = Path(tempfile.mkdtemp())
+    # print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
+    # test_py_explicit_stochastic_simulation(tmp_path)

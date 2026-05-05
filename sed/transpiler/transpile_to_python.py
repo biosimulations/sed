@@ -37,8 +37,8 @@ def translate_to_python(seddoc: SedDocument, path):
     headers = sorted(list(headers))
     ret = ""
     for header in headers:
-        ret += header + "\n"
-    ret += "\n\n" + python
+        ret += f"{header}\n"
+    ret += f"\n\n{python}"
 
     return ret
 

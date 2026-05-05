@@ -107,7 +107,7 @@ class DataImport(AbstractTask):
             code = f"{str_to_py_str(key)} = pd.read_csv(r'{str(Path(root_dir) / self.location)}')\n"
             return headers, code
         else:
-            raise ValueError("Unable to translate reading data in format '" + self.format + "'.")
+            raise ValueError(f"Unable to translate reading data in format '{self.format}'.")
 
     def load_data(self, root):
         # TODO: deal with all error handling (!)
@@ -185,7 +185,7 @@ class ExplicitODESimulation(ODESimulation):
         elif self.executor == "Copasi":
             return self.exportToPython_copasi(key)
         else:
-            raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
+            raise ValueError(f"Unknown uniform time course executor '{self.executor}'")
 
     def exportToPython_tellurium(self, key):
         if self.independentVariable != "urn:sedml:symbol:time":
@@ -194,30 +194,16 @@ class ExplicitODESimulation(ODESimulation):
         headers = set(["import tellurium as te", "import pandas as pd"])
         modelid = str_to_py_str(self.model)
         taskid = str_to_py_str(key)
-        code = taskid + f"_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
+        code = f"{taskid}_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
         code += (
-            taskid
-            + " = "
-            + taskid
-            + "_model.simulate("
-            + str(self.independentVariableRange.start)
-            + ", "
-            + str(self.independentVariableRange.end)
-            + ", steps="
-            + str(self.independentVariableRange.numberOfSteps)
-            + ", selections = "
-            + str(['time'] + self.outputVariables)
-            + ")\n"
+            f"{taskid} = {taskid}_model.simulate("
+            f"{self.independentVariableRange.start}, "
+            f"{self.independentVariableRange.end}, "
+            f"steps = {self.independentVariableRange.numberOfSteps}, "
+            f"selections = {['time'] + self.outputVariables})\n"
         )
         # Convert to pandas dataframe
-        code += (
-            taskid
-            + " = pd.DataFrame("
-            + taskid
-            + ", columns="
-            + taskid
-            + ".colnames)\n"
-        )
+        code += f"{taskid} = pd.DataFrame({taskid}, columns={taskid}.colnames)\n"
         return headers, code
 
     def exportToPython_copasi(self, key):
@@ -243,25 +229,22 @@ class ExplicitODESimulation(ODESimulation):
         modelid = str_to_py_str(self.model)
         taskid = str_to_py_str(key)
         code = (
-            taskid
-            + "_copasi = basico.run_time_course(start_time="
-            + str(self.independentVariableRange.start)
-            + ", duration="
-            + str(self.independentVariableRange.end - self.independentVariableRange.start)
-            + ", intervals="
-            + str(self.independentVariableRange.numberOfSteps)
-            + ", update_model=True, use_sbml_id=True,model=basico.load_model("
-            + modelid
-            + ".getCurrentSBML()))\n"
+            f"{taskid}_copasi = basico.run_time_course("
+            f"start_time = {self.independentVariableRange.start}, "
+            f"duration = {self.independentVariableRange.end - self.independentVariableRange.start}, "
+            f"intervals = {self.independentVariableRange.numberOfSteps}, "
+            f"update_model = True, "
+            f"use_sbml_id = True, "
+            f"model = basico.load_model({modelid}.getCurrentSBML()))\n"
         )
-        code += taskid + " = {}\n"
+        code += f"{taskid} = {{}}\n"
         first = 0
         if self.outputVariables[0] == "time":
             first = 1
-            code += taskid + "['time'] = np.array(" + taskid + "_copasi.index)\n"
+            code += f"{taskid}['time'] = np.array({taskid}_copasi.index)\n"
         for var in self.outputVariables[first:]:
-            code += taskid + "['" + var + "'] = np.array(" + taskid + "_copasi['" + var + "'])\n"
-        code += taskid + " = DataFrame(" + taskid + ")\n"
+            code += f"{taskid}['{var}'] = np.array({taskid}_copasi['{var}'])\n"
+        code += f"{taskid} = DataFrame({taskid})\n"
         return headers, code
 
     # Chain problem,
@@ -336,7 +319,7 @@ class BoundedODESimulation(ODESimulation):
         elif self.executor == "Copasi":
             raise ValueError("Copasi export not yet implemented.")
         else:
-            raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
+            raise ValueError(f"Unknown uniform time course executor '{self.executor}'")
 
     def exportToPython_tellurium(self, key):
         if self.independentVariable != "urn:sedml:symbol:time":
@@ -345,28 +328,15 @@ class BoundedODESimulation(ODESimulation):
         headers = set(["import tellurium as te", "import pandas as pd"])
         modelid = str_to_py_str(self.model)
         taskid = str_to_py_str(key)
-        code = taskid + f"_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
+        code = f"{taskid}_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
         code += (
-            taskid
-            + " = "
-            + taskid
-            + "_model.simulate("
-            + str(self.independentVariableSpan.start)
-            + ", "
-            + str(self.independentVariableSpan.end)
-            + ", selections = "
-            + str(['time'] + self.outputVariables)
-            + ")\n"
+            f"{taskid} = {taskid}_model.simulate("
+            f"{self.independentVariableSpan.start}, "
+            f"{self.independentVariableSpan.end}, "
+            f"selections = {['time'] + self.outputVariables})\n"
         )
         # Convert to pandas dataframe
-        code += (
-            taskid
-            + " = pd.DataFrame("
-            + taskid
-            + ", columns="
-            + taskid
-            + ".colnames)\n"
-        )
+        code += f"{taskid} = pd.DataFrame({taskid}, columns={taskid}.colnames)\n"
         return headers, code
 
     def exportToPython_copasi(self, key):
@@ -392,25 +362,22 @@ class BoundedODESimulation(ODESimulation):
         modelid = str_to_py_str(self.model)
         taskid = str_to_py_str(key)
         code = (
-            taskid
-            + "_copasi = basico.run_time_course(start_time="
-            + str(self.independentVariableRange.start)
-            + ", duration="
-            + str(self.independentVariableRange.end - self.independentVariableRange.start)
-            + ", intervals="
-            + str(self.independentVariableRange.numberOfSteps)
-            + ", update_model=True, use_sbml_id=True,model=basico.load_model("
-            + modelid
-            + ".getCurrentSBML()))\n"
+            f"{taskid}_copasi = basico.run_time_course("
+            f"start_time = {self.independentVariableRange.start}, "
+            f"duration = {self.independentVariableRange.end - self.independentVariableRange.start}, "
+            f"intervals = {self.independentVariableRange.numberOfSteps}, "
+            f"update_model = True, "
+            f"use_sbml_id = True, "
+            f"model = basico.load_model({modelid}.getCurrentSBML()))\n"
         )
-        code += taskid + " = {}\n"
+        code += f"{taskid} = {{}}\n"
         first = 0
         if self.outputVariables[0] == "time":
             first = 1
-            code += taskid + "['time'] = np.array(" + taskid + "_copasi.index)\n"
+            code += f"{taskid}['time'] = np.array({taskid}_copasi.index)\n"
         for var in self.outputVariables[first:]:
-            code += taskid + "['" + var + "'] = np.array(" + taskid + "_copasi['" + var + "'])\n"
-        code += taskid + " = DataFrame(" + taskid + ")\n"
+            code += f"{taskid}['{var}'] = np.array({taskid}_copasi['{var}'])\n"
+        code += f"{taskid} = DataFrame({taskid})\n"
         return headers, code
 
 
@@ -462,7 +429,7 @@ class ExplicitStochasticSimulation(ODESimulation):
         elif self.executor == "Copasi":
             raise ValueError("Copasi implementation of stochastic simulation is not yet implemented.")
         else:
-            raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
+            raise ValueError(f"Unknown uniform time course executor '{self.executor}'")
 
     def exportToPython_tellurium(self, key):
         if self.independentVariable != "urn:sedml:symbol:time":
@@ -474,28 +441,14 @@ class ExplicitStochasticSimulation(ODESimulation):
         code = f"{taskid}_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
         code += f"{taskid}_model.setIntegrator('gillespie')\n"
         code += (
-            taskid
-            + " = "
-            + taskid
-            + "_model.simulate("
-            + str(self.independentVariableRange.start)
-            + ", "
-            + str(self.independentVariableRange.end)
-            + ", steps="
-            + str(self.independentVariableRange.numberOfSteps)
-            + ", selections = "
-            + str(['time'] + self.outputVariables)
-            + ")\n"
+            f"{taskid} = {taskid}_model.simulate("
+            f"{self.independentVariableRange.start}, "
+            f"{self.independentVariableRange.end}, "
+            f"steps = {self.independentVariableRange.numberOfSteps}, "
+            f"selections = {['time'] + self.outputVariables})\n"
         )
         # Convert to pandas dataframe
-        code += (
-            taskid
-            + " = pd.DataFrame("
-            + taskid
-            + ", columns="
-            + taskid
-            + ".colnames)\n"
-        )
+        code += f"{taskid} = pd.DataFrame({taskid}, columns={taskid}.colnames)\n"
         return headers, code
 
 
@@ -513,9 +466,9 @@ class Calculation(AbstractTask):
         # self.expression = visit_expression(self.math, self.visitor)
 
     def __str__(self):
-        ret = "Calculation object.  Infix: '" + self.math + "'\n"
+        ret = f"Calculation object.  Infix: '{self.math}'\n"
         if self.units:
-            ret += "Units: '" + self.units + "'\n"
+            ret += f"Units: '{self.units}'\n"
         return ret.strip()
 
     def __repr__(self):
@@ -703,8 +656,8 @@ def load_tasks_section(tasks_section_config):
             case "steadyState":
                 tasks[key] = SteadyState(config)
             case None:
-                raise ValueError("No '_type' provided for task " + key + ".")
+                raise ValueError(f"No '_type' provided for task {key}.")
             case _:
                 print(f"unknown task type: {step_type}")
-                # raise ValueError("Unknown task type " + step_type + ".")
+                # raise ValueError(f"Unknown task type {step_type}.")
     return tasks

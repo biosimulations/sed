@@ -14,7 +14,7 @@ tasks_model1_model = te.loadSBMLModel(r'C:\Users\Lucian\Desktop\sed\tests\unit t
 # Task sim1:
 tasks_sim1_model = te.loadSBMLModel(tasks_model1_model.getCurrentSBML())
 tasks_sim1_model.setIntegrator('gillespie')
-tasks_sim1 = tasks_sim1_model.simulate(0, 20, steps=100, selections = ['time', 'S1', 'S2', 'S3'])
+tasks_sim1 = tasks_sim1_model.simulate(0, 20, steps = 100, selections = ['time', 'S1', 'S2', 'S3'])
 tasks_sim1 = pd.DataFrame(tasks_sim1, columns=tasks_sim1.colnames)
 
 # All Outputs:

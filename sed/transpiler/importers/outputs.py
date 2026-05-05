@@ -111,19 +111,19 @@ class Plot2D(Plot):
         for curve in self.curves:
             y = str_to_py_str(self.curves[curve].y)
             ys.append(y)
-            code += y + ", "
+            code += f"{y}, "
             # TODO: check to make sure all xrefs are the same
             xref = str_to_py_str(self.curves[curve].x)
         code += "))\nys = ys.transpose()\n"
-        code += "x = " + xref + "\n"
+        code += f"x = {xref}\n"
         code += "ax.plot(x, ys)\n"
         ax_args = ""
         if self.xaxis:
-            ax_args += "xlabel='" + self.xaxis.label + "'"
+            ax_args += f"xlabel='{self.xaxis.label}'"
         if self.yaxis:
-            ax_args += ", ylabel='" + self.yaxis.label + "'"
+            ax_args += f", ylabel='{self.yaxis.label}'"
         if self.label:
-            ax_args += ", title='" + self.label + "'"
+            ax_args += f", title='{self.label}'"
         code += f"ax.set({ax_args})\n"
         code += f"plt.savefig('{key}.png')\n"
         code += "plt.show()\n"
@@ -175,12 +175,12 @@ class Report(Output):
 
     def exportToPython(self, key, root_dir):
         headers = set(["import numpy as np", "import pandas as pd"])
-        repid = "outputs_" + key
+        repid = f"outputs_{key}"
         code = ""
         if isinstance(self.dataSets, str):
             line = str_to_py_str(self.dataSets)
             code = "header = True\n"
-            code += repid + " = " + line + "\n"
+            code += f"{repid} = {line}\n"
             headers.add("import collections")
             code += f"if isinstance({repid}, (collections.abc.Mapping, pd.DataFrame)):\n"
             code += f"   for key in {repid}:\n"
@@ -189,11 +189,11 @@ class Report(Output):
             code +=  "   header = False\n"
             code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False, header=header)\n'
         else:
-            code += repid + " = {}\n"
+            code += f"{repid} = {{}}\n"
             for ds_key in self.dataSets:
                 line = str_to_py_str(self.dataSets[ds_key])
-                code += repid + "['" + ds_key + "'] = np.atleast_1d(" + line + ")\n"
-            #code += "print(" + repid + ")\n"
+                code += f"{repid}['{ds_key}'] = np.atleast_1d({line})\n"
+            #code += f"print({repid})\n"
             code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False)\n'
         return headers, code
 
@@ -226,8 +226,8 @@ def load_outputs_section(output_section: dict[Any, Any]):
             case "plot3D":
                 outputs[key] = Plot3D(config)
             case None:
-                raise ValueError("No '_type' provided for task " + key + ".")
+                raise ValueError(f"No '_type' provided for task {key}.")
             case _:
                 print(f"unknown output type: {step_type}")
-                # raise ValueError("Unknown task type " + step_type + ".")
+                # raise ValueError(f"Unknown task type {step_type}.")
     return outputs
