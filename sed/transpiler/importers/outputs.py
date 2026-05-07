@@ -58,7 +58,7 @@ class Output(SedBase):
         self.kisaoID = config.pop("kisaoID", None)
         self.altDefinition = config.pop("altDefinition", None)
         raw_params = config.pop("algorithmParameters", [])
-        elif isinstance(raw_params, list):
+        if isinstance(raw_params, list):
             self.algorithmParameters = [AlgorithmParameter(p) for p in raw_params]
         else:
             raise ValueError(
