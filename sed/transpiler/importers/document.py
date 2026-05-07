@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any
 from sed.transpiler.importers.tasks import load_tasks_section, AbstractTask
 from sed.transpiler.importers.outputs import load_outputs_section
+from sed.transpiler.library import python_literal, interpret_special_strings
 from pbest.utils.builder import CompositeBuilder
 
 import pandas as pd
@@ -12,6 +13,7 @@ import pandas as pd
 class SedDocument():
     """The document itself."""
     def __init__(self, config: dict, context):
+        config = interpret_special_strings(config)
         self.versionStr = config.pop("versionStr", None)
         self.versionNum = config.pop("versionNum", None)
         self.constants = config.pop("constants", {})
@@ -46,7 +48,7 @@ class SedDocument():
         if len(self.constants):
             python += "\n# Constants:\n"
             for constid in self.constants:
-                python += f"constants_{constid} = {self.constants[constid]}\n"
+                python += f"constants_{constid} = {python_literal(self.constants[constid])}\n"
         python +=  "\n# All tasks:\n"
         for taskid in self.tasks:
             python +=  f"\n# Task {taskid}:\n"
@@ -60,5 +62,3 @@ class SedDocument():
             headers.update(newheaders)
             python += newpython
         return headers, python
-
-
