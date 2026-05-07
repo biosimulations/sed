@@ -45,10 +45,12 @@
     "sim2": {
       "_type": "explicitODESimulation",
       "kisaoID": "KISAO:0000694",
-      "algorithmParameters": {
-        "altDefinition": "urn:sedml:algorithms:compareWith",
-        "value": "#tasks:sim1"
-      },
+      "algorithmParameters": [
+        {
+          "altDefinition": "urn:sedml:algorithms:compareWith",
+          "value": "#tasks:sim1"
+        }
+      ],
       "model": "#tasks:model1.model",
       "independentVariable": "urn:sedml:symbol:time",
       "independentVariableInit": 0,

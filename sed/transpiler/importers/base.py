@@ -102,3 +102,25 @@ class LoopVariable(SedBase):
             print("Unsaved data when creating LoopVariable:", leftovers)
             return True
         return False
+
+
+class AlgorithmParameter(SedBase):
+    """A parameter for an algorithm or aggregation function, identified by a
+    KISAO ID or by an altDefinition URI when no KISAO term applies, with an
+    associated value.
+    """
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.type_key = "algorithmParameter"
+        self.kisaoID = config.pop("kisaoID", None)
+        self.altDefinition = config.pop("altDefinition", None)
+        self.value = config.pop("value", None)
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating AlgorithmParameter:", leftovers)
+            return True
+        return False

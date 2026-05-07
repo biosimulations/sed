@@ -26,4 +26,5 @@ if isinstance(outputs_sim1_out, (collections.abc.Mapping, pd.DataFrame)):
       outputs_sim1_out[key] = np.atleast_1d(outputs_sim1_out[key])
 else:
    header = False
+   outputs_sim1_out = np.atleast_1d(outputs_sim1_out)
 pd.DataFrame(outputs_sim1_out).to_csv("outputs_sim1_out.csv", index=False, header=header)

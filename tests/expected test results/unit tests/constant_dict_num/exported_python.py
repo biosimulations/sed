@@ -20,4 +20,5 @@ if isinstance(outputs_report, (collections.abc.Mapping, pd.DataFrame)):
       outputs_report[key] = np.atleast_1d(outputs_report[key])
 else:
    header = False
+   outputs_report = np.atleast_1d(outputs_report)
 pd.DataFrame(outputs_report).to_csv("outputs_report.csv", index=False, header=header)

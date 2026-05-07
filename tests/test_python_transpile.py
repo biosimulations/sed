@@ -189,6 +189,9 @@ def test_py_explicit_stochastic_simulation(tmp_path):
         rtol=0.5,
     )
 
+def test_py_calculate_aggregate_mean(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_mean")
+
 if __name__ == "__main__":
     import pytest
     pytest.main([__file__, "-v"])

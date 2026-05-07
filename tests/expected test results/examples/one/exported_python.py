@@ -56,6 +56,7 @@ if isinstance(outputs_sim1Report, (collections.abc.Mapping, pd.DataFrame)):
       outputs_sim1Report[key] = np.atleast_1d(outputs_sim1Report[key])
 else:
    header = False
+   outputs_sim1Report = np.atleast_1d(outputs_sim1Report)
 pd.DataFrame(outputs_sim1Report).to_csv("outputs_sim1Report.csv", index=False, header=header)
 
 # Output sim2Report:
@@ -66,6 +67,7 @@ if isinstance(outputs_sim2Report, (collections.abc.Mapping, pd.DataFrame)):
       outputs_sim2Report[key] = np.atleast_1d(outputs_sim2Report[key])
 else:
    header = False
+   outputs_sim2Report = np.atleast_1d(outputs_sim2Report)
 pd.DataFrame(outputs_sim2Report).to_csv("outputs_sim2Report.csv", index=False, header=header)
 
 # Output comparisonReport:

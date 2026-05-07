@@ -1,5 +1,5 @@
 from typing import Any
-from sed.transpiler.importers.base import SedBase, str_to_py_str
+from sed.transpiler.importers.base import SedBase, AlgorithmParameter, str_to_py_str
 
 
 class Axis(SedBase):
@@ -57,7 +57,13 @@ class Output(SedBase):
     def __init__(self, config: dict):
         self.kisaoID = config.pop("kisaoID", None)
         self.altDefinition = config.pop("altDefinition", None)
-        self.algorithmParameters = config.pop("algorithmParameters", None)
+        raw_params = config.pop("algorithmParameters", [])
+        elif isinstance(raw_params, list):
+            self.algorithmParameters = [AlgorithmParameter(p) for p in raw_params]
+        else:
+            raise ValueError(
+                f"'algorithmParameters' must be a list, got {type(raw_params).__name__}."
+            )
 
     def __validate(self, leftovers={}):
         """Validate."""
@@ -187,6 +193,7 @@ class Report(Output):
             code += f"      {repid}[key] = np.atleast_1d({repid}[key])\n"
             code +=  "else:\n"
             code +=  "   header = False\n"
+            code += f"   {repid} = np.atleast_1d({repid})\n"
             code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False, header=header)\n'
         else:
             code += f"{repid} = {{}}\n"
@@ -229,5 +236,5 @@ def load_outputs_section(output_section: dict[Any, Any]):
                 raise ValueError(f"No '_type' provided for task {key}.")
             case _:
                 print(f"unknown output type: {step_type}")
-                # raise ValueError(f"Unknown task type {step_type}.")
+                # raise ValueError(f"Unknown output type {step_type}.")
     return outputs

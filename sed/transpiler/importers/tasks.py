@@ -3,7 +3,15 @@ import re
 from pbest import CompositeBuilder
 
 from sed.transpiler.library import parse_hash
-from sed.transpiler.importers.base import SedBase, Range, Span, LoopVariable, from_attribute_to_list_path, str_to_py_str
+from sed.transpiler.importers.base import (
+    SedBase,
+    Range,
+    Span,
+    LoopVariable,
+    AlgorithmParameter,
+    from_attribute_to_list_path,
+    str_to_py_str,
+)
 import pandas as pd
 from pathlib import Path
 #from typing import Any
@@ -16,8 +24,15 @@ class AbstractTask(SedBase):
         super().__init__(config)
         self.kisaoID = config.pop("kisaoID", None)
         self.altDefinition = config.pop("altDefinition", None)
-        #TODO: make actual list of AlgorithmParameter objects
-        self.algorithmParameters = config.pop("algorithmParameters", None)
+        raw_params = config.pop("algorithmParameters", None)
+        if raw_params is None:
+            self.algorithmParameters = []
+        elif isinstance(raw_params, list):
+            self.algorithmParameters = [AlgorithmParameter(p) for p in raw_params]
+        else:
+            raise ValueError(
+                f"'algorithmParameters' must be a list, got {type(raw_params).__name__}."
+            )
         self.__validate(config)
 
     def __validate(self, leftovers={}):
@@ -119,6 +134,83 @@ class DataImport(AbstractTask):
         return data
 
 
+_APPLIED_DIMENSION_URN = "urn:sedml:aggregation:applied_dimension"
+
+# Aggregation function expression templates.  Each entry maps a KISAO ID to
+# (label, expression_template, extra_headers).  The expression_template is a
+# Python expression with {input} and {axis} placeholders; only dimension-
+# reducing siblings of KISAO:0000824 are listed here.  Cumulative siblings
+# (848-851) and any other unrecognised IDs raise at transpile time.
+_AGGREGATION_OPS = {
+    "KISAO:0000825": ("mean ignoring NaN",
+                      "np.nanmean({input}, axis={axis})",
+                      set()),
+    "KISAO:0000826": ("standard deviation ignoring NaN",
+                      "np.nanstd({input}, axis={axis})",
+                      set()),
+    "KISAO:0000827": ("standard error ignoring NaN",
+                      "sem({input}, axis={axis}, nan_policy='omit')",
+                      {"from scipy.stats import sem"}),
+    "KISAO:0000828": ("maximum ignoring NaN",
+                      "np.nanmax({input}, axis={axis})",
+                      set()),
+    "KISAO:0000829": ("minimum ignoring NaN",
+                      "np.nanmin({input}, axis={axis})",
+                      set()),
+    "KISAO:0000830": ("maximum",
+                      "np.max({input}, axis={axis})",
+                      set()),
+    "KISAO:0000840": ("minimum",
+                      "np.min({input}, axis={axis})",
+                      set()),
+    "KISAO:0000841": ("mean",
+                      "np.mean({input}, axis={axis})",
+                      set()),
+    "KISAO:0000842": ("standard deviation",
+                      "np.std({input}, axis={axis})",
+                      set()),
+    "KISAO:0000843": ("standard error",
+                      "sem({input}, axis={axis})",
+                      {"from scipy.stats import sem"}),
+    "KISAO:0000844": ("sum ignoring NaN",
+                      "np.nansum({input}, axis={axis})",
+                      set()),
+    "KISAO:0000845": ("sum",
+                      "np.sum({input}, axis={axis})",
+                      set()),
+    "KISAO:0000846": ("product ignoring NaN",
+                      "np.nanprod({input}, axis={axis})",
+                      set()),
+    "KISAO:0000847": ("product",
+                      "np.prod({input}, axis={axis})",
+                      set()),
+    "KISAO:0000852": ("count ignoring NaN",
+                      "np.count_nonzero(~np.isnan(np.asarray({input})) & (np.asarray({input}) != 0), axis={axis})",
+                      set()),
+    "KISAO:0000853": ("count",
+                      "np.count_nonzero({input}, axis={axis})",
+                      set()),
+    "KISAO:0000854": ("length ignoring NaN",
+                      "np.sum(~np.isnan(np.asarray({input})), axis={axis})",
+                      set()),
+    "KISAO:0000855": ("length",
+                      "np.size({input}, axis={axis})",
+                      set()),
+    "KISAO:0000856": ("median ignoring NaN",
+                      "np.nanmedian({input}, axis={axis})",
+                      set()),
+    "KISAO:0000857": ("median",
+                      "np.median({input}, axis={axis})",
+                      set()),
+    "KISAO:0000858": ("variance ignoring NaN",
+                      "np.nanvar({input}, axis={axis})",
+                      set()),
+    "KISAO:0000859": ("variance",
+                      "np.var({input}, axis={axis})",
+                      set()),
+}
+
+
 class AggregationCalculation(AbstractTask):
     """An 'aggregationCalculation' object, used for calculations of average, max, etc.  Also used for defined export variables from a Loop.
     """
@@ -135,6 +227,35 @@ class AggregationCalculation(AbstractTask):
             print("Unsaved data when creating AggregationCalculation:", leftovers)
             return True
         return False
+
+    def _resolve_axis(self):
+        """Return the axis to reduce along.  Defaults to 0; overridden by an
+        AlgorithmParameter whose altDefinition is the applied-dimension URN.
+        """
+        for param in self.algorithmParameters:
+            if param.altDefinition == _APPLIED_DIMENSION_URN:
+                return int(param.value)
+        return 0
+
+    def exportToPython(self, key, root_dir):
+        if self.kisaoID not in _AGGREGATION_OPS:
+            raise ValueError(
+                f"Unknown or unsupported aggregation KISAO ID '{self.kisaoID}' for task '{key}'."
+            )
+        _label, expr_template, extra_headers = _AGGREGATION_OPS[self.kisaoID]
+        axis = self._resolve_axis()
+        input_var = str_to_py_str(self.input)
+        output_var = str_to_py_str(key)
+        expr_main = expr_template.format(input=input_var, axis=axis)
+        expr_per_kv = expr_template.format(input="v", axis=axis)
+        headers = {"import numpy as np", "import pandas as pd"} | extra_headers
+        code = (
+            f"if isinstance({input_var}, (dict, pd.DataFrame)):\n"
+            f"    {output_var} = pd.DataFrame([{{k: {expr_per_kv} for k, v in {input_var}.items()}}])\n"
+            f"else:\n"
+            f"    {output_var} = {expr_main}\n"
+        )
+        return headers, code
 
 
 class ODESimulation(AbstractTask):
@@ -649,6 +770,8 @@ def load_tasks_section(tasks_section_config):
                 tasks[key] = ExplicitStochasticSimulation(config)
             case "calculation":
                 tasks[key] = Calculation(config)
+            case "aggregationCalculation":
+                tasks[key] = AggregationCalculation(config)
             case "sumOfSquares":
                 tasks[key] = SumOfSquares(config)
             case "parameterScan":
