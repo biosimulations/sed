@@ -1,0 +1,21 @@
+{
+    "versionStr": "SED v2.0 alpha",
+    "versionNum": 2.0,
+    "constants": {
+        "X": [3, 1, 4, 1, -5.4, 9, 2, 6, -0.7]
+    },
+    "tasks": {
+        "X_min": {
+            "_type": "aggregationCalculation",
+            "kisaoID": "KISAO:0000840",
+            "name": "minimum",
+            "input": "#constants:X"
+        }
+    },
+    "outputs": {
+        "report": {
+            "_type": "report",
+            "dataSets": "#tasks:X_min"
+        }
+    }
+}

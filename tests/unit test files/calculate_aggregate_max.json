@@ -1,0 +1,21 @@
+{
+    "versionStr": "SED v2.0 alpha",
+    "versionNum": 2.0,
+    "constants": {
+        "X": [3, 1, 4, 1, 5, 9, 2, 6, -2]
+    },
+    "tasks": {
+        "X_max": {
+            "_type": "aggregationCalculation",
+            "kisaoID": "KISAO:0000830",
+            "name": "maximum",
+            "input": "#constants:X"
+        }
+    },
+    "outputs": {
+        "report": {
+            "_type": "report",
+            "dataSets": "#tasks:X_max"
+        }
+    }
+}

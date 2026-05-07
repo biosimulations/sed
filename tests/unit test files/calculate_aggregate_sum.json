@@ -1,0 +1,21 @@
+{
+    "versionStr": "SED v2.0 alpha",
+    "versionNum": 2.0,
+    "constants": {
+        "X": [1, 2, -3, 4, 5]
+    },
+    "tasks": {
+        "X_sum": {
+            "_type": "aggregationCalculation",
+            "kisaoID": "KISAO:0000845",
+            "name": "sum",
+            "input": "#constants:X"
+        }
+    },
+    "outputs": {
+        "report": {
+            "_type": "report",
+            "dataSets": "#tasks:X_sum"
+        }
+    }
+}
