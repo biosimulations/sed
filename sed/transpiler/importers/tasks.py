@@ -1,4 +1,5 @@
 import re
+from typing import Any
 
 from pbest import CompositeBuilder
 
@@ -250,27 +251,16 @@ class ExplicitODESimulation(ODESimulation):
     # Get model,
     # SED provides start, end, num_steps, initialValue, model, outputVariables (we'll probably output everything for now)
     # PBG Requires model source, time, n_steps, output dir
-    def zekes_case(self, builder: CompositeBuilder) -> CompositeBuilder:
-
-        inputs = {
-            "model": from_attribute_to_list_path(self.model),
-            "independentVariable": from_attribute_to_list_path(self.independentVariableRange)
-        }
-        outputs = {}
-
+    def exportToPbgRepresentation(self, builder: CompositeBuilder, tasks: dict[str, Any]  = None) -> CompositeBuilder:
         # builder.add_step(address=self.executor, config={}, inputs=)
         builder.add_step(
             address="TelluriumUTCStep",
-            config={"model_source": self.model, "time": self.independentVariableRange.end,
+            config={"model_source": tasks[self.model.split(":")[1].split(".")[0]].location, "time": self.independentVariableRange.end,
                     "n_points": self.independentVariableRange.numberOfSteps, "output_dir": ""},
             inputs={},
-            outputs={"result": ['sim', 'tellurium']}
+            outputs={"result": ['sim', "results", str(id(self))]}
         )
         return builder
-
-    # Worry about conflicts higher up
-    def logans_case(self) -> dict[str, str]:
-        return {}
 
     def default_step_name(self):
         return "pbest.registry.simulators.tellurium_process.TelluriumUTCStep"

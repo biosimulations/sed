@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 #   actually run it (???)
 
 
-def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> dict[str, Any]:
+def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> SedDocument:
     root_dir = Path(root_dir or ".")
 
     seddoc = SedDocument(sed, context)

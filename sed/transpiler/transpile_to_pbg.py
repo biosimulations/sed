@@ -4,7 +4,9 @@ import pprint
 from pathlib import Path
 from typing import Any
 
-from sed.transpiler.importers.inputs import load_inputs_section
+from pbest import CompositeBuilder
+
+from sed.transpiler.importers.document import SedDocument
 from sed.transpiler.importers.outputs import load_outputs_section
 from sed.transpiler.importers.tasks import load_tasks_section
 
@@ -26,14 +28,7 @@ logger = logging.getLogger(__name__)
 def export_to_pbg(sed, context, path):
     pbg = {"data": {}, "models": {}}
 
-    for data_key, data_object in sed["inputs"]["data"].items():
-        pbg["data"][data_key] = data_object.load(path)
-
-    for model_key, model_object in sed["inputs"]["models"].items():
-        pbg["models"][model_key] = model_object.load_model(path)
-
     for task_key, task_data in sed["tasks"].items():
-        type_key = task_data.type_key
 
         step_name = task_data.default_step_name()
         if "tasks" in context and task_key in context["tasks"]:
@@ -44,7 +39,7 @@ def export_to_pbg(sed, context, path):
             "address": f"local:{step_name}",
             # TODO:  Need to change hard-coded 'sed['inputs']['models']['model1']' to instead convert from task_data.model ("#inputs:models:model1")
             "config": {
-                "model_source": context["root_dir"] / sed["inputs"]["models"]["model1"].location,
+                "model_source": context["root_dir"] / sed["tasks"]["model1"].location,
                 "n_points": 10,
                 "time": 1,
             },
@@ -59,18 +54,10 @@ def export_to_pbg(sed, context, path):
     return pbg
 
 
-def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> dict[str, Any]:
+def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> SedDocument:
     root_dir = Path(root_dir or ".")
 
-    inputs = sed.get("inputs", {})
-    tasks = sed.get("tasks", {})
-    outputs = sed.get("outputs", {})
-
-    seddoc = {}
-
-    seddoc["inputs"] = load_inputs_section(inputs, root_dir)
-    seddoc["tasks"] = load_tasks_section(tasks)
-    seddoc["outputs"] = load_outputs_section(outputs)
+    seddoc = SedDocument(sed, context)
 
     logger.debug(seddoc)
     logger.debug("")
@@ -78,10 +65,8 @@ def load_sed(sed: dict[Any, Any], root_dir=None, context={}) -> dict[str, Any]:
     return seddoc
 
 
-def translate_to_pbg(seddoc, context, path):
-    pbg = export_to_pbg(seddoc, context, path)
-
-    return pbg
+def translate_to_pbg(seddoc: SedDocument, context: dict[Any, Any], path: Path) -> dict[str, Any]:
+    return seddoc.exportToPBG(root_dir=path)
 
 
 def transpile(path, filename, context={}):
