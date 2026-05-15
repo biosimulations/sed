@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import Any
-from sed.transpiler.importers.tasks import load_tasks_section, AbstractTask, ExplicitODESimulation
+from sed.transpiler.importers.tasks import load_tasks_section, AbstractTask, ExplicitODESimulation, ModelImport
 from sed.transpiler.importers.outputs import load_outputs_section
 from pbest.utils.builder import CompositeBuilder
 
@@ -39,7 +39,7 @@ class SedDocument():
         for task in self.tasks:
             task_object = self.tasks[task]
             if isinstance(task_object, ExplicitODESimulation):
-                self.tasks[task].exportToPbgRepresentation(builder, self.tasks)
+                self.tasks[task].exportToPbgRepresentation(builder, self.tasks, root_dir)
 
         return builder.get_builder_state()
 

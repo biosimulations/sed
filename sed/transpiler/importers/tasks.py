@@ -1,3 +1,4 @@
+import os
 import re
 from typing import Any
 
@@ -51,7 +52,7 @@ class ModelImport(AbstractTask):
             if k == len(list_path) - 1 and k in dict_in_q:
                 raise ValueError(f"Path should not have any values in it. Path: {list_path}, State: {builder.get_builder_state()}")
             elif k == len(list_path) - 1:
-                dict_in_q[k] = self.location
+                dict_in_q[k] = os.path.join(root_dir, self.location)
             elif k in dict_in_q:
                 dict_in_q = dict_in_q[k]
             else:
@@ -251,11 +252,13 @@ class ExplicitODESimulation(ODESimulation):
     # Get model,
     # SED provides start, end, num_steps, initialValue, model, outputVariables (we'll probably output everything for now)
     # PBG Requires model source, time, n_steps, output dir
-    def exportToPbgRepresentation(self, builder: CompositeBuilder, tasks: dict[str, Any]  = None) -> CompositeBuilder:
+    def exportToPbgRepresentation(self, builder: CompositeBuilder, tasks: dict[str, Any]  = None, root_dir: str = "") -> CompositeBuilder:
         # builder.add_step(address=self.executor, config={}, inputs=)
+        specific_model = tasks[self.model.split(":")[1].split(".")[0]].location
+        full_model_path = os.path.join(root_dir, specific_model)
         builder.add_step(
             address="TelluriumUTCStep",
-            config={"model_source": tasks[self.model.split(":")[1].split(".")[0]].location, "time": self.independentVariableRange.end,
+            config={"model_source": full_model_path, "time": self.independentVariableRange.end,
                     "n_points": self.independentVariableRange.numberOfSteps, "output_dir": ""},
             inputs={},
             outputs={"result": ['sim', "results", str(id(self))]}
