@@ -11,9 +11,7 @@
     "outputs": {
         "init_all_values": {
             "_type": "report",
-            "dataSets": {
-                "model1": "#tasks:model1.model"
-            }
+            "dataSets": ["#tasks:model1.model"]
         }
     }
 }

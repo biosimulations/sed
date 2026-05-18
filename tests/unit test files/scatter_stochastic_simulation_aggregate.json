@@ -1,0 +1,65 @@
+{
+    "versionStr": "SED v2.0 alpha",
+    "versionNum": 2.0,
+    "tasks": {
+        "model1": {
+            "_type": "modelImport",
+            "location": "three_species_chain_stochlevels.xml",
+            "language": "urn:sedml:language:sbml"
+        },
+        "repeat": {
+            "_type": "scatter",
+            "range": {
+                "numberOfSteps": 10
+            },
+            "subTasks": {
+                "sim1": {
+                    "_type": "explicitStochasticSimulation",
+                    "kisaoID": "KISAO:0000319",
+                    "model": "#tasks:model1.model",
+                    "independentVariable": "urn:sedml:symbol:time",
+                    "independentVariableInit": 0,
+                    "independentVariableRange": {
+                        "numberOfSteps": 100
+                    },
+                    "outputVariables": ["S1", "S2", "S3"],
+                    "outputModel": false
+                }
+            },
+            "aggregateOutputVariables": {
+                "avg_sim": {
+                    "_type": "aggregationCalculation",
+                    "kisaoID": "KISAO:0000841",
+                    "name": "mean",
+                    "input": "#tasks:repeat:subTasks:sim1"
+                },
+                "sim_sd": {
+                    "_type": "aggregationCalculation",
+                    "kisaoID": "KISAO:0000842",
+                    "name": "standard deviation",
+                    "input": "#tasks:repeat:subTasks:sim1"
+                }
+            },
+            "notes": "The only outputs from this task are the aggregateOutputVariables.  They may be accumulated as they come in, therefore, instead of calculated after the fact."
+        },
+        "aggregate_results": {
+            "_type": "createDataBlock",
+            "data": {
+                "S1_avg": "#tasks:repeat.aggregates['avg_sim']['S1']",
+                "S1_sd":  "#tasks:repeat.aggregates['sim_sd']['S1']",
+                "S2_avg": "#tasks:repeat.aggregates['avg_sim']['S2']",
+                "S2_sd":  "#tasks:repeat.aggregates['sim_sd']['S2']",
+                "S3_avg": "#tasks:repeat.aggregates['avg_sim']['S3']",
+                "S3_sd":  "#tasks:repeat.aggregates['sim_sd']['S3']"
+            } 
+        }
+    },
+    "outputs": {
+        "sim1_out": {
+            "_type": "report",
+            "dataSets": [
+                "#tasks:aggregate_results"
+            ]
+        }
+    }
+}

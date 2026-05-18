@@ -2,8 +2,8 @@
   "tasks": {
     "scan_S1_and_k2": {
       "_type": "parameterScan",
-      "model": "#tasks:mod1",
-      "ranges": [
+      "model": "#tasks:mod1.model",
+      "parameterRanges": [
         {
           "modelElement": "S1",
           "start": 0,
@@ -21,19 +21,21 @@
       "subTasks": {
         "sim1": {
           "_type": "explicitODESimulation",
-          "kisaoID": "KISAO:0000319",
+          "kisaoID": "KISAO:0000694",
           "model": "#tasks:scan_S1_and_k2:model",
           "outputModel": false,
-          "outputVariables": "['S1', 'S2', 'S3']",
+          "outputVariables": ["S1", "S2", "S3"],
           "independentVariable": "urn:sedml:symbol:time",
           "independentVariableRange": {
               "start": 0,
               "end": 20,
-              "numberOfSteps": 50
+              "interval": 0.5
           }
         }
       },
-      "outputVariables": ["#tasks:scan_S1_and_k2:subTasks:sim1"],
+      "outputVariableMap": {
+        "sim1_scan": "#tasks:scan_S1_and_k2:subTasks:sim1"
+      },
       "notes": "The simulation data from subTasks:sim1 is exported as 2D data for S1 values by k1 values."
     }
   }

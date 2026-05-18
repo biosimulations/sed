@@ -24,7 +24,7 @@
     "outputs": {
         "sim1_out": {
             "_type": "report",
-            "dataSets": "#tasks:sim1"
+            "dataSets": ["#tasks:sim1"]
         }
     }
 }

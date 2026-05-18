@@ -1,17 +1,23 @@
 {
     "tasks": {
         "sim1": {
-            "_type": "example",
-            "kisaoID": "",
-            "notes": "This field can have *markdown*! ###Hooray!",
-            "annotations": [
+            "_type": "explicitODESimulation",
+            "kisaoID": "KISAO:0000694",
+            "algorithmParameters": [
                 {
-                    "qualifier": "bibo:Journal",
-                    "value": "Proc. Natl. Acad. Sci. U.S.A. 1997:94(17):9147-52"
+                    "kisaoID": "KISAO:0000209",
+                    "name": "relative tolerance",
+                    "value": 1e-6
                 },
                 {
-                    "qualifier": "dc:license",
-                    "value": "http://creativecommons.org/publicdomain/zero/1.0/"
+                    "kisaoID": "KISAO:0000571",
+                    "name": "Absolute tolerance adjustment factor",
+                    "value": 1e-12
+                },
+                {
+                    "kisaoID": "KISAO:0000216",
+                    "name": "Integrate reduced model",
+                    "value": "false"
                 }
             ]
         }

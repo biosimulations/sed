@@ -732,7 +732,7 @@ class Loop(AbstractTask):
         if aggregateOutputs:
             for key, config in aggregateOutputs.items():
                 self.aggregateOutputs[key] = AggregationCalculation(config)
-        subTasks = load_tasks_section(config.pop("subTasks", {}))
+        self.subTasks = load_tasks_section(config.pop("subTasks", {}))
         self.__validate(config)
 
     def __validate(self, leftovers={}):

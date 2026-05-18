@@ -1,0 +1,44 @@
+{
+    "versionStr": "SED v2.0 alpha",
+    "versionNum": 2.0,
+    "tasks": {
+        "model1": {
+            "_type": "modelImport",
+            "location": "three_species_chain_stochlevels.xml",
+            "language": "urn:sedml:language:sbml"
+        },
+        "repeat": {
+            "_type": "scatter",
+            "range": {
+                "numberOfSteps": 10
+            },
+            "subTasks": {
+                "sim1": {
+                    "_type": "explicitStochasticSimulation",
+                    "kisaoID": "KISAO:0000319",
+                    "model": "#tasks:model1.model",
+                    "independentVariable": "urn:sedml:symbol:time",
+                    "independentVariableInit": 0,
+                    "independentVariableRange": {
+                        "start": 0,
+                        "end": 20,
+                        "numberOfSteps": 100,
+                        "scale": "linear"
+                    },
+                    "outputVariables": ["S1", "S2", "S3"],
+                    "outputModel": false
+                }
+            },
+            "outputVariableMap": {
+                "sim1_repeat": "#tasks:repeat:subTasks:sim1"
+            },
+            "notes": "The whole data set of all the repeats are exported here."
+        }
+    },
+    "outputs": {
+        "sim1_out": {
+            "_type": "report",
+            "dataSets": ["#tasks:repeat"]
+        }
+    }
+}

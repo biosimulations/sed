@@ -1,0 +1,9 @@
+{
+  "tasks": {
+    "aggregate_results": {
+        "_type": "relabelData",
+        "input": "#tasks:sim1",
+        "labels": ["Time", "[S1]", "[S2]", "[S3]"]
+    }
+  }
+}

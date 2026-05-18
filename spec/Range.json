@@ -14,7 +14,8 @@
             "range": {
                 "start": 0,
                 "end": 10,
-                "numberOfSteps": 100
+                "numberOfSteps": 100,
+                "scale": "linear"
             }
         },
         "ex4": {
@@ -29,6 +30,15 @@
                 "start": 1,
                 "end": 1000,
                 "numberOfSteps": 3,
+                "scale": "log10"
+            }
+        },
+        "ex6": {
+            "parameterRange": {
+                "modelElement": "S1",
+                "start": "0.001",
+                "end": "10",
+                "numberOfSteps": 4,
                 "scale": "log10"
             }
         }

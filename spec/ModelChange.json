@@ -2,14 +2,14 @@
     "tasks": {
         "model1": {
             "_type": "modelChange",
-            "model_input": "#tasks:model1_orig.model",
+            "inputModel": "#tasks:model1_orig.model",
             "setValues": {
                 "S1": 5
             }
         },
         "model2": {
             "_type": "modelChange",
-            "model_input": "#tasks:model1_orig.model",
+            "inputModel": "#tasks:model1_orig.model",
             "setValues": {
                 "S1": 10,
                 "S1.hasOnlySubstanceUnits": true,

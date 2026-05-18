@@ -15,7 +15,7 @@
     "outputs": {
         "report": {
             "_type": "report",
-            "dataSets": "#tasks:X_nanmedian"
+            "dataSets": ["#tasks:X_nanmedian"]
         }
     }
 }

@@ -36,7 +36,7 @@
           "kisaoID": "KISAO:0000319",
           "model": "#tasks:model1.model",
           "outputModel": true,
-          "outputVariables": "['S1', 'S2', 'S3']",
+          "outputVariables": ["S1", "S2", "S3"],
           "independentVariable": "urn:sedml:symbol:time",
           "independentVariableRange": {
               "start": 0,

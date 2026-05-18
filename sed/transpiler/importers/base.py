@@ -65,7 +65,85 @@ class Range(SedBase):
             print("Unsaved data when creating Range:", leftovers)
             return True
         return False
+    
+    def getPythonIterable(self):
+        """Returns the python string that would come after 'for X in ...', i.e. 'range(0, 10, 3)"""
+        if self.values:
+            return self.values
+        defined = {
+            'start': self.start,
+            'end': self.end,
+            'numberOfSteps': self.numberOfSteps,
+            'interval': self.interval,
+        }
+        provided = {k for k, v in defined.items() if v is not None}
 
+        # --- Option 1: start, end, numberOfSteps (requires scale) ---
+        if provided == {'start', 'end', 'numberOfSteps'}:
+            n = self.numberOfSteps
+            start = self.start
+            end = self.end
+
+            if self.scale is None:
+                raise ValueError("'scale' must be defined when using start, end, and numberOfSteps.")
+
+            if self.scale == 'linear':
+                return [start + (end - start) * i / n for i in range(n + 1)]
+
+            elif self.scale == 'log10':
+                import math
+                log_start = math.log10(start)
+                log_end = math.log10(end)
+                return [10 ** (log_start + (log_end - log_start) * i / n) for i in range(n + 1)]
+
+            else:
+                raise ValueError(f"Unsupported scale '{self.scale}'. Must be 'linear' or 'log10'.")
+
+        # --- Option 2: start, numberOfSteps, interval ---
+        if provided == {'start', 'numberOfSteps', 'interval'}:
+            return [self.start + i * self.interval for i in range(self.numberOfSteps)]
+
+        # --- Option 3: end, numberOfSteps, interval ---
+        if provided == {'end', 'numberOfSteps', 'interval'}:
+            end = self.end
+            interval = self.interval
+            n = self.numberOfSteps
+            start = end - (n - 1) * interval
+            return [start + i * interval for i in range(n)]
+
+        # --- Option 4: start, end, interval ---
+        if provided == {'start', 'end', 'interval'}:
+            start = self.start
+            end = self.end
+            interval = self.interval
+            tolerance = interval * 0.000001
+
+            points = []
+            i = 0
+            while True:
+                t = start + i * interval
+                if t >= end - tolerance:
+                    break
+                points.append(t)
+                i += 1
+
+            # Decide whether to append the last calculated point, end, or both
+            if points:
+                last_calculated = start + i * interval  # the point that broke the loop
+                if abs(last_calculated - end) <= tolerance:
+                    points.append(end)
+                else:
+                    points.append(last_calculated)
+                    points.append(end)
+            else:
+                points.append(end)
+
+            return points
+
+        raise ValueError(
+            f"Exactly three of (start, end, numberOfSteps, interval) must be defined. "
+            f"Got: {provided}"
+        )
 
 class Span(SedBase):
     """A 'span' object, used to define the bounds of a range but not any internal steps.
