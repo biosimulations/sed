@@ -14,6 +14,7 @@
             "independentVariable": "urn:sedml:symbol:time",
             "independentVariableInit": 0,
             "independentVariableRange": {
+                "_type": "numericRange",
                 "start": 0,
                 "end": 20,
                 "numberOfSteps": 100,
@@ -26,7 +27,7 @@
     "outputs": {
         "sim1_out": {
             "_type": "report",
-            "dataSets": "#tasks:sim1"
+            "data": "#tasks:sim1"
         }
     }
 }

@@ -1,0 +1,15 @@
+{
+  "tasks": {
+        "aggregate_results": {
+            "_type": "createDataBlock",
+            "data": {
+                "S1_avg": "#tasks:repeat.aggregates['avg_sim']['S1']",
+                "S1_sd":  "#tasks:repeat.aggregates['sim_sd']['S1']",
+                "S2_avg": "#tasks:repeat.aggregates['avg_sim']['S2']",
+                "S2_sd":  "#tasks:repeat.aggregates['sim_sd']['S2']",
+                "S3_avg": "#tasks:repeat.aggregates['avg_sim']['S3']",
+                "S3_sd":  "#tasks:repeat.aggregates['sim_sd']['S3']"
+            } 
+        }
+  }
+}

@@ -38,49 +38,42 @@ def str_to_py_str(sedstr):
     ret = re.sub(r'\.(?=[A-Za-z])', '_', ret)
     return ret
     
-
-class Range(SedBase):
-    """A 'range' object, used to define a range in one of several ways:
-    * start, end, numberOfSteps (and optional 'scale')
-    * start, end, interval
-    * start, numberOfSteps, interval
-    * end, numberOfSteps, interval
-    * values
+class LoopVariable(SedBase):
+    """A 'loopVariable' object, used to define elements of a loop that change for every cycle.
     """
 
-    def __init__(self, range_config: dict):
-        super().__init__(range_config)
-        self.type_key = "Range"
-        self.start = range_config.pop("start", None)
-        self.end = range_config.pop("end", None)
-        self.numberOfSteps = range_config.pop("numberOfSteps", None)
-        self.interval = range_config.pop("interval", None)
-        self.scale = range_config.pop("scale", None)
-        self.values = range_config.pop("values", None)
-        self.__validate(range_config)
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.type_key = "loopVariable"
+        self.initialValue = config.pop("initialValue", None)
+        self.postLoopValues = config.pop("postLoopValues", None)
+        self.__validate(config)
 
     def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
-            print("Unsaved data when creating Range:", leftovers)
+            print("Unsaved data when creating LoopVariable:", leftovers)
             return True
         return False
 
 
-class Span(SedBase):
-    """A 'span' object, used to define the bounds of a range but not any internal steps.
+class AlgorithmParameter(SedBase):
+    """A parameter for an algorithm or aggregation function, identified by a
+    KISAO ID or by an altDefinition URI when no KISAO term applies, with an
+    associated value.
     """
 
-    def __init__(self, range_config: dict):
-        super().__init__(range_config)
-        self.type_key = "Range"
-        self.start = range_config.pop("start", None)
-        self.end = range_config.pop("end", None)
-        self.__validate(range_config)
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.type_key = "algorithmParameter"
+        self.kisaoID = config.pop("kisaoID", None)
+        self.altDefinition = config.pop("altDefinition", None)
+        self.value = config.pop("value", None)
+        self.__validate(config)
 
     def __validate(self, leftovers={}):
         """Validate."""
         if len(leftovers):
-            print("Unsaved data when creating Span:", leftovers)
+            print("Unsaved data when creating AlgorithmParameter:", leftovers)
             return True
         return False

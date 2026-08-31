@@ -14,7 +14,7 @@ tasks_model1_model = te.loadSBMLModel(r'C:\Users\Lucian\Desktop\sed\tests\unit t
 # Task sim1:
 tasks_sim1_model = te.loadSBMLModel(tasks_model1_model.getCurrentSBML())
 tasks_sim1_model.setIntegrator('gillespie')
-tasks_sim1 = tasks_sim1_model.simulate(0, 20, steps=100, selections = ['time', 'S1', 'S2', 'S3'])
+tasks_sim1 = tasks_sim1_model.simulate(0, 20, steps = 100, selections = ['time', 'S1', 'S2', 'S3'])
 tasks_sim1 = pd.DataFrame(tasks_sim1, columns=tasks_sim1.colnames)
 
 # All Outputs:
@@ -27,4 +27,5 @@ if isinstance(outputs_sim1_out, (collections.abc.Mapping, pd.DataFrame)):
       outputs_sim1_out[key] = np.atleast_1d(outputs_sim1_out[key])
 else:
    header = False
+   outputs_sim1_out = np.atleast_1d(outputs_sim1_out)
 pd.DataFrame(outputs_sim1_out).to_csv("outputs_sim1_out.csv", index=False, header=header)

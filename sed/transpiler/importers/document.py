@@ -2,6 +2,7 @@ from pathlib import Path
 from typing import Any
 from sed.transpiler.importers.tasks import load_tasks_section, AbstractTask, ExplicitODESimulation, ModelImport
 from sed.transpiler.importers.outputs import load_outputs_section
+from sed.transpiler.library import python_literal, interpret_special_strings
 from pbest.utils.builder import CompositeBuilder
 
 import pandas as pd
@@ -12,6 +13,7 @@ import pandas as pd
 class SedDocument():
     """The document itself."""
     def __init__(self, config: dict, context):
+        config = interpret_special_strings(config)
         self.versionStr = config.pop("versionStr", None)
         self.versionNum = config.pop("versionNum", None)
         self.constants = config.pop("constants", {})
@@ -47,23 +49,21 @@ class SedDocument():
 
     def exportToPython(self, path):
         headers = set()
-        python = "# Translation of SED document v" + self.versionStr + " to python\n"
+        python = f"# Translation of SED document v{self.versionStr} to python\n"
         if len(self.constants):
             python += "\n# Constants:\n"
             for constid in self.constants:
-                python += "constants_" + constid + " = " + str(self.constants[constid]) + "\n"
+                python += f"constants_{constid} = {python_literal(self.constants[constid])}\n"
         python +=  "\n# All tasks:\n"
-        for task in self.tasks:
-            python +=  "\n# Task " + task + ":\n"
-            newheaders, newpython = self.tasks[task].exportToPython(task, path)
+        for taskid in self.tasks:
+            python +=  f"\n# Task {taskid}:\n"
+            newheaders, newpython = self.tasks[taskid].exportToPython(f"#tasks:{taskid}", path)
             headers.update(newheaders)
             python += newpython
         python +=  "\n# All Outputs:\n"
         for output in self.outputs:
-            python +=  "\n# Output " + output + ":\n"
+            python +=  f"\n# Output {output}:\n"
             newheaders, newpython = self.outputs[output].exportToPython(output, path)
             headers.update(newheaders)
             python += newpython
         return headers, python
-
-

@@ -1,7 +1,7 @@
 {
     "tasks": {
         "sim1": {
-            "_type": "steadyState",
+            "_type": "fluxBalanceAnalysis",
             "kisaoID": "KISAO:0000437",
             "model": "#tasks:model1.model",
             "outputVariables": ["J1", "J2", "J3"],

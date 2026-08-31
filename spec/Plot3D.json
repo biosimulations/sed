@@ -2,29 +2,31 @@
   "outputs": {
     "Fig1": {
       "_type": "plot3D",
-      "label": "Figure 1",
+      "name": "Figure 1",
       "xAxis": {
-        "label": "k1",
+        "name": "k1",
         "scale": "linear"
       },
       "yAxis": {
-        "label": "k2",
-        "scale": "log"
+        "name": "k2",
+        "scale": "log10"
       },
       "zAxis": {
-        "label": "Concentrations",
+        "name": "Concentrations",
         "scale": "linear"
       },
       "surfaces": {
         "S1": {
-          "x": "#tasks:scan_k1_and_k2:ranges[0]",
-          "y": "#tasks:scan_k1_and_k2:ranges[1]",
-          "z": "#tasks:steadyStates['S1']"
+          "surfaceType": "parametricCurve",
+          "x": "#tasks:scan_k1_and_k2['k1']",
+          "y": "#tasks:scan_k1_and_k2['k2']",
+          "z": "#tasks:scan_k1_and_k2['S1']"
         },
         "S2": {
-          "x": "#tasks:scan_k1_and_k2:ranges[0]",
-          "y": "#tasks:scan_k1_and_k2:ranges[1]",
-          "z": "#tasks:steadyStates['S2']"
+          "surfaceType": "parametricCurve",
+          "x": "#tasks:scan_k1_and_k2['k1']",
+          "y": "#tasks:scan_k1_and_k2['k2']",
+          "z": "#tasks:scan_k1_and_k2['S2']"
         }
       }
     }

@@ -5,7 +5,13 @@ from typing import Any
 from pbest import CompositeBuilder
 
 from sed.transpiler.library import parse_hash
-from sed.transpiler.importers.base import SedBase, Range, Span, from_attribute_to_list_path, str_to_py_str
+from sed.transpiler.importers.base import (
+    SedBase,
+    LoopVariable,
+    AlgorithmParameter,
+    from_attribute_to_list_path,
+    str_to_py_str,
+)
 import pandas as pd
 from pathlib import Path
 #from typing import Any
@@ -18,8 +24,15 @@ class AbstractTask(SedBase):
         super().__init__(config)
         self.kisaoID = config.pop("kisaoID", None)
         self.altDefinition = config.pop("altDefinition", None)
-        #TODO: make actual list of AlgorithmParameter objects
-        self.algorithmParameters = config.pop("algorithmParameters", None)
+        raw_params = config.pop("algorithmParameters", None)
+        if raw_params is None:
+            self.algorithmParameters = []
+        elif isinstance(raw_params, list):
+            self.algorithmParameters = [AlgorithmParameter(p) for p in raw_params]
+        else:
+            raise ValueError(
+                f"'algorithmParameters' must be a list, got {type(raw_params).__name__}."
+            )
         self.__validate(config)
 
     def __validate(self, leftovers={}):
@@ -62,7 +75,7 @@ class ModelImport(AbstractTask):
 
     def exportToPython(self, key, root_dir):
         headers = set(["import tellurium as te"])
-        code = f"tasks_{key}_model = te.loadSBMLModel(r'{str(Path(root_dir) / self.location)}')\n"
+        code = f"{str_to_py_str(key)}_model = te.loadSBMLModel(r'{str(Path(root_dir) / self.location)}')\n"
         return headers, code
 
     # No processing, pass the file location to appropiate step/process
@@ -106,10 +119,10 @@ class DataImport(AbstractTask):
     def exportToPython(self, key, root_dir):
         if self.format == "http://purl.org/NET/mediatypes/text/csv":
             headers = set(["import pandas as pd"])
-            code = "tasks_" + key + " = pd.read_csv(r'" + str(Path(root_dir) / self.location) + "')\n"
+            code = f"{str_to_py_str(key)} = pd.read_csv(r'{str(Path(root_dir) / self.location)}')\n"
             return headers, code
         else:
-            raise ValueError("Unable to translate reading data in format '" + self.format + "'.")
+            raise ValueError(f"Unable to translate reading data in format '{self.format}'.")
 
     def load_data(self, root):
         # TODO: deal with all error handling (!)
@@ -120,6 +133,289 @@ class DataImport(AbstractTask):
 
         return data
 
+
+class CSVImport(AbstractTask):
+    """A 'csvImport' object, used to import data from a csv file."""
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.location = config.pop("location", None)
+        self.organization = config.pop("organization", None)
+        self.separator = config.pop("separator", None)
+        self.headers = config.pop("headers", None)
+        self.columnNames = config.pop("columnNames", None)
+        self.ncols = config.pop("ncols", None)
+        self.nrows = config.pop("nrows", None)
+        self.units = config.pop("units", None)
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating DataImport:", leftovers)
+            return True
+        return False
+
+    def load(self, root):
+        # TODO: deal with parameters (!)
+        df = pd.read_csv(root / self.location)
+        return {key: list(series) for key, series in df.items()}
+
+    def exportToPython(self, key, root_dir):
+        headers = set(["import pandas as pd"])
+        # TODO: deal with parameters (!)
+        code = f"{str_to_py_str(key)} = pd.read_csv(r'{str(Path(root_dir) / self.location)}')\n"
+        return headers, code
+
+
+_APPLIED_DIMENSION_URN = "urn:sedml:aggregation:applied_dimension"
+
+# Aggregation function expression templates.  Each entry maps a KISAO ID to
+# (label, expression_template, extra_headers).  The expression_template is a
+# Python expression with {input} and {axis} placeholders; only dimension-
+# reducing siblings of KISAO:0000824 are listed here.  Cumulative siblings
+# (848-851) and any other unrecognised IDs raise at transpile time.
+_AGGREGATION_OPS = {
+    "KISAO:0000825": ("mean ignoring NaN",
+                      "np.nanmean({input}, axis={axis})",
+                      set()),
+    "KISAO:0000826": ("standard deviation ignoring NaN",
+                      "np.nanstd({input}, axis={axis})",
+                      set()),
+    "KISAO:0000827": ("standard error ignoring NaN",
+                      "sem({input}, axis={axis}, nan_policy='omit')",
+                      {"from scipy.stats import sem"}),
+    "KISAO:0000828": ("maximum ignoring NaN",
+                      "np.nanmax({input}, axis={axis})",
+                      set()),
+    "KISAO:0000829": ("minimum ignoring NaN",
+                      "np.nanmin({input}, axis={axis})",
+                      set()),
+    "KISAO:0000830": ("maximum",
+                      "np.max({input}, axis={axis})",
+                      set()),
+    "KISAO:0000840": ("minimum",
+                      "np.min({input}, axis={axis})",
+                      set()),
+    "KISAO:0000841": ("mean",
+                      "np.mean({input}, axis={axis})",
+                      set()),
+    "KISAO:0000842": ("standard deviation",
+                      "np.std({input}, axis={axis})",
+                      set()),
+    "KISAO:0000843": ("standard error",
+                      "sem({input}, axis={axis})",
+                      {"from scipy.stats import sem"}),
+    "KISAO:0000844": ("sum ignoring NaN",
+                      "np.nansum({input}, axis={axis})",
+                      set()),
+    "KISAO:0000845": ("sum",
+                      "np.sum({input}, axis={axis})",
+                      set()),
+    "KISAO:0000846": ("product ignoring NaN",
+                      "np.nanprod({input}, axis={axis})",
+                      set()),
+    "KISAO:0000847": ("product",
+                      "np.prod({input}, axis={axis})",
+                      set()),
+    "KISAO:0000852": ("count ignoring NaN",
+                      "np.count_nonzero(~np.isnan(np.asarray({input})) & (np.asarray({input}) != 0), axis={axis})",
+                      set()),
+    "KISAO:0000853": ("count",
+                      "np.count_nonzero({input}, axis={axis})",
+                      set()),
+    "KISAO:0000854": ("length ignoring NaN",
+                      "np.sum(~np.isnan(np.asarray({input})), axis={axis})",
+                      set()),
+    "KISAO:0000855": ("length",
+                      "np.size({input}, axis={axis})",
+                      set()),
+    "KISAO:0000856": ("median ignoring NaN",
+                      "np.nanmedian({input}, axis={axis})",
+                      set()),
+    "KISAO:0000857": ("median",
+                      "np.median({input}, axis={axis})",
+                      set()),
+    "KISAO:0000858": ("variance ignoring NaN",
+                      "np.nanvar({input}, axis={axis})",
+                      set()),
+    "KISAO:0000859": ("variance",
+                      "np.var({input}, axis={axis})",
+                      set()),
+}
+
+
+class AggregationCalculation(AbstractTask):
+    """An 'aggregationCalculation' object, used for calculations of average, max, etc.  Also used for defined export variables from a Loop.
+    """
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.type_key = "aggregationCalculation"
+        self.input = config.pop("input", None)
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating AggregationCalculation:", leftovers)
+            return True
+        return False
+
+    def _resolve_axis(self):
+        """Return the axis to reduce along.  Defaults to 0; overridden by an
+        AlgorithmParameter whose altDefinition is the applied-dimension URN.
+        """
+        for param in self.algorithmParameters:
+            if param.altDefinition == _APPLIED_DIMENSION_URN:
+                return int(param.value)
+        return 0
+
+    def exportToPython(self, key, root_dir):
+        if self.kisaoID not in _AGGREGATION_OPS:
+            raise ValueError(
+                f"Unknown or unsupported aggregation KISAO ID '{self.kisaoID}' for task '{key}'."
+            )
+        _label, expr_template, extra_headers = _AGGREGATION_OPS[self.kisaoID]
+        axis = self._resolve_axis()
+        input_var = str_to_py_str(self.input)
+        output_var = str_to_py_str(key)
+        expr_main = expr_template.format(input=input_var, axis=axis)
+        expr_per_kv = expr_template.format(input="v", axis=axis)
+        headers = {"import numpy as np", "import pandas as pd"} | extra_headers
+        code = (
+            f"if isinstance({input_var}, (dict, pd.DataFrame)):\n"
+            f"    {output_var} = pd.DataFrame([{{k: {expr_per_kv} for k, v in {input_var}.items()}}])\n"
+            f"else:\n"
+            f"    {output_var} = {expr_main}\n"
+        )
+        return headers, code
+
+
+class Range(AbstractTask):
+    """A 'range' object, used to define a range in one of several ways:
+    * start, end, numberOfSteps (and optional 'scale')
+    * start, end, interval
+    * start, numberOfSteps, interval
+    * end, numberOfSteps, interval
+    * values
+    * numberOfSteps
+    """
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.type_key = "Range"
+        self.start = config.pop("start", None)
+        self.end = config.pop("end", None)
+        self.numberOfSteps = config.pop("numberOfSteps", None)
+        self.interval = config.pop("interval", None)
+        self.scale = config.pop("scale", None)
+        self.values = config.pop("values", None)
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating Range:", leftovers)
+            return True
+        return False
+    
+    def getPythonIterable(self):
+        """Returns the python string that would come after 'for X in ...', i.e. 'range(0, 10, 3)"""
+        if self.values:
+            return self.values
+        defined = {
+            'start': self.start,
+            'end': self.end,
+            'numberOfSteps': self.numberOfSteps,
+            'interval': self.interval,
+        }
+        provided = {k for k, v in defined.items() if v is not None}
+
+        # --- Option 1: start, end, numberOfSteps (requires scale) ---
+        if provided == {'start', 'end', 'numberOfSteps'}:
+            n = self.numberOfSteps
+            start = self.start
+            end = self.end
+
+            if self.scale is None:
+                raise ValueError("'scale' must be defined when using start, end, and numberOfSteps.")
+
+            if self.scale == 'linear':
+                return [start + (end - start) * i / n for i in range(n + 1)]
+
+            elif self.scale == 'log10':
+                import math
+                log_start = math.log10(start)
+                log_end = math.log10(end)
+                return [10 ** (log_start + (log_end - log_start) * i / n) for i in range(n + 1)]
+
+            else:
+                raise ValueError(f"Unsupported scale '{self.scale}'. Must be 'linear' or 'log10'.")
+
+        # --- Option 2: start, numberOfSteps, interval ---
+        if provided == {'start', 'numberOfSteps', 'interval'}:
+            return [self.start + i * self.interval for i in range(self.numberOfSteps)]
+
+        # --- Option 3: end, numberOfSteps, interval ---
+        if provided == {'end', 'numberOfSteps', 'interval'}:
+            end = self.end
+            interval = self.interval
+            n = self.numberOfSteps
+            start = end - (n - 1) * interval
+            return [start + i * interval for i in range(n)]
+
+        # --- Option 4: start, end, interval ---
+        if provided == {'start', 'end', 'interval'}:
+            start = self.start
+            end = self.end
+            interval = self.interval
+            tolerance = interval * 0.000001
+
+            points = []
+            i = 0
+            while True:
+                t = start + i * interval
+                if t >= end - tolerance:
+                    break
+                points.append(t)
+                i += 1
+
+            # Decide whether to append the last calculated point, end, or both
+            if points:
+                last_calculated = start + i * interval  # the point that broke the loop
+                if abs(last_calculated - end) <= tolerance:
+                    points.append(end)
+                else:
+                    points.append(last_calculated)
+                    points.append(end)
+            else:
+                points.append(end)
+
+            return points
+
+        raise ValueError(
+            f"Exactly three of (start, end, numberOfSteps, interval) must be defined. "
+            f"Got: {provided}"
+        )
+
+class Span(AbstractTask):
+    """A 'span' object, used to define the bounds of a range but not any internal steps.
+    """
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.type_key = "Range"
+        self.start = config.pop("start", None)
+        self.end = config.pop("end", None)
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating Span:", leftovers)
+            return True
+        return False
 
 class ODESimulation(AbstractTask):
     """The definition of a uniform time course simulation."""
@@ -169,7 +465,7 @@ class ExplicitODESimulation(ODESimulation):
         elif self.executor == "Copasi":
             return self.exportToPython_copasi(key)
         else:
-            raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
+            raise ValueError(f"Unknown uniform time course executor '{self.executor}'")
 
     def exportToPython_tellurium(self, key):
         if self.independentVariable != "urn:sedml:symbol:time":
@@ -177,31 +473,17 @@ class ExplicitODESimulation(ODESimulation):
             return
         headers = set(["import tellurium as te", "import pandas as pd"])
         modelid = str_to_py_str(self.model)
-        taskid = "tasks_" + key
-        code = taskid + f"_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
+        taskid = str_to_py_str(key)
+        code = f"{taskid}_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
         code += (
-            taskid
-            + " = "
-            + taskid
-            + "_model.simulate("
-            + str(self.independentVariableRange.start)
-            + ", "
-            + str(self.independentVariableRange.end)
-            + ", steps="
-            + str(self.independentVariableRange.numberOfSteps)
-            + ", selections = "
-            + str(['time'] + self.outputVariables)
-            + ")\n"
+            f"{taskid} = {taskid}_model.simulate("
+            f"{self.independentVariableRange.start}, "
+            f"{self.independentVariableRange.end}, "
+            f"steps = {self.independentVariableRange.numberOfSteps}, "
+            f"selections = {['time'] + self.outputVariables})\n"
         )
         # Convert to pandas dataframe
-        code += (
-            taskid
-            + " = pd.DataFrame("
-            + taskid
-            + ", columns="
-            + taskid
-            + ".colnames)\n"
-        )
+        code += f"{taskid} = pd.DataFrame({taskid}, columns={taskid}.colnames)\n"
         return headers, code
 
     def exportToPython_copasi(self, key):
@@ -225,27 +507,24 @@ class ExplicitODESimulation(ODESimulation):
         headers.add("import numpy as np")
         headers.add("from pandas import DataFrame")
         modelid = str_to_py_str(self.model)
-        taskid = "tasks_" + key
+        taskid = str_to_py_str(key)
         code = (
-            taskid
-            + "_copasi = basico.run_time_course(start_time="
-            + str(self.independentVariableRange.start)
-            + ", duration="
-            + str(self.independentVariableRange.end - self.independentVariableRange.start)
-            + ", intervals="
-            + str(self.independentVariableRange.numberOfSteps)
-            + ", update_model=True, use_sbml_id=True,model=basico.load_model("
-            + modelid
-            + ".getCurrentSBML()))\n"
+            f"{taskid}_copasi = basico.run_time_course("
+            f"start_time = {self.independentVariableRange.start}, "
+            f"duration = {self.independentVariableRange.end - self.independentVariableRange.start}, "
+            f"intervals = {self.independentVariableRange.numberOfSteps}, "
+            f"update_model = True, "
+            f"use_sbml_id = True, "
+            f"model = basico.load_model({modelid}.getCurrentSBML()))\n"
         )
-        code += taskid + " = {}\n"
+        code += f"{taskid} = {{}}\n"
         first = 0
         if self.outputVariables[0] == "time":
             first = 1
-            code += taskid + "['time'] = np.array(" + taskid + "_copasi.index)\n"
+            code += f"{taskid}['time'] = np.array({taskid}_copasi.index)\n"
         for var in self.outputVariables[first:]:
-            code += taskid + "['" + var + "'] = np.array(" + taskid + "_copasi['" + var + "'])\n"
-        code += taskid + " = DataFrame(" + taskid + ")\n"
+            code += f"{taskid}['{var}'] = np.array({taskid}_copasi['{var}'])\n"
+        code += f"{taskid} = DataFrame({taskid})\n"
         return headers, code
 
     # Chain problem,
@@ -311,7 +590,7 @@ class BoundedODESimulation(ODESimulation):
         elif self.executor == "Copasi":
             raise ValueError("Copasi export not yet implemented.")
         else:
-            raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
+            raise ValueError(f"Unknown uniform time course executor '{self.executor}'")
 
     def exportToPython_tellurium(self, key):
         if self.independentVariable != "urn:sedml:symbol:time":
@@ -319,29 +598,16 @@ class BoundedODESimulation(ODESimulation):
             return
         headers = set(["import tellurium as te", "import pandas as pd"])
         modelid = str_to_py_str(self.model)
-        taskid = "tasks_" + key
-        code = taskid + f"_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
+        taskid = str_to_py_str(key)
+        code = f"{taskid}_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
         code += (
-            taskid
-            + " = "
-            + taskid
-            + "_model.simulate("
-            + str(self.independentVariableSpan.start)
-            + ", "
-            + str(self.independentVariableSpan.end)
-            + ", selections = "
-            + str(['time'] + self.outputVariables)
-            + ")\n"
+            f"{taskid} = {taskid}_model.simulate("
+            f"{self.independentVariableSpan.start}, "
+            f"{self.independentVariableSpan.end}, "
+            f"selections = {['time'] + self.outputVariables})\n"
         )
         # Convert to pandas dataframe
-        code += (
-            taskid
-            + " = pd.DataFrame("
-            + taskid
-            + ", columns="
-            + taskid
-            + ".colnames)\n"
-        )
+        code += f"{taskid} = pd.DataFrame({taskid}, columns={taskid}.colnames)\n"
         return headers, code
 
     def exportToPython_copasi(self, key):
@@ -365,27 +631,24 @@ class BoundedODESimulation(ODESimulation):
         headers.add("import numpy as np")
         headers.add("from pandas import DataFrame")
         modelid = str_to_py_str(self.model)
-        taskid = "tasks_" + key
+        taskid = str_to_py_str(key)
         code = (
-            taskid
-            + "_copasi = basico.run_time_course(start_time="
-            + str(self.independentVariableRange.start)
-            + ", duration="
-            + str(self.independentVariableRange.end - self.independentVariableRange.start)
-            + ", intervals="
-            + str(self.independentVariableRange.numberOfSteps)
-            + ", update_model=True, use_sbml_id=True,model=basico.load_model("
-            + modelid
-            + ".getCurrentSBML()))\n"
+            f"{taskid}_copasi = basico.run_time_course("
+            f"start_time = {self.independentVariableRange.start}, "
+            f"duration = {self.independentVariableRange.end - self.independentVariableRange.start}, "
+            f"intervals = {self.independentVariableRange.numberOfSteps}, "
+            f"update_model = True, "
+            f"use_sbml_id = True, "
+            f"model = basico.load_model({modelid}.getCurrentSBML()))\n"
         )
-        code += taskid + " = {}\n"
+        code += f"{taskid} = {{}}\n"
         first = 0
         if self.outputVariables[0] == "time":
             first = 1
-            code += taskid + "['time'] = np.array(" + taskid + "_copasi.index)\n"
+            code += f"{taskid}['time'] = np.array({taskid}_copasi.index)\n"
         for var in self.outputVariables[first:]:
-            code += taskid + "['" + var + "'] = np.array(" + taskid + "_copasi['" + var + "'])\n"
-        code += taskid + " = DataFrame(" + taskid + ")\n"
+            code += f"{taskid}['{var}'] = np.array({taskid}_copasi['{var}'])\n"
+        code += f"{taskid} = DataFrame({taskid})\n"
         return headers, code
 
 
@@ -437,7 +700,7 @@ class ExplicitStochasticSimulation(ODESimulation):
         elif self.executor == "Copasi":
             raise ValueError("Copasi implementation of stochastic simulation is not yet implemented.")
         else:
-            raise ValueError("Unknown uniform time course executor '" + self.executor + "'")
+            raise ValueError(f"Unknown uniform time course executor '{self.executor}'")
 
     def exportToPython_tellurium(self, key):
         if self.independentVariable != "urn:sedml:symbol:time":
@@ -445,32 +708,18 @@ class ExplicitStochasticSimulation(ODESimulation):
             return
         headers = set(["import tellurium as te", "import pandas as pd"])
         modelid = str_to_py_str(self.model)
-        taskid = "tasks_" + key
+        taskid = str_to_py_str(key)
         code = f"{taskid}_model = te.loadSBMLModel({modelid}.getCurrentSBML())\n"
         code += f"{taskid}_model.setIntegrator('gillespie')\n"
         code += (
-            taskid
-            + " = "
-            + taskid
-            + "_model.simulate("
-            + str(self.independentVariableRange.start)
-            + ", "
-            + str(self.independentVariableRange.end)
-            + ", steps="
-            + str(self.independentVariableRange.numberOfSteps)
-            + ", selections = "
-            + str(['time'] + self.outputVariables)
-            + ")\n"
+            f"{taskid} = {taskid}_model.simulate("
+            f"{self.independentVariableRange.start}, "
+            f"{self.independentVariableRange.end}, "
+            f"steps = {self.independentVariableRange.numberOfSteps}, "
+            f"selections = {['time'] + self.outputVariables})\n"
         )
         # Convert to pandas dataframe
-        code += (
-            taskid
-            + " = pd.DataFrame("
-            + taskid
-            + ", columns="
-            + taskid
-            + ".colnames)\n"
-        )
+        code += f"{taskid} = pd.DataFrame({taskid}, columns={taskid}.colnames)\n"
         return headers, code
 
 
@@ -480,7 +729,7 @@ class Calculation(AbstractTask):
     def __init__(self, config: dict):
         # TODO: error checking
         super().__init__(config)
-        self.type_key = "Calculation"
+        self.type_key = "calculation"
         self.math = config.pop("math", None)
         self.units = config.pop("units", None)
         self.__validate(config)
@@ -488,9 +737,9 @@ class Calculation(AbstractTask):
         # self.expression = visit_expression(self.math, self.visitor)
 
     def __str__(self):
-        ret = "Calculation object.  Infix: '" + self.math + "'\n"
+        ret = f"Calculation object.  Infix: '{self.math}'\n"
         if self.units:
-            ret += "Units: '" + self.units + "'\n"
+            ret += f"Units: '{self.units}'\n"
         return ret.strip()
 
     def __repr__(self):
@@ -512,7 +761,7 @@ class Calculation(AbstractTask):
         headers = set()
         line = str_to_py_str(self.math)
         line = line.replace("^", "**")
-        code = "tasks_" + key + " = " + line + "\n"
+        code = f"{str_to_py_str(key)} = {line}\n"
         return headers, code
 
     def default_step_name(self):
@@ -546,7 +795,7 @@ class SumOfSquares(AbstractTask):
 
     def __init__(self, config: dict):
         super().__init__(config)
-        self.type_key = "SumOfSquares"
+        self.type_key = "sumOfSquares"
         self.inputs = config.pop("inputs", None)
         self.__validate(config)
 
@@ -567,7 +816,7 @@ class ParameterScan(AbstractTask):
     """The definition of a 'parameter scan' task, which takes a model as input and outputs an array of models."""
 
     def __init__(self, config: dict):
-        self.type_key = "ParameterScan"
+        self.type_key = "parameterScan"
         super().__init__(config)
         self.model = config.pop("model", None)
         self.scannedVariable = config.pop("scannedVariable", None)
@@ -593,7 +842,7 @@ class SteadyState(AbstractTask):
 
     def __init__(self, config: dict):
         super().__init__(config)
-        self.type_key = "SteadyState"
+        self.type_key = "steadyState"
         self.model = config.pop("model", None)
         self.outputVariables = config.pop("outputVariables", None)
         self.outputModel = config.pop("outputModel", None)
@@ -616,6 +865,44 @@ class SteadyState(AbstractTask):
         return headers, code
 
 
+class Loop(AbstractTask):
+    """The definition of a 'loop' task, which takes a model as input and outputs an array of models."""
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.type_key = "loop"
+        self.outputVariables = config.pop("outputVariables", None)
+        self.range = Range(config.pop("range", {}))
+        self.loopVariables = {}
+        loopVariables = config.pop("loopVariables", {})
+        if loopVariables:
+            for key, config in loopVariables.items():
+                self.loopVariables[key] = LoopVariable(config)
+        aggregateOutputs = config.pop("aggregateOutputs", {})
+        if aggregateOutputs:
+            for key, config in aggregateOutputs.items():
+                self.aggregateOutputs[key] = AggregationCalculation(config)
+        self.subTasks = load_tasks_section(config.pop("subTasks", {}))
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating SteadyState:", leftovers)
+            return True
+        return False
+
+    def exportToProcessBigraph():
+        """foo"""
+        pass
+
+    def exportToPython(self, key, root_dir):
+        headers = set()
+        code = ""
+        return headers, code
+
+
+
 def load_tasks_section(tasks_section_config):
     tasks = {}
     for key, config in tasks_section_config.items():
@@ -625,6 +912,8 @@ def load_tasks_section(tasks_section_config):
                 tasks[key] = ModelImport(config)
             case "dataImport":
                 tasks[key] = DataImport(config)
+            case "csvImport":
+                tasks[key] = CSVImport(config)
             case "explicitODESimulation":
                 tasks[key] = ExplicitODESimulation(config)
             case "boundedODESimulation":
@@ -633,6 +922,8 @@ def load_tasks_section(tasks_section_config):
                 tasks[key] = ExplicitStochasticSimulation(config)
             case "calculation":
                 tasks[key] = Calculation(config)
+            case "aggregationCalculation":
+                tasks[key] = AggregationCalculation(config)
             case "sumOfSquares":
                 tasks[key] = SumOfSquares(config)
             case "parameterScan":
@@ -640,8 +931,8 @@ def load_tasks_section(tasks_section_config):
             case "steadyState":
                 tasks[key] = SteadyState(config)
             case None:
-                raise ValueError("No '_type' provided for task " + key + ".")
+                raise ValueError(f"No '_type' provided for task {key}.")
             case _:
                 print(f"unknown task type: {step_type}")
-                # raise ValueError("Unknown task type " + step_type + ".")
+                # raise ValueError(f"Unknown task type {step_type}.")
     return tasks

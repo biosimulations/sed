@@ -11,11 +11,7 @@
     "outputs": {
         "experimental_species_values": {
             "_type": "report",
-            "dataSets": {
-                "data1_S1": "#tasks:data1['S1']",
-                "data1_S2": "#tasks:data1['S2']",
-                "data1_S3": "#tasks:data1['S3']"
-            }
+            "data": "#tasks:data1"
         }
     }
 }

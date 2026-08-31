@@ -2,19 +2,23 @@
   "outputs": {
     "Fig1": {
       "_type": "plot2D",
-      "label": "Figure 1",
+      "name": "Figure 1",
       "xAxis": {
-        "label": "Time"
+        "name": "Time",
+        "scale": "linear"
       },
       "yAxis": {
-        "label": "Concentrations"
+        "name": "Concentrations",
+        "scale": "linear"
       },
       "curves": {
         "Sim1_S1": {
+          "curveType": "points",
           "x": "#tasks:sim1['time']",
           "y": "#tasks:sim1['S1']"
         },
         "Sim1_S2": {
+          "curveType": "points",
           "x": "#tasks:sim1['time']",
           "y": "#tasks:sim1['S2']"
         }

@@ -28,4 +28,5 @@ if isinstance(outputs_report_no_labels, (collections.abc.Mapping, pd.DataFrame))
       outputs_report_no_labels[key] = np.atleast_1d(outputs_report_no_labels[key])
 else:
    header = False
+   outputs_report_no_labels = np.atleast_1d(outputs_report_no_labels)
 pd.DataFrame(outputs_report_no_labels).to_csv("outputs_report_no_labels.csv", index=False, header=header)

@@ -22,11 +22,11 @@ tasks_experiment1 = pd.read_csv(r'C:\Users\Lucian\Desktop\sed\examples\one\exper
 
 # Task sim1:
 tasks_sim1_model = te.loadSBMLModel(tasks_model1_model.getCurrentSBML())
-tasks_sim1 = tasks_sim1_model.simulate(0, 20, steps=50, selections = ['time', 'S1', 'S2'])
+tasks_sim1 = tasks_sim1_model.simulate(0, 20, steps = 50, selections = ['time', 'S1', 'S2'])
 tasks_sim1 = pd.DataFrame(tasks_sim1, columns=tasks_sim1.colnames)
 
 # Task sim2:
-tasks_sim2_copasi = basico.run_time_course(start_time=0, duration=20, intervals=50, update_model=True, use_sbml_id=True,model=basico.load_model(tasks_model1_model.getCurrentSBML()))
+tasks_sim2_copasi = basico.run_time_course(start_time = 0, duration = 20, intervals = 50, update_model = True, use_sbml_id = True, model = basico.load_model(tasks_model1_model.getCurrentSBML()))
 tasks_sim2 = {}
 tasks_sim2['S1'] = np.array(tasks_sim2_copasi['S1'])
 tasks_sim2['S2'] = np.array(tasks_sim2_copasi['S2'])
@@ -56,6 +56,7 @@ if isinstance(outputs_sim1Report, (collections.abc.Mapping, pd.DataFrame)):
       outputs_sim1Report[key] = np.atleast_1d(outputs_sim1Report[key])
 else:
    header = False
+   outputs_sim1Report = np.atleast_1d(outputs_sim1Report)
 pd.DataFrame(outputs_sim1Report).to_csv("outputs_sim1Report.csv", index=False, header=header)
 
 # Output sim2Report:
@@ -66,6 +67,7 @@ if isinstance(outputs_sim2Report, (collections.abc.Mapping, pd.DataFrame)):
       outputs_sim2Report[key] = np.atleast_1d(outputs_sim2Report[key])
 else:
    header = False
+   outputs_sim2Report = np.atleast_1d(outputs_sim2Report)
 pd.DataFrame(outputs_sim2Report).to_csv("outputs_sim2Report.csv", index=False, header=header)
 
 # Output comparisonReport:

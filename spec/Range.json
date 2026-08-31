@@ -2,23 +2,28 @@
     "tasks": {
         "ex1": {
             "range": {
+                "_type": "range",
                 "values": [1, 2, 5, 10, 20, 50, 100]
             }
         },
         "ex2": {
             "range": {
+                "_type": "range",
                 "values": ["S1", "S2", "S3", "S5"]
             }
         },
         "ex3": {
             "range": {
+                "_type": "numericRange",
                 "start": 0,
                 "end": 10,
-                "numberOfSteps": 100
+                "numberOfSteps": 100,
+                "scale": "linear"
             }
         },
         "ex4": {
             "range": {
+                "_type": "numericRange",
                 "start": 0,
                 "end": 10,
                 "interval": 0.01
@@ -26,9 +31,20 @@
         },
         "ex5": {
             "range": {
+                "_type": "numericRange",
                 "start": 1,
                 "end": 1000,
                 "numberOfSteps": 3,
+                "scale": "log10"
+            }
+        },
+        "ex6": {
+            "parameterRange": {
+                "_type": "parameterRange",
+                "modelElement": "S1",
+                "start": 0.001,
+                "end": 10,
+                "numberOfSteps": 4,
                 "scale": "log10"
             }
         }

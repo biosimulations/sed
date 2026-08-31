@@ -5,11 +5,12 @@
             "kisaoID": "KISAO:0000694",
             "model": "#tasks:model1.model",
             "independentVariable": "urn:sedml:symbol:time",
-            "independentInitialValue": 0,
+            "independentVariableInit": 0,
             "independentVariableRange": {
                 "start": 0,
                 "end": 20,
-                "numberOfSteps": 50
+                "numberOfSteps": 50,
+                "scale": "linear"
             },
             "outputVariables": ["S1", "S2"],
             "outputModel": false

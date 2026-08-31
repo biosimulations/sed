@@ -10,21 +10,23 @@
       "loopVariables": {
         "looped_model": {
           "initialValue": "#tasks:mod1.model",
-          "postLoopValues": "#tasks:repeat:subTasks:sim1.model"
+          "subsequentValues": "#tasks:repeat:subTasks:sim1.model"
         }
       },
       "subTasks": {
         "sim1": {
-          "_type": "oneStep",
+          "_type": "oneStepODE",
           "kisaoID": "KISAO:0000694",
-          "model": "#tasks:range:loopVariables:looped_model",
+          "model": "#tasks:repeat:loopVariables:looped_model",
           "outputModel": true,
-          "outputVariables": "['S1', 'S2', 'S3']",
+          "outputVariables": ["S1", "S2", "S3"],
           "independentVariable": "urn:sedml:symbol:time",
           "independentStep": 1.0
         }
       },
-      "outputVariables": ["#tasks:repeat:subTasks:sim1"]
+      "outputVariableMap": {
+        "sim1_repeat": "#tasks:repeat:subTasks:sim1"
+      }
     }
   }
 }

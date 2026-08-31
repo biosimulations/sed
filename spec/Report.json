@@ -2,24 +2,11 @@
   "outputs": {
     "sim1Report": {
       "_type": "report",
-      "dataSets": {
-        "out1": {
-          "reference": "#tasks:sim1"
-        }
-      }
+      "data": "#tasks:sim1"
     },
-    "sim2Report": {
+    "sim2TruncatedReport": {
       "_type": "report",
-      "dataSets": {
-        "S1_conc": {
-          "label": "S1 concentration",
-          "reference": "#tasks:sim2['S1']"
-        },
-        "S2_conc": {
-          "label": "S2 concentration",
-          "reference": "#tasks:sim2['S2']"
-        }
-      }
+      "data": "#tasks:sim2['S1']"
     }
   }
 }

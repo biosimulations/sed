@@ -15,19 +15,19 @@
       "language": "urn:sedml:language:sbml"
     },
     "experiment1": {
-      "_type": "dataImport",
+      "_type": "csvImport",
       "location": "experimental_data.csv",
-      "format": "http://purl.org/NET/mediatypes/text/csv",
-      "parameters": {
-        "organization": "column-based",
-        "ncols": 3,
-        "nrows": 52,
-        "units": [
-          "seconds",
-          "mMol",
-          "mMol"
-        ]
-      }
+      "organization": "column-based",
+      "separator": "\t",
+      "headers": "True",
+      "columnNames": ["time", "S1", "S2"],
+      "ncols": 3,
+      "nrows": 52,
+      "units": [
+        "seconds",
+        "mMol",
+        "mMol"
+      ]
     },
     "sim1": {
       "_type": "explicitODESimulation",
@@ -36,6 +36,7 @@
       "independentVariable": "urn:sedml:symbol:time",
       "independentVariableInit": 0,
       "independentVariableRange": {
+        "_type": "numericRange",
         "start": 0,
         "end": 20,
         "numberOfSteps": 50
@@ -45,14 +46,17 @@
     "sim2": {
       "_type": "explicitODESimulation",
       "kisaoID": "KISAO:0000694",
-      "algorithmParameters": {
-        "altDefinition": "urn:sedml:algorithms:compareWith",
-        "value": "#tasks:sim1"
-      },
+      "taskParameters": [
+        {
+          "altDefinition": "urn:sedml:algorithms:compareWith",
+          "value": "#tasks:sim1"
+        }
+      ],
       "model": "#tasks:model1.model",
       "independentVariable": "urn:sedml:symbol:time",
       "independentVariableInit": 0,
       "independentVariableRange": {
+        "_type": "numericRange",
         "start": 0,
         "end": 20,
         "numberOfSteps": 50
@@ -75,27 +79,9 @@
       "_type": "calculation",
       "math": "[sum(#tasks:sim1_sim2_compare['S1']) + sum(#tasks:sim1_sim2_compare['S2']), sum(#tasks:sim1_exp_compare['S1']) + sum(#tasks:sim1_exp_compare['S2']), sum(#tasks:sim2_exp_compare['S1']) + sum(#tasks:sim2_exp_compare['S2'])]"
     },
-    "simcompare_v2": {
-      "_type": "sumOfSquares",
-      "inputs": [
-        "#tasks:sim1",
-        "#tasks:sim2",
-        "#tasks:experiment1"
-      ]
-    }
-  },
-  "outputs": {
-    "sim1Report": {
-      "_type": "report",
-      "dataSets": "#tasks:sim1"
-    },
-    "sim2Report": {
-      "_type": "report",
-      "dataSets": "#tasks:sim2"
-    },
-    "comparisonReport": {
-      "_type": "report",
-      "dataSets": {
+    "comparison": {
+      "_type": "createDataBlock",
+      "data": {
         "time": "#tasks:sim1['time']",
         "S1_ssq_sim1sim2": "#tasks:sim1_sim2_compare['S1']",
         "S1_ssq_sim1exp": "#tasks:sim1_exp_compare['S1']",
@@ -105,48 +91,70 @@
         "S2_ssq_sim2exp": "#tasks:sim2_exp_compare['S2']"
       }
     },
+    "compare_summary_out": {
+      "_type": "relabelData",
+      "input": "#tasks:compare_summary",
+      "labels": "#constants:compare_labels"
+    }
+  },
+  "outputs": {
+    "sim1Report": {
+      "_type": "report",
+      "data": "#tasks:sim1"
+    },
+    "sim2Report": {
+      "_type": "report",
+      "data": "#tasks:sim2"
+    },
+    "comparisonReport": {
+      "_type": "report",
+      "data": "#tasks:comparison"
+    },
     "comparisonSummary": {
       "_type": "report",
-      "dataSets": {
-        "comparison": "#constants:compare_labels",
-        "sum of squares": "#tasks:compare_summary"
-      }
+      "data": "#tasks:compare_summary_out"
     },
     "Fig1": {
       "_type": "plot2D",
-      "label": "Figure 1",
+      "name": "Figure 1",
       "xAxis": {
-        "label": "Time"
+        "name": "Time"
       },
       "yAxis": {
-        "label": "Concentrations"
+        "name": "Concentrations"
       },
       "curves": {
         "Sim1_S1": {
+          "curveType": "points",
           "x": "#tasks:sim1['time']",
           "y": "#tasks:sim1['S1']"
         },
         "Sim1_S2": {
+          "curveType": "points",
           "x": "#tasks:sim1['time']",
           "y": "#tasks:sim1['S2']"
         },
         "Sim2_S1": {
+          "curveType": "points",
           "x": "#tasks:sim1['time']",
           "y": "#tasks:sim2['S1']"
         },
         "Sim2_S2": {
+          "curveType": "points",
           "x": "#tasks:sim1['time']",
           "y": "#tasks:sim2['S2']"
         },
         "S1_data": {
+          "curveType": "points",
           "x": "#tasks:sim1['time']",
           "y": "#tasks:experiment1['S1']",
-          "style": "points_only"
+          "style": "#styles:points_only"
         },
         "S2_data": {
+          "curveType": "points",
           "x": "#tasks:sim1['time']",
           "y": "#tasks:experiment1['S2']",
-          "style": "points_only"
+          "style": "#styles:points_only"
         }
       }
     }

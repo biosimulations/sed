@@ -1,5 +1,5 @@
 from typing import Any
-from sed.transpiler.importers.base import SedBase, str_to_py_str
+from sed.transpiler.importers.base import SedBase, AlgorithmParameter, str_to_py_str
 
 
 class Axis(SedBase):
@@ -57,7 +57,13 @@ class Output(SedBase):
     def __init__(self, config: dict):
         self.kisaoID = config.pop("kisaoID", None)
         self.altDefinition = config.pop("altDefinition", None)
-        self.algorithmParameters = config.pop("algorithmParameters", None)
+        raw_params = config.pop("algorithmParameters", [])
+        if isinstance(raw_params, list):
+            self.algorithmParameters = [AlgorithmParameter(p) for p in raw_params]
+        else:
+            raise ValueError(
+                f"'algorithmParameters' must be a list, got {type(raw_params).__name__}."
+            )
 
     def __validate(self, leftovers={}):
         """Validate."""
@@ -111,19 +117,19 @@ class Plot2D(Plot):
         for curve in self.curves:
             y = str_to_py_str(self.curves[curve].y)
             ys.append(y)
-            code += y + ", "
+            code += f"{y}, "
             # TODO: check to make sure all xrefs are the same
             xref = str_to_py_str(self.curves[curve].x)
         code += "))\nys = ys.transpose()\n"
-        code += "x = " + xref + "\n"
+        code += f"x = {xref}\n"
         code += "ax.plot(x, ys)\n"
         ax_args = ""
         if self.xaxis:
-            ax_args += "xlabel='" + self.xaxis.label + "'"
+            ax_args += f"xlabel='{self.xaxis.label}'"
         if self.yaxis:
-            ax_args += ", ylabel='" + self.yaxis.label + "'"
+            ax_args += f", ylabel='{self.yaxis.label}'"
         if self.label:
-            ax_args += ", title='" + self.label + "'"
+            ax_args += f", title='{self.label}'"
         code += f"ax.set({ax_args})\n"
         code += f"plt.savefig('{key}.png')\n"
         code += "plt.show()\n"
@@ -163,7 +169,7 @@ class Report(Output):
     def __init__(self, config: dict):
         self.filename = config.pop("filename", None)
         self.file_format = config.pop("file_format", None)
-        self.dataSets = config.pop("dataSets", None)
+        self.data = config.pop("data", None)
         self.__validate(config)
 
     def __validate(self, leftovers={}):
@@ -175,26 +181,19 @@ class Report(Output):
 
     def exportToPython(self, key, root_dir):
         headers = set(["import numpy as np", "import pandas as pd"])
-        repid = "outputs_" + key
+        repid = f"outputs_{key}"
         code = ""
-        if isinstance(self.dataSets, str):
-            line = str_to_py_str(self.dataSets)
-            code = "header = True\n"
-            code += repid + " = " + line + "\n"
-            headers.add("import collections")
-            code += f"if isinstance({repid}, (collections.abc.Mapping, pd.DataFrame)):\n"
-            code += f"   for key in {repid}:\n"
-            code += f"      {repid}[key] = np.atleast_1d({repid}[key])\n"
-            code +=  "else:\n"
-            code +=  "   header = False\n"
-            code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False, header=header)\n'
-        else:
-            code += repid + " = {}\n"
-            for ds_key in self.dataSets:
-                line = str_to_py_str(self.dataSets[ds_key])
-                code += repid + "['" + ds_key + "'] = np.atleast_1d(" + line + ")\n"
-            #code += "print(" + repid + ")\n"
-            code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False)\n'
+        line = str_to_py_str(self.data)
+        code = "header = True\n"
+        code += f"{repid} = {line}\n"
+        headers.add("import collections")
+        code += f"if isinstance({repid}, (collections.abc.Mapping, pd.DataFrame)):\n"
+        code += f"   for key in {repid}:\n"
+        code += f"      {repid}[key] = np.atleast_1d({repid}[key])\n"
+        code +=  "else:\n"
+        code +=  "   header = False\n"
+        code += f"   {repid} = np.atleast_1d({repid})\n"
+        code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False, header=header)\n'
         return headers, code
 
 
@@ -226,8 +225,8 @@ def load_outputs_section(output_section: dict[Any, Any]):
             case "plot3D":
                 outputs[key] = Plot3D(config)
             case None:
-                raise ValueError("No '_type' provided for task " + key + ".")
+                raise ValueError(f"No '_type' provided for task {key}.")
             case _:
                 print(f"unknown output type: {step_type}")
-                # raise ValueError("Unknown task type " + step_type + ".")
+                # raise ValueError(f"Unknown output type {step_type}.")
     return outputs

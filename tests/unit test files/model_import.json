@@ -6,16 +6,20 @@
             "_type": "modelImport",
             "location": "three_species_chain.xml",
             "language": "urn:sedml:language:sbml"
+        },
+        "three_init_vals": {
+            "_type": "createDataBlock",
+            "data": {
+                "S1_init": "#tasks:model1.model['S1']",
+                "S2_init": "#tasks:model1.model['S2']",
+                "S3_init": "#tasks:model1.model['S3']"
+            }
         }
     },
     "outputs": {
-        "init_species_values": {
+        "init_S1": {
             "_type": "report",
-            "dataSets": {
-                "model1_S1": "#tasks:model1.model['S1']",
-                "model1_S2": "#tasks:model1.model['S2']",
-                "model1_S3": "#tasks:model1.model['S3']"
-            }
+            "data": "#tasks:three_init_vals"
         }
     }
 }

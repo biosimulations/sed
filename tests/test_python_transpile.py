@@ -145,7 +145,7 @@ def unittest(tmp_path, testname, filenames=[], stochastic_files=None,
              rtol=DEFAULT_STOCHASTIC_RTOL):
     unittest_dir = root_dir / "tests" / "unit test files"
     expected_dir = root_dir / "tests" / "expected test results" / "unit tests"
-    filename = testname + ".json"
+    filename = f"{testname}.json"
     expected = expected_dir / testname
     python_transpile_test(tmp_path, unittest_dir, filename, expected, filenames,
                           stochastic_files=stochastic_files, rtol=rtol)
@@ -189,9 +189,75 @@ def test_py_explicit_stochastic_simulation(tmp_path):
         rtol=0.5,
     )
 
+def test_py_calculate_aggregate_mean(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_mean")
+
+def test_py_calculate_aggregate_nanmean(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_nanmean")
+
+def test_py_calculate_aggregate_max(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_max")
+
+def test_py_calculate_aggregate_nanmax(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_nanmax")
+
+def test_py_calculate_aggregate_min(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_min")
+
+def test_py_calculate_aggregate_nanmin(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_nanmin")
+
+def test_py_calculate_aggregate_sum(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_sum")
+
+def test_py_calculate_aggregate_nansum(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_nansum")
+
+def test_py_calculate_aggregate_prod(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_prod")
+
+def test_py_calculate_aggregate_nanprod(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_nanprod")
+
+def test_py_calculate_aggregate_count(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_count")
+
+def test_py_calculate_aggregate_nancount(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_nancount")
+
+def test_py_calculate_aggregate_length(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_length")
+
+def test_py_calculate_aggregate_nanlength(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_nanlength")
+
+def test_py_calculate_aggregate_median(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_median")
+
+def test_py_calculate_aggregate_nanmedian(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_nanmedian")
+
+def test_py_calculate_aggregate_std(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_std")
+
+def test_py_calculate_aggregate_nanstd(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_nanstd")
+
+def test_py_calculate_aggregate_sem(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_sem")
+
+def test_py_calculate_aggregate_nansem(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_nansem")
+
+def test_py_calculate_aggregate_var(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_var")
+
+def test_py_calculate_aggregate_nanvar(tmp_path):
+    unittest(tmp_path, "calculate_aggregate_nanvar")
+
 if __name__ == "__main__":
-    # import pytest
-    # pytest.main([__file__, "-v"])
-    tmp_path = Path(tempfile.mkdtemp())
-    print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
-    test_py_explicit_stochastic_simulation(tmp_path)
+    import pytest
+    pytest.main([__file__, "-v"])
+    # tmp_path = Path(tempfile.mkdtemp())
+    # print(f"tmp_path = {tmp_path}")   # so you can inspect afterward
+    # test_py_explicit_stochastic_simulation(tmp_path)

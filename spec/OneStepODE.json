@@ -1,7 +1,7 @@
 {
     "tasks": {
         "sim1": {
-            "_type": "oneStep",
+            "_type": "oneStepODE",
             "kisaoID": "KISAO:0000694",
             "model": "#tasks:model1.model",
             "independentVariable": "urn:sedml:symbol:time",

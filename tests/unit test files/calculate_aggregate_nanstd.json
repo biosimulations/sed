@@ -1,0 +1,21 @@
+{
+    "versionStr": "SED v2.0 alpha",
+    "versionNum": 2.0,
+    "constants": {
+        "X": [1, 2, "NaN", 4, 5]
+    },
+    "tasks": {
+        "X_nanstd": {
+            "_type": "aggregationCalculation",
+            "kisaoID": "KISAO:0000826",
+            "name": "standard deviation ignoring NaN",
+            "input": "#constants:X"
+        }
+    },
+    "outputs": {
+        "report": {
+            "_type": "report",
+            "data": "#tasks:X_nanstd"
+        }
+    }
+}
