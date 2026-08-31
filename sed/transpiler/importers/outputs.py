@@ -169,7 +169,7 @@ class Report(Output):
     def __init__(self, config: dict):
         self.filename = config.pop("filename", None)
         self.file_format = config.pop("file_format", None)
-        self.dataSets = config.pop("dataSets", None)
+        self.data = config.pop("data", None)
         self.__validate(config)
 
     def __validate(self, leftovers={}):
@@ -183,25 +183,17 @@ class Report(Output):
         headers = set(["import numpy as np", "import pandas as pd"])
         repid = f"outputs_{key}"
         code = ""
-        if isinstance(self.dataSets, str):
-            line = str_to_py_str(self.dataSets)
-            code = "header = True\n"
-            code += f"{repid} = {line}\n"
-            headers.add("import collections")
-            code += f"if isinstance({repid}, (collections.abc.Mapping, pd.DataFrame)):\n"
-            code += f"   for key in {repid}:\n"
-            code += f"      {repid}[key] = np.atleast_1d({repid}[key])\n"
-            code +=  "else:\n"
-            code +=  "   header = False\n"
-            code += f"   {repid} = np.atleast_1d({repid})\n"
-            code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False, header=header)\n'
-        else:
-            code += f"{repid} = {{}}\n"
-            for ds_key in self.dataSets:
-                line = str_to_py_str(self.dataSets[ds_key])
-                code += f"{repid}['{ds_key}'] = np.atleast_1d({line})\n"
-            #code += f"print({repid})\n"
-            code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False)\n'
+        line = str_to_py_str(self.data)
+        code = "header = True\n"
+        code += f"{repid} = {line}\n"
+        headers.add("import collections")
+        code += f"if isinstance({repid}, (collections.abc.Mapping, pd.DataFrame)):\n"
+        code += f"   for key in {repid}:\n"
+        code += f"      {repid}[key] = np.atleast_1d({repid}[key])\n"
+        code +=  "else:\n"
+        code +=  "   header = False\n"
+        code += f"   {repid} = np.atleast_1d({repid})\n"
+        code += f'pd.DataFrame({repid}).to_csv("{repid}.csv", index=False, header=header)\n'
         return headers, code
 
 

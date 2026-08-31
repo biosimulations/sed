@@ -3,7 +3,7 @@
         "sim1": {
             "_type": "explicitODESimulation",
             "kisaoID": "KISAO:0000694",
-            "algorithmParameters": [
+            "taskParameters": [
                 {
                     "kisaoID": "KISAO:0000209",
                     "name": "relative tolerance",

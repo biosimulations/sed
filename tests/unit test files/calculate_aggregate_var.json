@@ -15,7 +15,7 @@
     "outputs": {
         "report": {
             "_type": "report",
-            "dataSets": ["#tasks:X_var"]
+            "data": "#tasks:X_var"
         }
     }
 }

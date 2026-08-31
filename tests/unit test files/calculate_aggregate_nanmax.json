@@ -15,7 +15,7 @@
     "outputs": {
         "report": {
             "_type": "report",
-            "dataSets": ["#tasks:X_nanmax"]
+            "data": "#tasks:X_nanmax"
         }
     }
 }

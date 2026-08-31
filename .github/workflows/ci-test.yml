@@ -42,5 +42,26 @@ jobs:
       - name: Run All tests
         run: uv run python -m pytest tests --cov --cov-config=pyproject.toml --cov-report=xml
 
+      - name: Validate SED2 unit test files
+        run: uv run --with jsonschema python tests/validate_sed2.py
+
+      - name: Validate SED2 examples subdirectories
+        run: |
+          failed=0
+          shopt -s nullglob
+          for dir in examples/*/; do
+            json_count=$(find "$dir" -maxdepth 1 -name '*.json' | wc -l)
+            if [ "$json_count" -eq 0 ]; then
+              echo "Skipping ${dir} (no JSON files)"
+              continue
+            fi
+            echo "::group::Validating ${dir}"
+            if ! uv run --with jsonschema python tests/validate_sed2.py "$dir"; then
+              failed=1
+            fi
+            echo "::endgroup::"
+          done
+          exit $failed
+
       # - name: Check typing
       #   run: uv run mypy

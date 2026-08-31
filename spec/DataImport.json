@@ -4,7 +4,7 @@
             "_type": "dataImport",
             "location": "filename.csv",
             "format": "http://purl.org/NET/mediatypes/text/csv",
-            "algorithmParameters": [
+            "taskParameters": [
                 {
                     "name": "delimiter",
                     "value": "\t",

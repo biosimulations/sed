@@ -5,8 +5,6 @@ from pbest import CompositeBuilder
 from sed.transpiler.library import parse_hash
 from sed.transpiler.importers.base import (
     SedBase,
-    Range,
-    Span,
     LoopVariable,
     AlgorithmParameter,
     from_attribute_to_list_path,
@@ -134,6 +132,40 @@ class DataImport(AbstractTask):
         return data
 
 
+class CSVImport(AbstractTask):
+    """A 'csvImport' object, used to import data from a csv file."""
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.location = config.pop("location", None)
+        self.organization = config.pop("organization", None)
+        self.separator = config.pop("separator", None)
+        self.headers = config.pop("headers", None)
+        self.columnNames = config.pop("columnNames", None)
+        self.ncols = config.pop("ncols", None)
+        self.nrows = config.pop("nrows", None)
+        self.units = config.pop("units", None)
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating DataImport:", leftovers)
+            return True
+        return False
+
+    def load(self, root):
+        # TODO: deal with parameters (!)
+        df = pd.read_csv(root / self.location)
+        return {key: list(series) for key, series in df.items()}
+
+    def exportToPython(self, key, root_dir):
+        headers = set(["import pandas as pd"])
+        # TODO: deal with parameters (!)
+        code = f"{str_to_py_str(key)} = pd.read_csv(r'{str(Path(root_dir) / self.location)}')\n"
+        return headers, code
+
+
 _APPLIED_DIMENSION_URN = "urn:sedml:aggregation:applied_dimension"
 
 # Aggregation function expression templates.  Each entry maps a KISAO ID to
@@ -257,6 +289,131 @@ class AggregationCalculation(AbstractTask):
         )
         return headers, code
 
+
+class Range(AbstractTask):
+    """A 'range' object, used to define a range in one of several ways:
+    * start, end, numberOfSteps (and optional 'scale')
+    * start, end, interval
+    * start, numberOfSteps, interval
+    * end, numberOfSteps, interval
+    * values
+    * numberOfSteps
+    """
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.type_key = "Range"
+        self.start = config.pop("start", None)
+        self.end = config.pop("end", None)
+        self.numberOfSteps = config.pop("numberOfSteps", None)
+        self.interval = config.pop("interval", None)
+        self.scale = config.pop("scale", None)
+        self.values = config.pop("values", None)
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating Range:", leftovers)
+            return True
+        return False
+    
+    def getPythonIterable(self):
+        """Returns the python string that would come after 'for X in ...', i.e. 'range(0, 10, 3)"""
+        if self.values:
+            return self.values
+        defined = {
+            'start': self.start,
+            'end': self.end,
+            'numberOfSteps': self.numberOfSteps,
+            'interval': self.interval,
+        }
+        provided = {k for k, v in defined.items() if v is not None}
+
+        # --- Option 1: start, end, numberOfSteps (requires scale) ---
+        if provided == {'start', 'end', 'numberOfSteps'}:
+            n = self.numberOfSteps
+            start = self.start
+            end = self.end
+
+            if self.scale is None:
+                raise ValueError("'scale' must be defined when using start, end, and numberOfSteps.")
+
+            if self.scale == 'linear':
+                return [start + (end - start) * i / n for i in range(n + 1)]
+
+            elif self.scale == 'log10':
+                import math
+                log_start = math.log10(start)
+                log_end = math.log10(end)
+                return [10 ** (log_start + (log_end - log_start) * i / n) for i in range(n + 1)]
+
+            else:
+                raise ValueError(f"Unsupported scale '{self.scale}'. Must be 'linear' or 'log10'.")
+
+        # --- Option 2: start, numberOfSteps, interval ---
+        if provided == {'start', 'numberOfSteps', 'interval'}:
+            return [self.start + i * self.interval for i in range(self.numberOfSteps)]
+
+        # --- Option 3: end, numberOfSteps, interval ---
+        if provided == {'end', 'numberOfSteps', 'interval'}:
+            end = self.end
+            interval = self.interval
+            n = self.numberOfSteps
+            start = end - (n - 1) * interval
+            return [start + i * interval for i in range(n)]
+
+        # --- Option 4: start, end, interval ---
+        if provided == {'start', 'end', 'interval'}:
+            start = self.start
+            end = self.end
+            interval = self.interval
+            tolerance = interval * 0.000001
+
+            points = []
+            i = 0
+            while True:
+                t = start + i * interval
+                if t >= end - tolerance:
+                    break
+                points.append(t)
+                i += 1
+
+            # Decide whether to append the last calculated point, end, or both
+            if points:
+                last_calculated = start + i * interval  # the point that broke the loop
+                if abs(last_calculated - end) <= tolerance:
+                    points.append(end)
+                else:
+                    points.append(last_calculated)
+                    points.append(end)
+            else:
+                points.append(end)
+
+            return points
+
+        raise ValueError(
+            f"Exactly three of (start, end, numberOfSteps, interval) must be defined. "
+            f"Got: {provided}"
+        )
+
+class Span(AbstractTask):
+    """A 'span' object, used to define the bounds of a range but not any internal steps.
+    """
+
+    def __init__(self, config: dict):
+        super().__init__(config)
+        self.type_key = "Range"
+        self.start = config.pop("start", None)
+        self.end = config.pop("end", None)
+        self.__validate(config)
+
+    def __validate(self, leftovers={}):
+        """Validate."""
+        if len(leftovers):
+            print("Unsaved data when creating Span:", leftovers)
+            return True
+        return False
 
 class ODESimulation(AbstractTask):
     """The definition of a uniform time course simulation."""
@@ -762,6 +919,8 @@ def load_tasks_section(tasks_section_config):
                 tasks[key] = ModelImport(config)
             case "dataImport":
                 tasks[key] = DataImport(config)
+            case "csvImport":
+                tasks[key] = CSVImport(config)
             case "explicitODESimulation":
                 tasks[key] = ExplicitODESimulation(config)
             case "boundedODESimulation":

@@ -19,7 +19,7 @@
     "outputs": {
         "init_all_values": {
             "_type": "report",
-            "dataSets": ["#tasks:sim1"]
+            "data": "#tasks:sim1"
         }
     }
 }
